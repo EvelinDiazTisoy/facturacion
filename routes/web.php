@@ -96,6 +96,9 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/concentracion/actualizar', 'ConcentracionController@update');
         Route::get('/concentracion/selectConcentracion', 'ConcentracionController@selectConcentracion');
 
+        Route::get('/stock', 'StockController@index');
+        Route::post('/stock/registrar', 'StockController@store');
+
         Route::get('/conf_formatos', 'Conf_formatosController@index');
         Route::post('/conf_formatos/registrar', 'Conf_formatosController@store');
         Route::put('/conf_formatos/actualizar', 'Conf_formatosController@update');

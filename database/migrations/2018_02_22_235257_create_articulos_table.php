@@ -21,6 +21,7 @@ class CreateArticulosTable extends Migration
             $table->decimal('precio_venta', 11, 2);
             $table->integer('stock');
             $table->string('descripcion', 256)->nullable();
+            $table->integer('id_usuario');
             $table->boolean('condicion')->default(1);
             $table->timestamps();
 

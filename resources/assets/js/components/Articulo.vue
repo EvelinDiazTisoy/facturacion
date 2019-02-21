@@ -147,8 +147,7 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Stock</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="number" v-model="stock" v-if="stock" class="form-control" placeholder="" disabled>
-                                        <input type="number" v-model="stock" v-else class="form-control" placeholder="">
+                                        <input type="number" v-model="stock" class="form-control" placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -186,10 +185,9 @@
                                     <div class="col-md-9 float-right">
                                         <select class="form-control col-md-10 float-left" v-model="tipo_articulo">
                                             <option value="0" disabled>Seleccione</option>
-                                            <option value="inicial">Inicial</option>
-                                            <option value="ingreso">Ingreso</option>
-                                            <option value="salida">Salida</option>
-                                            <option value="venta">Venta</option>
+                                            <option value="1">Fisico</option>
+                                            <option value="2">Virtual</option>
+                                            <option value="3">Servicio</option>
                                         </select>
                                     </div>
                                 </div>
@@ -334,6 +332,7 @@
                 tipo_articulo : '',
                 iva : 0,
                 descripcion : '',
+                tipo_movimiento : 1,
 
 
                 arrayArticulo : [],
@@ -520,7 +519,8 @@
                     'minimo': this.minimo,
                     'tipo_articulo': this.tipo_articulo,
                     'iva': this.iva,
-                    'descripcion': this.descripcion
+                    'descripcion': this.descripcion,
+                    'tipo_movimiento' : 1,
                 }).then(function (response) {
                     me.cerrarModal();
                     me.listarArticulo(1,'','nombre');

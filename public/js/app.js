@@ -35377,8 +35377,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -35405,6 +35403,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             tipo_articulo: '',
             iva: 0,
             descripcion: '',
+            tipo_movimiento: 1,
 
             arrayArticulo: [],
             modal: 0,
@@ -35585,7 +35584,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 'minimo': this.minimo,
                 'tipo_articulo': this.tipo_articulo,
                 'iva': this.iva,
-                'descripcion': this.descripcion
+                'descripcion': this.descripcion,
+                'tipo_movimiento': 1
             }).then(function (response) {
                 me.cerrarModal();
                 me.listarArticulo(1, '', 'nombre');
@@ -39250,53 +39250,27 @@ var render = function() {
                         ),
                         _vm._v(" "),
                         _c("div", { staticClass: "col-md-9 float-right" }, [
-                          _vm.stock
-                            ? _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.stock,
-                                    expression: "stock"
-                                  }
-                                ],
-                                staticClass: "form-control",
-                                attrs: {
-                                  type: "number",
-                                  placeholder: "",
-                                  disabled: ""
-                                },
-                                domProps: { value: _vm.stock },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.stock = $event.target.value
-                                  }
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.stock,
+                                expression: "stock"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "number", placeholder: "" },
+                            domProps: { value: _vm.stock },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
                                 }
-                              })
-                            : _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.stock,
-                                    expression: "stock"
-                                  }
-                                ],
-                                staticClass: "form-control",
-                                attrs: { type: "number", placeholder: "" },
-                                domProps: { value: _vm.stock },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.stock = $event.target.value
-                                  }
-                                }
-                              })
+                                _vm.stock = $event.target.value
+                              }
+                            }
+                          })
                         ])
                       ])
                     ]),
@@ -39501,20 +39475,16 @@ var render = function() {
                                 [_vm._v("Seleccione")]
                               ),
                               _vm._v(" "),
-                              _c("option", { attrs: { value: "inicial" } }, [
-                                _vm._v("Inicial")
+                              _c("option", { attrs: { value: "1" } }, [
+                                _vm._v("Fisico")
                               ]),
                               _vm._v(" "),
-                              _c("option", { attrs: { value: "ingreso" } }, [
-                                _vm._v("Ingreso")
+                              _c("option", { attrs: { value: "2" } }, [
+                                _vm._v("Virtual")
                               ]),
                               _vm._v(" "),
-                              _c("option", { attrs: { value: "salida" } }, [
-                                _vm._v("Salida")
-                              ]),
-                              _vm._v(" "),
-                              _c("option", { attrs: { value: "venta" } }, [
-                                _vm._v("Venta")
+                              _c("option", { attrs: { value: "3" } }, [
+                                _vm._v("Servicio")
                               ])
                             ]
                           )

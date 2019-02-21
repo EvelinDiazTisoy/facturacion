@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Articulo;
+use App\Stock;
+use Illuminate\Support\Facades\Auth;
 
 class ArticuloController extends Controller
 {
@@ -13,6 +15,7 @@ class ArticuloController extends Controller
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
+        $id_usuario = Auth::user()->id;
         
         if ($buscar==''){
             $articulos = Articulo::join('categorias','articulos.idcategoria','=','categorias.id')
@@ -42,7 +45,8 @@ class ArticuloController extends Controller
                 'from'         => $articulos->firstItem(),
                 'to'           => $articulos->lastItem(),
             ],
-            'articulos' => $articulos
+            'articulos' => $articulos,
+            'usuario' => $id_usuario
         ];
     }
 
@@ -103,7 +107,7 @@ class ArticuloController extends Controller
 
         return ['articulos' => $articulos];
     }
-
+    
     public function buscarArticuloVenta(Request $request){
         if (!$request->ajax()) return redirect('/');
 
@@ -120,6 +124,7 @@ class ArticuloController extends Controller
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+        $id_usuario = Auth::user()->id;
         $articulo = new Articulo();
         $articulo->idcategoria = $request->idcategoria;
         $articulo->codigo = $request->codigo;
@@ -136,8 +141,18 @@ class ArticuloController extends Controller
         $articulo->id_und_medida = $request->id_und_medida;
         $articulo->id_concentracion = $request->id_concentracion;
         $articulo->id_presentacion = $request->id_presentacion;
+        $articulo->id_usuario = $id_usuario;
         $articulo->condicion = '1';
         $articulo->save();
+
+        $stock = new Stock();
+        $stock->id_producto = $articulo->id;
+        $stock->id_usuario = $articulo->id_usuario;
+        $stock->cantidad = $articulo->stock;
+        $stock->tipo_movimiento = $request->tipo_movimiento;
+        $stock->sumatoria = $articulo->stock;
+        
+        $stock->save();
     }
     public function update(Request $request)
     {

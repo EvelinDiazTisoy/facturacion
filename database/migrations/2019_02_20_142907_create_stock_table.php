@@ -25,6 +25,7 @@ class CreateStockTable extends Migration
             $table->date('fec_crea');
             $table->integer('cantidad');
             $table->string('tipo_movimiento', 100);
+            $table->double('sumatoria', 15, 8);
             $table->boolean('condicion')->default(1);
 
             $table->timestamps();
