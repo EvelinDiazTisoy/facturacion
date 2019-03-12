@@ -110,6 +110,7 @@ Route::group(['middleware'=>['auth']],function(){
 
         Route::get('/stock', 'StockController@index');
         Route::post('/stock/registrar', 'StockController@store');
+        Route::get('/stock/buscarStock', 'StockController@buscarStockArticulo');
 
         Route::get('/conf_formatos', 'Conf_formatosController@index');
         Route::post('/conf_formatos/registrar', 'Conf_formatosController@store');

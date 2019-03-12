@@ -2390,7 +2390,8 @@ var app = new Vue({
   data: {
     menu: 0,
     ruta: 'http://localhost:8081/laravel_estudio/sistema/public'
-    //ruta : 'http://localhost/sistema/public/' 
+    //ruta : 'http://localhost/sistema/public/'
+
   }
 });
 
@@ -35375,6 +35376,66 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -35438,7 +35499,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             idArticuloStock: 0,
             cantidadStock: 0,
             tipoMovimientoStock: 0,
-            sumatoria: 0
+            sumatoria: 0,
+
+            // variables modal stock
+            arrayStock: [],
+            modal2: 0,
+            tituloModalStock: '',
+            tipoAccionStock: 0,
+            errorStock: 0,
+            errorMostrarMsjStock: []
         };
     },
 
@@ -35481,6 +35550,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 var respuesta = response.data;
                 me.arrayArticulo = respuesta.articulos.data;
                 me.pagination = respuesta.pagination;
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        buscarStock: function buscarStock(id_articulo) {
+            var me = this;
+            var url = this.ruta + '/stock/buscarStock?id_articulo=' + id_articulo;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayStock = respuesta.stock;
             }).catch(function (error) {
                 console.log(error);
             });
@@ -35853,6 +35932,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         this.nombre_crear = '';
                         this.descripcion_crear = '';
                         this.tipoAccionCrear = 1;
+                        break;
+                    }
+            }
+        },
+        cerrarModalStock: function cerrarModalStock() {
+            this.modal2 = 0;
+            this.tituloModalStock = '';
+            this.idArticuloStock = 0;
+            // console.log('cerrar: '+this.idArticuloStock);
+            this.errorStock = 0;
+        },
+        abrirModalStock: function abrirModalStock(accion) {
+            var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+            switch (accion) {
+                case "ver":
+                    {
+                        this.modal2 = 1;
+                        this.tituloModalStock = 'Lista de stock';
+                        this.tipoAccionStock = 1;
+                        this.idArticuloStock = data;
+                        // console.log('abrir: '+this.idArticuloStock); 
+                        this.buscarStock(data);
+                        break;
+                    }
+                case "registrar":
+                    {
+                        this.modal2 = 2;
+                        this.tituloModalStock = 'Registrar Stock';
+                        this.tipoAccionStock = 1;
                         break;
                     }
             }
@@ -38856,6 +38965,22 @@ var render = function() {
                               _vm._v("Desactivado")
                             ])
                           ])
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-info btn-sm",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.abrirModalStock("ver", articulo.id)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-archive" })]
+                      )
                     ])
                   ])
                 })
@@ -40195,6 +40320,165 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        class: { mostrar: _vm.modal2 },
+        staticStyle: { display: "none" },
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "myModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-primary modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h4", {
+                  staticClass: "modal-title",
+                  domProps: { textContent: _vm._s(_vm.tituloModalStock) }
+                }),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: { type: "button", "aria-label": "Close" },
+                    on: {
+                      click: function($event) {
+                        _vm.cerrarModalStock()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c(
+                  "table",
+                  {
+                    staticClass: "table table-bordered table-striped table-sm"
+                  },
+                  [
+                    _vm._m(2),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.arrayStock, function(stock) {
+                        return _c("tr", { key: stock.id }, [
+                          _c("td", {
+                            domProps: { textContent: _vm._s(stock.fec_crea) }
+                          }),
+                          _vm._v(" "),
+                          stock.tipo_movimiento == 1
+                            ? _c("td", [_vm._v("Ingreso inicial")])
+                            : stock.tipo_movimiento == 2
+                              ? _c("td", [_vm._v("Ingreso")])
+                              : stock.tipo_movimiento == 3
+                                ? _c("td", [_vm._v("Egreso")])
+                                : stock.tipo_movimiento == 4
+                                  ? _c("td", [_vm._v("Venta")])
+                                  : _vm._e(),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: { textContent: _vm._s(stock.cantidad) }
+                          }),
+                          _vm._v(" "),
+                          _c("td", {
+                            domProps: { textContent: _vm._s(stock.sumatoria) }
+                          }),
+                          _vm._v(" "),
+                          _c("td", [
+                            stock.condicion
+                              ? _c("div", [
+                                  _c(
+                                    "span",
+                                    { staticClass: "badge badge-success" },
+                                    [_vm._v("Activo")]
+                                  )
+                                ])
+                              : _c("div", [
+                                  _c(
+                                    "span",
+                                    { staticClass: "badge badge-danger" },
+                                    [_vm._v("Desactivado")]
+                                  )
+                                ])
+                          ])
+                        ])
+                      })
+                    )
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.cerrarModalStock()
+                      }
+                    }
+                  },
+                  [_vm._v("Cerrar")]
+                ),
+                _vm._v(" "),
+                _vm.tipoAccion == 1
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.registrarArticulo()
+                          }
+                        }
+                      },
+                      [_vm._v("Guardar")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.tipoAccion == 2
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.actualizarArticulo()
+                          }
+                        }
+                      },
+                      [_vm._v("Actualizar")]
+                    )
+                  : _vm._e()
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -40228,6 +40512,26 @@ var staticRenderFns = [
         _c("th", [_vm._v("Stock")]),
         _vm._v(" "),
         _c("th", [_vm._v("Descripción")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Estado")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { width: "1em" } })
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Fec. crea")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tipo Movimiento")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Cantidad")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Sumatoria")]),
         _vm._v(" "),
         _c("th", [_vm._v("Estado")])
       ])

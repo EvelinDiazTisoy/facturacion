@@ -42,6 +42,7 @@ const app = new Vue({
     data :{
         menu : 0,
         ruta : 'http://localhost:8081/laravel_estudio/sistema/public' 
-        //ruta : 'http://localhost/sistema/public/' 
+        //ruta : 'http://localhost/sistema/public/'
+         
     }
 });

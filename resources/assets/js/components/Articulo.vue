@@ -37,6 +37,7 @@
                                     <th>Stock</th>
                                     <th>Descripción</th>
                                     <th>Estado</th>
+                                    <th style="width:1em;"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -70,6 +71,11 @@
                                             <span class="badge badge-danger">Desactivado</span>
                                         </div>
                                         
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" >
+                                            <i class="fa fa-archive"></i>
+                                        </button>
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -300,6 +306,60 @@
                 <!-- /.modal-dialog -->
             </div>
             <!--Fin del modal-->
+            <!-- Inicio modal stock -->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModalStock"></h4>
+                            <button type="button" class="close" @click="cerrarModalStock()" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Fec. crea</th>
+                                        <th>Tipo Movimiento</th>
+                                        <th>Cantidad</th>
+                                        <th>Sumatoria</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="stock in arrayStock" :key="stock.id">
+                                        <td v-text="stock.fec_crea"></td>
+                                        <td v-if="stock.tipo_movimiento==1">Ingreso inicial</td>
+                                        <td v-else-if="stock.tipo_movimiento==2">Ingreso</td>
+                                        <td v-else-if="stock.tipo_movimiento==3">Egreso</td>
+                                        <td v-else-if="stock.tipo_movimiento==4">Venta</td>
+                                        <td v-text="stock.cantidad"></td>
+                                        <td v-text="stock.sumatoria"></td>
+                                        <td>
+                                            <div v-if="stock.condicion">
+                                                <span class="badge badge-success">Activo</span>
+                                            </div>
+                                            <div v-else>
+                                                <span class="badge badge-danger">Desactivado</span>
+                                            </div>
+                                            
+                                        </td>
+                                    </tr>                                
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModalStock()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarArticulo()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarArticulo()">Actualizar</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- Fin modal stock -->
         </main>
 </template>
 
@@ -368,11 +428,19 @@
                 cantidadStock : 0,
                 tipoMovimientoStock : 0,
                 sumatoria : 0,
+
+                // variables modal stock
+                arrayStock : [],
+                modal2 : 0,
+                tituloModalStock : '',
+                tipoAccionStock : 0,
+                errorStock : 0,
+                errorMostrarMsjStock : [],
             }
         },
         components: {
         'barcode': VueBarcode
-    },
+        },
         computed:{
             isActived: function(){
                 return this.pagination.current_page;
@@ -410,6 +478,17 @@
                     var respuesta= response.data;
                     me.arrayArticulo = respuesta.articulos.data;
                     me.pagination= respuesta.pagination;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            buscarStock(id_articulo){
+                let me=this;
+                var url= this.ruta + '/stock/buscarStock?id_articulo='+id_articulo;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayStock = respuesta.stock;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -758,7 +837,6 @@
                 }
                 
             },
-
             cerrarModalCrear(){
                 this.modalCrear=0;
                 this.tituloModalCrear='';
@@ -799,6 +877,33 @@
                         this.nombre_crear= '';
                         this.descripcion_crear = '';
                         this.tipoAccionCrear = 1;
+                        break;
+                    }
+                }
+            },
+            cerrarModalStock(){
+                this.modal2=0;
+                this.tituloModalStock='';
+                this.idArticuloStock = 0;
+                // console.log('cerrar: '+this.idArticuloStock);
+		        this.errorStock=0;
+            },
+            abrirModalStock(accion, data=[]){
+                switch(accion){
+                    case "ver":
+                    {   
+                        this.modal2 = 1;
+                        this.tituloModalStock = 'Lista de stock';
+                        this.tipoAccionStock = 1;
+                        this.idArticuloStock = data;
+                        // console.log('abrir: '+this.idArticuloStock); 
+                        this.buscarStock(data);
+                        break;
+                    }
+                    case "registrar":
+                    {   this.modal2 = 2;
+                        this.tituloModalStock = 'Registrar Stock';
+                        this.tipoAccionStock = 1;
                         break;
                     }
                 }

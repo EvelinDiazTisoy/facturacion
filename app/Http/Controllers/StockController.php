@@ -81,4 +81,19 @@ class StockController extends Controller
         $articulo->condicion = '1';
         $articulo->save();
     }
+
+    public function buscarStockArticulo(Request $request){
+        if (!$request->ajax()) return redirect('/');
+
+        $id_articulo = $request->id_articulo;
+
+        $stock = Stock::join('articulos','stock.id_producto','=','articulos.id')
+        ->join('users','stock.id_usuario','=','users.id')
+        ->select('stock.id','stock.id_producto','stock.id_usuario','articulos.nombre as nombre_producto', 'articulos.codigo as codigo_producto','users.usuario as nombre_usuario','stock.fec_crea','stock.cantidad','stock.tipo_movimiento','stock.sumatoria','stock.condicion')
+        ->where('id_producto','like', $id_articulo)
+        ->orderBy('stock.id', 'desc')
+        ->get();
+
+        return ['stock' => $stock];
+    }
 }
