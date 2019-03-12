@@ -96,6 +96,18 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/concentracion/actualizar', 'ConcentracionController@update');
         Route::get('/concentracion/selectConcentracion', 'ConcentracionController@selectConcentracion');
 
+        
+        Route::get('/articulo', 'ArticuloController@index');
+        Route::post('/articulo/registrar', 'ArticuloController@store');
+        Route::put('/articulo/actualizar', 'ArticuloController@update');
+        Route::put('/articulo/desactivar', 'ArticuloController@desactivar');
+        Route::put('/articulo/activar', 'ArticuloController@activar');
+        Route::get('/articulo/buscarArticulo', 'ArticuloController@buscarArticulo');
+        Route::get('/articulo/listarArticulo', 'ArticuloController@listarArticulo');
+        Route::get('/articulo/buscarArticuloVenta', 'ArticuloController@buscarArticuloVenta');
+        Route::get('/articulo/listarArticuloVenta', 'ArticuloController@listarArticuloVenta');
+
+
         Route::get('/stock', 'StockController@index');
         Route::post('/stock/registrar', 'StockController@store');
 
@@ -157,17 +169,6 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/planCuentas/selectCuentaInfo', 'PlanCuentas@selectCuentaInfo');
         Route::put('/planCuentas/desactivar', 'PlanCuentas@desactivar');
         Route::put('/planCuentas/activar', 'PlanCuentas@activar');
-
-
-        Route::get('/articulo', 'ArticuloController@index');
-        Route::post('/articulo/registrar', 'ArticuloController@store');
-        Route::put('/articulo/actualizar', 'ArticuloController@update');
-        Route::put('/articulo/desactivar', 'ArticuloController@desactivar');
-        Route::put('/articulo/activar', 'ArticuloController@activar');
-        Route::get('/articulo/buscarArticulo', 'ArticuloController@buscarArticulo');
-        Route::get('/articulo/listarArticulo', 'ArticuloController@listarArticulo');
-        Route::get('/articulo/buscarArticuloVenta', 'ArticuloController@buscarArticuloVenta');
-        Route::get('/articulo/listarArticuloVenta', 'ArticuloController@listarArticuloVenta');
 
         Route::get('/proveedor', 'ProveedorController@index');
         Route::post('/proveedor/registrar', 'ProveedorController@store');

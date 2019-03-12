@@ -55,6 +55,9 @@
                             <li @click="menu=32" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-bag"></i> Concentración</a>
                             </li>
+                            <li @click="menu=33" class="nav-item">
+                                <a class="nav-link" href="#"><i class="icon-bag"></i> Stock</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item nav-dropdown">

@@ -35,6 +35,7 @@ Vue.component('auxiliares_conta', require('./components/AuxiliaresConta.vue'));
 Vue.component('presentacion', require('./components/Presentacion.vue'));
 Vue.component('und_medida', require('./components/UndMedida.vue'));
 Vue.component('concentracion', require('./components/Concentracion.vue'));
+Vue.component('stock', require('./components/Stock.vue'));
 
 const app = new Vue({
     el: '#app', 

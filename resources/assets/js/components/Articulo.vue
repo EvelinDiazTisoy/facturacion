@@ -103,7 +103,7 @@
                         </div>
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="form-control-label col-md-3 float-left" for="text-input">Categoría</label>
                                     <div class="col-md-9 float-right">
@@ -120,24 +120,24 @@
                                         <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de artículo">
                                     </div>
                                 </div>
-                            </div>
-                            <div style="display:none;" :class="{'row col-md-12 mostrar-crear' : modalCrear==1}">
-                                <div class="form-group col-md-10 float-left">
-                                    <div class="col-md-6 float-left">
-                                        <span v-text="tituloModalCrear" class="form-control-label"></span>
-                                        <input type="text" class="form-control" v-model="nombre_crear">
+                                <div style="display:none;" :class="{'col-md-12 mostrar-crear' : modalCrear==1}">
+                                    <div class="col-md-10 float-left">
+                                        <div class="form-group col-md-6 float-left">
+                                            <span v-text="tituloModalCrear" class="form-control-label col-md-4 float-left"></span>
+                                            <input type="text" class="form-control col-md-8 float-right" v-model="nombre_crear">
+                                        </div>
+                                        <div class="col-md-6 float-left">
+                                            <span class="form-control-label col-md-4 float-left">Descripción</span>
+                                            <input type="text" class="form-control col-md-8 float-right" v-model="descripcion_crear">
+                                        </div>
                                     </div>
-                                    <div class="col-md-6 float-left">
-                                        <span class="form-control-label">Descripción</span>
-                                        <input type="text" class="form-control" v-model="descripcion_crear">
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('categoria')"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
-                                <div class="col-md-2 float-right">
-                                    <button type="button" class="btn btn-primary" @click="crearExtras('categoria')"><i class="fa fa-save"></i></button>
-                                    <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
-                                </div>
                             </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Precio Venta</label>
                                     <div class="col-md-9 float-right">
@@ -151,7 +151,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Cod. invima</label>
                                     <div class="col-md-9 float-right">
@@ -165,7 +165,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Fec. vence</label>
                                     <div class="col-md-9 float-right">
@@ -179,11 +179,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="form-control-label col-md-3 float-left" for="text-input">Tipo artículo</label>
                                     <div class="col-md-9 float-right">
-                                        <select class="form-control col-md-10 float-left" v-model="tipo_articulo">
+                                        <select class="form-control" v-model="tipo_articulo">
                                             <option value="0" disabled>Seleccione</option>
                                             <option value="1">Fisico</option>
                                             <option value="2">Virtual</option>
@@ -198,7 +198,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Und. medida</label>
                                     <div class="col-md-9 float-right">
@@ -219,28 +219,28 @@
                                         <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('concentracion')"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
+                                <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==2}">
+                                    <div class="col-md-10 float-left">
+                                        <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
+                                        <input type="text" class="form-control col-md-9 float-right" v-model="nombre_crear">
+                                    </div>
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('und_medida')"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                    </div>
+                                </div>
+                                <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==3}">
+                                    <div class="col-md-10 float-left">
+                                        <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
+                                        <input type="text" class="col-md-9 form-control float-right" v-model="nombre_crear">
+                                    </div>
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('concentracion')"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="display:none;" :class="{'row col-md-12 mostrar-crear' : modalCrear==2}">
-                                <div class="form-group col-md-10 float-left">
-                                    <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
-                                    <input type="text" class="form-control col-md-9 float-right" v-model="nombre_crear">
-                                </div>
-                                <div class="form-group col-md-2 float-right">
-                                    <button type="button" class="btn btn-primary" @click="crearExtras('und_medida')"><i class="fa fa-save"></i></button>
-                                    <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
-                                </div>
-                            </div>
-                            <div style="display:none;" :class="{'row col-md-12 mostrar-crear' : modalCrear==3}">
-                                <div class="form-group col-md-10 float-left">
-                                    <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
-                                    <input type="text" class="col-md-9 form-control float-right" v-model="nombre_crear">
-                                </div>
-                                <div class="form-group col-md-2 float-right">
-                                    <button type="button" class="btn btn-primary" @click="crearExtras('concentracion')"><i class="fa fa-save"></i></button>
-                                    <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
-                                </div>
-                            </div>
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Presentación</label>
                                     <div class="col-md-9 float-right">
@@ -257,29 +257,26 @@
                                         <input type="text" v-model="descripcion" class="form-control" placeholder="Ingrese descripción">
                                     </div>
                                 </div>
-                            </div>
-                            <div style="display:none;" :class="{'row col-md-12 mostrar-crear' : modalCrear==4}">
-                                <div class="form-group col-md-10 float-left">
-                                    <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
-                                    <input type="text" class="col-md-9 form-control-label float-right" v-model="nombre_crear">
-                                </div>
-                                <div class="form-group col-md-2 float-right">
-                                    <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')"><i class="fa fa-save"></i></button>
-                                    <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==4}">
+                                    <div class="col-md-10 float-left">
+                                        <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
+                                        <input type="text" class="col-md-9 form-control-label float-right" v-model="nombre_crear">
+                                    </div>
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                    </div>
                                 </div>
                             </div>        
-                            <div class="row col-md-12">
+                            <div class="row">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Código</label>
                                     <div class="col-md-9 float-right">
                                         <input type="text" v-model="codigo" class="form-control" placeholder="Código de barras"> 
-                                        <!-- <barcode :value="codigo" :options="{ format: 'EAN-13' }" >
-                                            Generando código de barras.    
-                                        </barcode>                                        -->
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    
+                                    <!-- <barcode :value="codigo" :options="{ format: 'EAN-13' }" >Generando código de barras...</barcode> -->
                                 </div>
                             </div>
                                 <div v-show="errorArticulo" class="form-group row div-error">
@@ -365,6 +362,12 @@
                 tipoAccionCrear : 0,
                 errorCrear : 0,
                 errorMostrarMsjCrear : [],
+
+                // variables para el stock
+                idArticuloStock : 0,
+                cantidadStock : 0,
+                tipoMovimientoStock : 0,
+                sumatoria : 0,
             }
         },
         components: {
@@ -522,8 +525,31 @@
                     'descripcion': this.descripcion,
                     'tipo_movimiento' : 1,
                 }).then(function (response) {
+                    me.idArticuloStock = $respone['id'];
+                    me.cantidadStock = $response['stock'];
+                    me.tipoMovimientoStock = 1;
+                    me.sumatoria = $response['stock'];
+                    me.registrarStock();
                     me.cerrarModal();
                     me.listarArticulo(1,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            registrarStock(){
+                if (this.validarArticulo()){
+                    return;
+                }
+                
+                let me = this;
+
+                axios.post(this.ruta + '/stock/registrar',{
+                    'id_producto': this.idArticuloStock,
+                    'cantidad' : this.cantidadStock,
+                    'tipo_movimiento': this.tipoMovimientoStock,
+                    'sumatoria': this.sumatoria
+                }).then(function (response) {
+
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -666,7 +692,11 @@
                 this.minimo = '';
                 this.tipo_articulo = '',
                 this.iva = 0;
-		        this.errorArticulo=0;
+                this.errorArticulo=0;
+                
+                this.idArticuloStock = 0;
+                this.cantidadStock = 0;
+                this.sumatoria = 0;
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
@@ -781,7 +811,7 @@
 </script>
 <style>    
     .modal-content{
-        width: 100% !important;
+        width: 130% !important;
         position: absolute !important;
     }
     .mostrar{
