@@ -83,17 +83,29 @@ class StockController extends Controller
     }
 
     public function buscarStockArticulo(Request $request){
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
 
         $id_articulo = $request->id_articulo;
+        $fecIni = $request->fecIni.' 00:00:00';
+        $fecFin = $request->fecFin.' 23:59:59';
 
         $stock = Stock::join('articulos','stock.id_producto','=','articulos.id')
         ->join('users','stock.id_usuario','=','users.id')
         ->select('stock.id','stock.id_producto','stock.id_usuario','articulos.nombre as nombre_producto', 'articulos.codigo as codigo_producto','users.usuario as nombre_usuario','stock.fec_crea','stock.cantidad','stock.tipo_movimiento','stock.sumatoria','stock.condicion')
         ->where('id_producto','like', $id_articulo)
-        ->orderBy('stock.id', 'desc')
-        ->get();
+        ->whereBetween('stock.fec_crea', [$fecIni, $fecFin])
+        ->orderBy('stock.fec_crea', 'desc')->paginate(12);
 
-        return ['stock' => $stock];
+        return [
+            'pagination_stock' => [
+                'total_stock'        => $stock->total(),
+                'current_page_stock' => $stock->currentPage(),
+                'per_page_stock'     => $stock->perPage(),
+                'last_page_stock'    => $stock->lastPage(),
+                'from_stock'         => $stock->firstItem(),
+                'to_stock'           => $stock->lastItem(),
+            ],
+            'stock' => $stock
+        ];
     }
 }

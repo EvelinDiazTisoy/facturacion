@@ -2344,8 +2344,12 @@ module.exports = __webpack_require__(27);
 
 /***/ }),
 /* 27 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bootstrap__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bootstrap___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__bootstrap__);
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -2353,7 +2357,7 @@ module.exports = __webpack_require__(27);
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-__webpack_require__(28);
+
 
 window.Vue = __webpack_require__(51);
 
@@ -2390,8 +2394,6 @@ var app = new Vue({
   data: {
     menu: 0,
     ruta: 'http://localhost:8081/laravel_estudio/sistema/public'
-    //ruta : 'http://localhost/sistema/public/'
-
   }
 });
 
@@ -35436,6 +35438,37 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -35478,7 +35511,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 'from': 0,
                 'to': 0
             },
+            pagination_stock: {
+                'total_stock': 0,
+                'current_page_stock': 0,
+                'per_page_stock': 0,
+                'last_page_stock': 0,
+                'from_stock': 0,
+                'to_stock': 0
+            },
             offset: 3,
+            offset2: 3,
             criterio: 'nombre',
             buscar: '',
             arrayCategoria: [],
@@ -35507,7 +35549,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             tituloModalStock: '',
             tipoAccionStock: 0,
             errorStock: 0,
-            errorMostrarMsjStock: []
+            errorMostrarMsjStock: [],
+
+            // variables filtro modal stock
+            fecIni: '2019-01-01',
+            fecActual: '',
+            fecFin: ''
         };
     },
 
@@ -35517,6 +35564,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         isActived: function isActived() {
             return this.pagination.current_page;
+            return this.pagination_stock.current_page_stock;
         },
         //Calcula los elementos de la paginación
         pagesNumber: function pagesNumber() {
@@ -35540,6 +35588,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 from++;
             }
             return pagesArray;
+        },
+
+        pagesNumberStock: function pagesNumberStock() {
+            if (!this.pagination_stock.to_stock) {
+                return [];
+            }
+
+            var from_stock = this.pagination_stock.current_page_stock - this.offset2;
+            if (from_stock < 1) {
+                from_stock = 1;
+            }
+
+            var to_stock = from_stock + this.offset2 * 2;
+            if (to_stock >= this.pagination_stock.last_page_stock) {
+                to_stock = this.pagination_stock.last_page_stock;
+            }
+
+            var pagesArrayStock = [];
+            while (from_stock <= to_stock) {
+                pagesArrayStock.push(from_stock);
+                from_stock++;
+            }
+            return pagesArrayStock;
         }
     },
     methods: {
@@ -35554,12 +35625,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 console.log(error);
             });
         },
-        buscarStock: function buscarStock(id_articulo) {
+        listarStock: function listarStock(page_stock, id_articulo) {
             var me = this;
-            var url = this.ruta + '/stock/buscarStock?id_articulo=' + id_articulo;
+            this.arrayStock = [];
+            console.log('pagina: ' + page_stock);
+
+            var url = this.ruta + '/stock/buscarStock?page=' + page_stock + '&id_articulo=' + id_articulo + '&fecIni=' + this.fecIni + '&fecFin=' + this.fecFin;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayStock = respuesta.stock;
+                me.arrayStock = respuesta.stock.data;
+                me.pagination_stock = respuesta.pagination_stock;
             }).catch(function (error) {
                 console.log(error);
             });
@@ -35644,6 +35719,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             me.pagination.current_page = page;
             //Envia la petición para visualizar la data de esa página
             me.listarArticulo(page, buscar, criterio);
+        },
+        cambiarPaginaStock: function cambiarPaginaStock(page_stock, id_articulo) {
+            var me = this;
+            //Actualiza la página actual
+            me.pagination_stock.current_page_stock = page_stock;
+            //Envia la petición para visualizar la data de esa página
+            me.listarStock(page_stock, id_articulo);
         },
         registrarArticulo: function registrarArticulo() {
             if (this.validarArticulo()) {
@@ -35941,6 +36023,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.tituloModalStock = '';
             this.idArticuloStock = 0;
             // console.log('cerrar: '+this.idArticuloStock);
+            this.arrayStock = [];
+            this.fecIni = '2019-01-01';
+            this.fecFin = this.fecActual;
             this.errorStock = 0;
         },
         abrirModalStock: function abrirModalStock(accion) {
@@ -35954,7 +36039,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         this.tipoAccionStock = 1;
                         this.idArticuloStock = data;
                         // console.log('abrir: '+this.idArticuloStock); 
-                        this.buscarStock(data);
+                        this.listarStock(1, data);
                         break;
                     }
                 case "registrar":
@@ -35968,6 +36053,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
     },
     mounted: function mounted() {
+        var d = new Date();
+
+        var dd = d.getDate();
+        var mm = d.getMonth() + 1;
+        var yyyy = d.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        d = yyyy + '-' + mm + '-' + dd;
+        this.fecFin = d;
+        this.fecActual = d;
+
         this.listarArticulo(1, this.buscar, this.criterio);
     }
 });
@@ -38874,24 +38974,26 @@ var render = function() {
                     _c(
                       "td",
                       [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-warning btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.abrirModal(
-                                  "articulo",
-                                  "actualizar",
-                                  articulo
-                                )
+                        [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-warning btn-sm",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  _vm.abrirModal(
+                                    "articulo",
+                                    "actualizar",
+                                    articulo
+                                  )
+                                }
                               }
-                            }
-                          },
-                          [_c("i", { staticClass: "icon-pencil" })]
-                        ),
-                        _vm._v("  \n                                "),
+                            },
+                            [_c("i", { staticClass: "icon-pencil" })]
+                          )
+                        ],
+                        _vm._v(" "),
                         articulo.condicion
                           ? [
                               _c(
@@ -38922,7 +39024,23 @@ var render = function() {
                                 },
                                 [_c("i", { staticClass: "icon-check" })]
                               )
-                            ]
+                            ],
+                        _vm._v(" "),
+                        [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-info btn-sm",
+                              attrs: { type: "button" },
+                              on: {
+                                click: function($event) {
+                                  _vm.abrirModalStock("ver", articulo.id)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "fa fa-archive" })]
+                          )
+                        ]
                       ],
                       2
                     ),
@@ -38965,22 +39083,6 @@ var render = function() {
                               _vm._v("Desactivado")
                             ])
                           ])
-                    ]),
-                    _vm._v(" "),
-                    _c("td", [
-                      _c(
-                        "button",
-                        {
-                          staticClass: "btn btn-info btn-sm",
-                          attrs: { type: "button" },
-                          on: {
-                            click: function($event) {
-                              _vm.abrirModalStock("ver", articulo.id)
-                            }
-                          }
-                        },
-                        [_c("i", { staticClass: "fa fa-archive" })]
-                      )
                     ])
                   ])
                 })
@@ -40370,62 +40472,229 @@ var render = function() {
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
-                _c(
-                  "table",
-                  {
-                    staticClass: "table table-bordered table-striped table-sm"
-                  },
-                  [
-                    _vm._m(2),
+                _c("div", { staticClass: "container" }, [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "form-group col-md-5" }, [
+                      _c("label", { staticClass: "col-md-4 float-left" }, [
+                        _vm._v("Fec. Inicia")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-8 float-right" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.fecIni,
+                              expression: "fecIni"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "date" },
+                          domProps: { value: _vm.fecIni },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.fecIni = $event.target.value
+                            }
+                          }
+                        })
+                      ])
+                    ]),
                     _vm._v(" "),
+                    _c("div", { staticClass: "col-md-5" }, [
+                      _c("label", { staticClass: "col-md-4 float-left" }, [
+                        _vm._v("Fec. Finaliza")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-8 float-right" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.fecFin,
+                              expression: "fecFin"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "date" },
+                          domProps: { value: _vm.fecFin },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.fecFin = $event.target.value
+                            }
+                          }
+                        })
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-2" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit" },
+                          on: {
+                            click: function($event) {
+                              _vm.listarStock(1, _vm.idArticuloStock)
+                            }
+                          }
+                        },
+                        [
+                          _c("i", { staticClass: "fa fa-search" }),
+                          _vm._v(" Buscar\n                                ")
+                        ]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
                     _c(
-                      "tbody",
-                      _vm._l(_vm.arrayStock, function(stock) {
-                        return _c("tr", { key: stock.id }, [
-                          _c("td", {
-                            domProps: { textContent: _vm._s(stock.fec_crea) }
+                      "table",
+                      {
+                        staticClass:
+                          "table table-bordered table-striped table-sm"
+                      },
+                      [
+                        _vm._m(2),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          _vm._l(_vm.arrayStock, function(stock) {
+                            return _c("tr", { key: stock.id }, [
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(stock.fec_crea)
+                                }
+                              }),
+                              _vm._v(" "),
+                              stock.tipo_movimiento == 1 ||
+                              stock.tipo_movimiento == 2
+                                ? _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(stock.cantidad)
+                                    }
+                                  })
+                                : _c("td", [_vm._v("0")]),
+                              _vm._v(" "),
+                              stock.tipo_movimiento == 3 ||
+                              stock.tipo_movimiento == 4
+                                ? _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(stock.cantidad)
+                                    }
+                                  })
+                                : _c("td", [_vm._v("0")]),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(stock.cantidad)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(stock.sumatoria)
+                                }
+                              })
+                            ])
+                          })
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("nav", [
+                      _c(
+                        "ul",
+                        { staticClass: "pagination" },
+                        [
+                          _vm.pagination_stock.current_page_stock > 1
+                            ? _c("li", { staticClass: "page-item" }, [
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "page-link",
+                                    attrs: { href: "#" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        _vm.cambiarPaginaStock(
+                                          _vm.pagination_stock
+                                            .current_page_stock - 1,
+                                          _vm.idArticuloStock
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Ant")]
+                                )
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm._l(_vm.pagesNumberStock, function(page_stock) {
+                            return _c(
+                              "li",
+                              {
+                                key: page_stock,
+                                staticClass: "page-item",
+                                class: [
+                                  page_stock == _vm.isActived ? "active" : ""
+                                ]
+                              },
+                              [
+                                _c("a", {
+                                  staticClass: "page-link",
+                                  attrs: { href: "#" },
+                                  domProps: { textContent: _vm._s(page_stock) },
+                                  on: {
+                                    click: function($event) {
+                                      $event.preventDefault()
+                                      _vm.cambiarPaginaStock(
+                                        page_stock,
+                                        _vm.idArticuloStock
+                                      )
+                                    }
+                                  }
+                                })
+                              ]
+                            )
                           }),
                           _vm._v(" "),
-                          stock.tipo_movimiento == 1
-                            ? _c("td", [_vm._v("Ingreso inicial")])
-                            : stock.tipo_movimiento == 2
-                              ? _c("td", [_vm._v("Ingreso")])
-                              : stock.tipo_movimiento == 3
-                                ? _c("td", [_vm._v("Egreso")])
-                                : stock.tipo_movimiento == 4
-                                  ? _c("td", [_vm._v("Venta")])
-                                  : _vm._e(),
-                          _vm._v(" "),
-                          _c("td", {
-                            domProps: { textContent: _vm._s(stock.cantidad) }
-                          }),
-                          _vm._v(" "),
-                          _c("td", {
-                            domProps: { textContent: _vm._s(stock.sumatoria) }
-                          }),
-                          _vm._v(" "),
-                          _c("td", [
-                            stock.condicion
-                              ? _c("div", [
-                                  _c(
-                                    "span",
-                                    { staticClass: "badge badge-success" },
-                                    [_vm._v("Activo")]
-                                  )
-                                ])
-                              : _c("div", [
-                                  _c(
-                                    "span",
-                                    { staticClass: "badge badge-danger" },
-                                    [_vm._v("Desactivado")]
-                                  )
-                                ])
-                          ])
-                        ])
-                      })
-                    )
-                  ]
-                )
+                          _vm.pagination_stock.current_page_stock <
+                          _vm.pagination_stock.last_page_stock
+                            ? _c("li", { staticClass: "page-item" }, [
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "page-link",
+                                    attrs: { href: "#" },
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        _vm.cambiarPaginaStock(
+                                          _vm.pagination_stock
+                                            .current_page_stock + 1,
+                                          _vm.idArticuloStock
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Sig")]
+                                )
+                              ])
+                            : _vm._e()
+                        ],
+                        2
+                      )
+                    ])
+                  ])
+                ])
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-footer" }, [
@@ -40513,9 +40782,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Descripción")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estado")]),
-        _vm._v(" "),
-        _c("th", { staticStyle: { width: "1em" } })
+        _c("th", [_vm._v("Estado")])
       ])
     ])
   },
@@ -40527,13 +40794,13 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("Fec. crea")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Tipo Movimiento")]),
+        _c("th", [_vm._v("Ingreso")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Egreso")]),
         _vm._v(" "),
         _c("th", [_vm._v("Cantidad")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Sumatoria")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Estado")])
+        _c("th", [_vm._v("Sumatoria")])
       ])
     ])
   }

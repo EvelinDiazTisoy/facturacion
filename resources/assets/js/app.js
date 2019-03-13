@@ -5,7 +5,7 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+import './bootstrap';
 
 window.Vue = require('vue');
 
@@ -41,8 +41,6 @@ const app = new Vue({
     el: '#app', 
     data :{
         menu : 0,
-        ruta : 'http://localhost:8081/laravel_estudio/sistema/public' 
-        //ruta : 'http://localhost/sistema/public/'
-         
+        ruta : 'http://localhost:8081/laravel_estudio/sistema/public'
     }
 });

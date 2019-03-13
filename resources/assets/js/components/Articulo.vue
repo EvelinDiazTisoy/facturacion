@@ -37,15 +37,16 @@
                                     <th>Stock</th>
                                     <th>Descripción</th>
                                     <th>Estado</th>
-                                    <th style="width:1em;"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="articulo in arrayArticulo" :key="articulo.id">
                                     <td>
-                                        <button type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm">
-                                          <i class="icon-pencil"></i>
-                                        </button> &nbsp;
+                                        <template>
+                                            <button type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm">
+                                                <i class="icon-pencil"></i>
+                                            </button>
+                                        </template>
                                         <template v-if="articulo.condicion">
                                             <button type="button" class="btn btn-danger btn-sm" @click="desactivarArticulo(articulo.id)">
                                                 <i class="icon-trash"></i>
@@ -54,6 +55,11 @@
                                         <template v-else>
                                             <button type="button" class="btn btn-info btn-sm" @click="activarArticulo(articulo.id)">
                                                 <i class="icon-check"></i>
+                                            </button>
+                                        </template>
+                                        <template>
+                                            <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" >
+                                                <i class="fa fa-archive"></i>
                                             </button>
                                         </template>
                                     </td>
@@ -71,11 +77,6 @@
                                             <span class="badge badge-danger">Desactivado</span>
                                         </div>
                                         
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" >
-                                            <i class="fa fa-archive"></i>
-                                        </button>
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -317,37 +318,67 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <table class="table table-bordered table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Fec. crea</th>
-                                        <th>Tipo Movimiento</th>
-                                        <th>Cantidad</th>
-                                        <th>Sumatoria</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="stock in arrayStock" :key="stock.id">
-                                        <td v-text="stock.fec_crea"></td>
-                                        <td v-if="stock.tipo_movimiento==1">Ingreso inicial</td>
-                                        <td v-else-if="stock.tipo_movimiento==2">Ingreso</td>
-                                        <td v-else-if="stock.tipo_movimiento==3">Egreso</td>
-                                        <td v-else-if="stock.tipo_movimiento==4">Venta</td>
-                                        <td v-text="stock.cantidad"></td>
-                                        <td v-text="stock.sumatoria"></td>
-                                        <td>
-                                            <div v-if="stock.condicion">
-                                                <span class="badge badge-success">Activo</span>
-                                            </div>
-                                            <div v-else>
-                                                <span class="badge badge-danger">Desactivado</span>
-                                            </div>
-                                            
-                                        </td>
-                                    </tr>                                
-                                </tbody>
-                            </table>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="form-group col-md-5">
+                                        <label class="col-md-4 float-left">Fec. Inicia</label>
+                                        <div class="col-md-8 float-right">
+                                            <input type="date" class="form-control" v-model="fecIni">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="col-md-4 float-left">Fec. Finaliza</label>
+                                        <div class="col-md-8 float-right">
+                                            <input type="date" class="form-control" v-model="fecFin">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" @click="listarStock(1,idArticuloStock)" class="btn btn-primary">
+                                            <i class="fa fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <table class="table table-bordered table-striped table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Fec. crea</th>
+                                                <th>Ingreso</th>
+                                                <th>Egreso</th>
+                                                <th>Cantidad</th>
+                                                <th>Sumatoria</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="stock in arrayStock" :key="stock.id">
+                                                <td v-text="stock.fec_crea"></td>
+                                                
+                                                <td v-if="stock.tipo_movimiento==1 || stock.tipo_movimiento==2" v-text="stock.cantidad"></td>
+                                                <td v-else>0</td>
+
+                                                <td v-if="stock.tipo_movimiento==3 || stock.tipo_movimiento==4" v-text="stock.cantidad"></td>
+                                                <td v-else>0</td>
+
+                                                <td v-text="stock.cantidad"></td>
+                                                <td v-text="stock.sumatoria"></td>
+                                            </tr>                                
+                                        </tbody>
+                                    </table>
+                                    <nav>
+                                        <ul class="pagination">
+                                            <li class="page-item" v-if="pagination_stock.current_page_stock > 1">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(pagination_stock.current_page_stock - 1,idArticuloStock)">Ant</a>
+                                            </li>
+                                            <li class="page-item" v-for="page_stock in pagesNumberStock" :key="page_stock" :class="[page_stock == isActived ? 'active' : '']">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(page_stock,idArticuloStock)" v-text="page_stock"></a>
+                                            </li>
+                                            <li class="page-item" v-if="pagination_stock.current_page_stock < pagination_stock.last_page_stock">
+                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(pagination_stock.current_page_stock + 1,idArticuloStock)">Sig</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModalStock()">Cerrar</button>
@@ -406,7 +437,16 @@
                     'from' : 0,
                     'to' : 0,
                 },
+                pagination_stock : {
+                    'total_stock' : 0,
+                    'current_page_stock' : 0,
+                    'per_page_stock' : 0,
+                    'last_page_stock' : 0,
+                    'from_stock' : 0,
+                    'to_stock' : 0,
+                },
                 offset : 3,
+                offset2 : 3,
                 criterio : 'nombre',
                 buscar : '',
                 arrayCategoria :[],
@@ -436,6 +476,11 @@
                 tipoAccionStock : 0,
                 errorStock : 0,
                 errorMostrarMsjStock : [],
+
+                // variables filtro modal stock
+                fecIni : '2019-01-01',
+                fecActual : '',
+                fecFin : '',
             }
         },
         components: {
@@ -444,6 +489,7 @@
         computed:{
             isActived: function(){
                 return this.pagination.current_page;
+                return this.pagination_stock.current_page_stock;
             },
             //Calcula los elementos de la paginación
             pagesNumber: function() {
@@ -468,6 +514,30 @@
                 }
                 return pagesArray;             
 
+            },
+
+            pagesNumberStock: function() {
+                if(!this.pagination_stock.to_stock) {
+                    return [];
+                }
+                
+                var from_stock = this.pagination_stock.current_page_stock - this.offset2; 
+                if(from_stock < 1) {
+                    from_stock = 1;
+                }
+
+                var to_stock = from_stock + (this.offset2 * 2); 
+                if(to_stock >= this.pagination_stock.last_page_stock){
+                    to_stock = this.pagination_stock.last_page_stock;
+                }  
+
+                var pagesArrayStock = [];
+                while(from_stock <= to_stock) {
+                    pagesArrayStock.push(from_stock);
+                    from_stock++;
+                }
+                return pagesArrayStock;             
+
             }
         },
         methods : {
@@ -483,12 +553,16 @@
                     console.log(error);
                 });
             },
-            buscarStock(id_articulo){
+            listarStock(page_stock,id_articulo){
                 let me=this;
-                var url= this.ruta + '/stock/buscarStock?id_articulo='+id_articulo;
+                this.arrayStock = [];
+                console.log('pagina: '+page_stock);
+                
+                var url= this.ruta + '/stock/buscarStock?page='+page_stock+'&id_articulo='+id_articulo+'&fecIni='+this.fecIni+'&fecFin='+this.fecFin;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayStock = respuesta.stock;
+                    me.arrayStock = respuesta.stock.data;
+                    me.pagination_stock= respuesta.pagination_stock;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -578,6 +652,13 @@
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
                 me.listarArticulo(page,buscar,criterio);
+            },
+            cambiarPaginaStock(page_stock,id_articulo){
+                let me = this;
+                //Actualiza la página actual
+                me.pagination_stock.current_page_stock = page_stock;
+                //Envia la petición para visualizar la data de esa página
+                me.listarStock(page_stock,id_articulo);
             },
             registrarArticulo(){
                 if (this.validarArticulo()){
@@ -886,6 +967,9 @@
                 this.tituloModalStock='';
                 this.idArticuloStock = 0;
                 // console.log('cerrar: '+this.idArticuloStock);
+                this.arrayStock = [];
+                this.fecIni = '2019-01-01';
+                this.fecFin = this.fecActual;
 		        this.errorStock=0;
             },
             abrirModalStock(accion, data=[]){
@@ -897,7 +981,7 @@
                         this.tipoAccionStock = 1;
                         this.idArticuloStock = data;
                         // console.log('abrir: '+this.idArticuloStock); 
-                        this.buscarStock(data);
+                        this.listarStock(1,data);
                         break;
                     }
                     case "registrar":
@@ -910,6 +994,22 @@
             }
         },
         mounted() {
+            var d = new Date();
+            
+            
+            var dd = d.getDate();
+            var mm = d.getMonth()+1;
+            var yyyy = d.getFullYear();
+            if(dd<10){
+                dd='0'+dd;
+            } 
+            if(mm<10){
+                mm='0'+mm;
+            } 
+            d = yyyy+'-'+mm+'-'+dd;
+            this.fecFin = d;
+            this.fecActual = d;
+
             this.listarArticulo(1,this.buscar,this.criterio);
         }
     }
