@@ -19,7 +19,7 @@
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>
-                                      <option value="descripcion">Descripción</option>
+                                      <option value="codigo">Codigo</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup.enter="listarArticulo(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <button type="submit" @click="listarArticulo(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
@@ -558,7 +558,7 @@
                 this.arrayStock = [];
                 console.log('pagina: '+page_stock);
                 
-                var url= this.ruta + '/stock/buscarStock?page='+page_stock+'&id_articulo='+id_articulo+'&fecIni='+this.fecIni+'&fecFin='+this.fecFin;
+                var url= this.ruta + '/stock?page='+page_stock+'&id_articulo='+id_articulo+'&fecIni='+this.fecIni+'&fecFin='+this.fecFin;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayStock = respuesta.stock.data;

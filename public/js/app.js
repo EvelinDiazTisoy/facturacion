@@ -35630,7 +35630,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.arrayStock = [];
             console.log('pagina: ' + page_stock);
 
-            var url = this.ruta + '/stock/buscarStock?page=' + page_stock + '&id_articulo=' + id_articulo + '&fecIni=' + this.fecIni + '&fecFin=' + this.fecFin;
+            var url = this.ruta + '/stock?page=' + page_stock + '&id_articulo=' + id_articulo + '&fecIni=' + this.fecIni + '&fecFin=' + this.fecFin;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayStock = respuesta.stock.data;
@@ -38907,8 +38907,8 @@ var render = function() {
                       _vm._v("Nombre")
                     ]),
                     _vm._v(" "),
-                    _c("option", { attrs: { value: "descripcion" } }, [
-                      _vm._v("Descripción")
+                    _c("option", { attrs: { value: "codigo" } }, [
+                      _vm._v("Codigo")
                     ])
                   ]
                 ),
