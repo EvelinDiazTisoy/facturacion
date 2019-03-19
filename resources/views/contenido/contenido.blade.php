@@ -96,6 +96,9 @@
             <template v-if="menu==33">
                 <stock :ruta="ruta"></stock>
             </template>
+            <template v-if="menu==34">
+                <egreso :ruta="ruta"></egreso>
+            </template>
 
             @elseif (Auth::user()->idrol == 2)
             <template v-if="menu==5">

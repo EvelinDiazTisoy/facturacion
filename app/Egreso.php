@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Ingreso extends Model
+class Egreso extends Model
 {
     protected $fillable = [
         'idproveedor', 
@@ -12,7 +12,7 @@ class Ingreso extends Model
         'tipo_comprobante',
         'serie_comprobante',
         'num_comprobante',
-        'tipo_ingreso',
+        'tipo_egreso',
         'fecha_hora',
         'impuesto',
         'total',

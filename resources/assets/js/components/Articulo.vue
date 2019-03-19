@@ -685,7 +685,7 @@
                     'descripcion': this.descripcion,
                     'tipo_movimiento' : 1,
                 }).then(function (response) {
-                    me.idArticuloStock = $respone['id'];
+                    me.idArticuloStock = $response['id'];
                     me.cantidadStock = $response['stock'];
                     me.tipoMovimientoStock = 1;
                     me.sumatoria = $response['stock'];

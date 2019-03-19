@@ -52,6 +52,12 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
 
+        Route::get('/egreso', 'EgresoController@index');
+        Route::post('/egreso/registrar', 'EgresoController@store');
+        Route::put('/egreso/desactivar', 'EgresoController@desactivar');
+        Route::get('/egreso/obtenerCabecera', 'EgresoController@obtenerCabecera');
+        Route::get('/egreso/obtenerDetalles', 'EgresoController@obtenerDetalles');
+
     });
 
     Route::group(['middleware' => ['Vendedor']], function () {

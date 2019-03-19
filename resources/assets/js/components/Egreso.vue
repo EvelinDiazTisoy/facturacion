@@ -8,7 +8,7 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Ingresos
+                        <i class="fa fa-align-justify"></i> Egresos
                         <button type="button" @click="mostrarDetalle()" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
@@ -24,8 +24,8 @@
                                       <option value="num_comprobante">Número Comprobante</option>
                                       <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarIngreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <input type="text" v-model="buscar" @keyup.enter="listarEgreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listarEgreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -48,28 +48,28 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
+                                    <tr v-for="egreso in arrayEgreso" :key="egreso.id">
                                         <td>
-                                            <button type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm">
+                                            <button type="button" @click="verEgreso(egreso.id)" class="btn btn-success btn-sm">
                                             <i class="icon-eye"></i>
                                             </button> &nbsp;
-                                            <template v-if="ingreso.estado=='Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(ingreso.id)">
+                                            <template v-if="egreso.estado=='Registrado'">
+                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarEgreso(egreso.id)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
                                         </td>
-                                        <td v-text="ingreso.usuario"></td>
-                                        <td v-text="ingreso.nombre"></td>
+                                        <td v-text="egreso.usuario"></td>
+                                        <td v-text="egreso.nombre"></td>
                                         <!--
-                                        <td v-text="ingreso.tipo_comprobante"></td>
-                                        <td v-text="ingreso.serie_comprobante"></td>
-                                        <td v-text="ingreso.num_comprobante"></td>
+                                        <td v-text="egreso.tipo_comprobante"></td>
+                                        <td v-text="egreso.serie_comprobante"></td>
+                                        <td v-text="egreso.num_comprobante"></td>
                                         -->
-                                        <td v-text="ingreso.fecha_hora"></td>
-                                        <td v-text="ingreso.total"></td>
-                                        <!-- <td v-text="ingreso.impuesto"></td> -->
-                                        <td v-text="ingreso.estado"></td>
+                                        <td v-text="egreso.fecha_hora"></td>
+                                        <td v-text="egreso.total"></td>
+                                        <!-- <td v-text="egreso.impuesto"></td> -->
+                                        <td v-text="egreso.estado"></td>
                                     </tr>                                
                                 </tbody>
                             </table>
@@ -108,9 +108,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Tipo ingreso</label>
+                                    <label>Tipo Egreso</label>
                                     <div class="">
-                                        <input type="text" v-model="tipo_ingreso">
+                                        <input type="text" v-model="tipo_egreso">
                                     </div>
                                 </div>
                             </div>
@@ -144,9 +144,9 @@
                             </div>
                             -->
                             <div class="col-md-12">
-                                <div v-show="errorIngreso" class="form-group row div-error">
+                                <div v-show="errorEgreso" class="form-group row div-error">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error">
+                                        <div v-for="error in errorMostrarMsjEgreso" :key="error" v-text="error">
 
                                         </div>
                                     </div>
@@ -241,13 +241,13 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar Ingreso</button>
+                                <button type="button" class="btn btn-primary" @click="registrarEgreso()">Registrar Egreso</button>
                             </div>
                         </div>
                     </div>
                     </template>
                     <!-- Fin Detalle-->
-                    <!-- Ver ingreso -->
+                    <!-- Ver egreso -->
                     <template v-else-if="listado==2">
                     <div class="card-body">
                         <div class="form-group row border">
@@ -338,7 +338,7 @@
                         </div>
                     </div>
                     </template>
-                    <!-- fin ver ingreso -->
+                    <!-- fin ver egreso -->
                 </div>
                 <!-- Fin ejemplo de tabla Listado -->
             </div>
@@ -470,7 +470,7 @@
         props : ['ruta'],
         data (){
             return {
-                ingreso_id: 0,
+                egreso_id: 0,
                 idproveedor:0,
                 proveedor:'',
                 nombre : '',
@@ -481,15 +481,15 @@
                 total:0.0,
                 totalImpuesto: 0.0,
                 totalParcial: 0.0, 
-                arrayIngreso : [],
+                arrayEgreso : [],
                 arrayProveedor: [],
                 arrayDetalle : [],
                 listado:1,
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
-                errorIngreso : 0,
-                errorMostrarMsjIngreso : [],
+                errorEgreso : 0,
+                errorMostrarMsjEgreso : [],
                 pagination : {
                     'total' : 0,
                     'current_page' : 0,
@@ -520,7 +520,7 @@
                 tipo_cta : '',    
                 cta_busq : '',  
                 terc_busq : '',
-                tipo_ingreso: '',
+                tipo_egreso: '',
                 arrayTerceros : [],
 
                 cuenta_ini : '',
@@ -568,12 +568,12 @@
             }
         },
         methods : {
-            listarIngreso (page,buscar,criterio){
+            listarEgreso (page,buscar,criterio){
                 let me=this;
-                var url= this.ruta +'/ingreso?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= this.ruta +'/egreso?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayIngreso = respuesta.ingresos.data;
+                    me.arrayEgreso = respuesta.egresos.data;
                     me.pagination= respuesta.pagination;
                 })
                 .catch(function (error) {
@@ -630,7 +630,7 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarIngreso(page,buscar,criterio);
+                me.listarEgreso(page,buscar,criterio);
             },
             encuentra(id){
                 var sw=0;
@@ -705,8 +705,8 @@
                     console.log(error);
                 });
             },
-            registrarIngreso(){
-                // if (this.validarIngreso()){
+            registrarEgreso(){
+                // if (this.validarEgreso()){
                 //     return;
                 // }
                 
@@ -716,20 +716,20 @@
                 me.num_comprobante = null;
                 me.impuesto = null;
 
-                axios.post(this.ruta +'/ingreso/registrar',{
+                axios.post(this.ruta +'/egreso/registrar',{
                     'idproveedor': this.id_tercero,
                     'tipo_comprobante': this.tipo_comprobante,
                     'serie_comprobante' : this.serie_comprobante,
                     'num_comprobante' : this.num_comprobante,
-                    'tipo_ingreso' : this.tipo_ingreso,
+                    'tipo_egreso' : this.tipo_egreso,
                     'impuesto' : this.impuesto,
                     'total' : this.total,
                     'data': this.arrayDetalle,
-                    'tipo_movimiento' : 2,
+                    'tipo_movimiento' : 3,
                     'sumatoria' : 0
                 }).then(function (response) {
                     me.listado=1;
-                    me.listarIngreso(1,'','num_comprobante');
+                    me.listarEgreso(1,'','num_comprobante');
                     me.id_tercero=0;
                     // me.tipo_comprobante='BOLETA';
                     me.tipo_comprobante='';
@@ -743,25 +743,26 @@
                     me.precio=0;
                     me.arrayDetalle=[];
                     me.id_tercero = 0,
-                    me.tipo_ingreso = 0,
+                    me.tipo_egreso = 0,
                     me.arrayTerceros=[];
+
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
-            validarIngreso(){
-                this.errorIngreso=0;
-                this.errorMostrarMsjIngreso =[];
+            validarEgreso(){
+                this.errorEgreso=0;
+                this.errorMostrarMsjEgreso =[];
 
-                if (this.idproveedor==0) this.errorMostrarMsjIngreso.push("Seleccione un Proveedor");
-                if (this.tipo_comprobante==0) this.errorMostrarMsjIngreso.push("Seleccione el comprobante");
-                if (!this.num_comprobante) this.errorMostrarMsjIngreso.push("Ingrese el número de comprobante");
-                if (!this.impuesto) this.errorMostrarMsjIngreso.push("Ingrese el impuesto de compra");
-                if (this.arrayDetalle.length<=0) this.errorMostrarMsjIngreso.push("Ingrese detalles");
+                if (this.idproveedor==0) this.errorMostrarMsjEgreso.push("Seleccione un Proveedor");
+                if (this.tipo_comprobante==0) this.errorMostrarMsjEgreso.push("Seleccione el comprobante");
+                if (!this.num_comprobante) this.errorMostrarMsjEgreso.push("Ingrese el número de comprobante");
+                if (!this.impuesto) this.errorMostrarMsjEgreso.push("Ingrese el impuesto de compra");
+                if (this.arrayDetalle.length<=0) this.errorMostrarMsjEgreso.push("Ingrese detalles");
 
-                if (this.errorMostrarMsjIngreso.length) this.errorIngreso = 1;
+                if (this.errorMostrarMsjEgreso.length) this.errorEgreso = 1;
 
-                return this.errorIngreso;
+                return this.errorEgreso;
             },
             mostrarDetalle(){
                 let me=this;
@@ -782,31 +783,31 @@
             ocultarDetalle(){
                 this.listado=1;
             },
-            verIngreso(id){
+            verEgreso(id){
                 let me=this;
                 me.listado=2;
                 
-                //Obtener los datos del ingreso
-                var arrayIngresoT=[];
-                var url= this.ruta +'/ingreso/obtenerCabecera?id=' + id;
+                //Obtener los datos del egreso
+                var arrayEgresoT=[];
+                var url= this.ruta +'/egreso/obtenerCabecera?id=' + id;
                 
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    arrayIngresoT = respuesta.ingreso;
+                    arrayEgresoT = respuesta.egreso;
 
-                    me.proveedor = arrayIngresoT[0]['nombre'];
-                    me.tipo_comprobante=arrayIngresoT[0]['tipo_comprobante'];
-                    me.serie_comprobante=arrayIngresoT[0]['serie_comprobante'];
-                    me.num_comprobante=arrayIngresoT[0]['num_comprobante'];
-                    me.impuesto=arrayIngresoT[0]['impuesto'];
-                    me.total=arrayIngresoT[0]['total'];
+                    me.proveedor = arrayEgresoT[0]['nombre'];
+                    me.tipo_comprobante=arrayEgresoT[0]['tipo_comprobante'];
+                    me.serie_comprobante=arrayEgresoT[0]['serie_comprobante'];
+                    me.num_comprobante=arrayEgresoT[0]['num_comprobante'];
+                    me.impuesto=arrayEgresoT[0]['impuesto'];
+                    me.total=arrayEgresoT[0]['total'];
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
 
                 //Obtener los datos de los detalles 
-                var urld= this.ruta +'/ingreso/obtenerDetalles?id=' + id;
+                var urld= this.ruta +'/egreso/obtenerDetalles?id=' + id;
                 
                 axios.get(urld).then(function (response) {
                     console.log(response);
@@ -826,9 +827,9 @@
                 this.modal = 1;
                 this.tituloModal = 'Seleccione uno o varios artículos';
             },
-            desactivarIngreso(id){
+            desactivarEgreso(id){
                swal({
-                title: 'Esta seguro de anular este ingreso?',
+                title: 'Esta seguro de anular este egreso?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -843,13 +844,13 @@
                 if (result.value) {
                     let me = this;
 
-                    axios.put(this.ruta +'/ingreso/desactivar',{
+                    axios.put(this.ruta +'/egreso/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarIngreso(1,'','num_comprobante');
+                        me.listarEgreso(1,'','num_comprobante');
                         swal(
                         'Anulado!',
-                        'El ingreso ha sido anulado con éxito.',
+                        'El egreso ha sido anulado con éxito.',
                         'success'
                         )
                     }).catch(function (error) {
@@ -920,7 +921,7 @@
             }
         },
         mounted() {
-            this.listarIngreso(1,this.buscar,this.criterio);
+            this.listarEgreso(1,this.buscar,this.criterio);
         }
     }
 </script>

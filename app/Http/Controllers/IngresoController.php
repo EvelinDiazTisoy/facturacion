@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Ingreso;
 use App\DetalleIngreso;
+use App\Stock;
+use Illuminate\Support\Facades\Auth;
 
 class IngresoController extends Controller
 {
@@ -21,7 +23,7 @@ class IngresoController extends Controller
             $ingresos = Ingreso::join('personas','ingresos.idproveedor','=','personas.id')
             ->join('users','ingresos.idusuario','=','users.id')
             ->select('ingresos.id','ingresos.tipo_comprobante','ingresos.serie_comprobante',
-            'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
+            'ingresos.num_comprobante','ingresos.tipo_ingreso','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
             'ingresos.estado','personas.nombre','users.usuario')
             ->orderBy('ingresos.id', 'desc')->paginate(3);
         }
@@ -29,7 +31,7 @@ class IngresoController extends Controller
             $ingresos = Ingreso::join('personas','ingresos.idproveedor','=','personas.id')
             ->join('users','ingresos.idusuario','=','users.id')
             ->select('ingresos.id','ingresos.tipo_comprobante','ingresos.serie_comprobante',
-            'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
+            'ingresos.num_comprobante','ingresos.tipo_ingreso','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
             'ingresos.estado','personas.nombre','users.usuario')
             ->where('ingresos.'.$criterio, 'like', '%'. $buscar . '%')->orderBy('ingresos.id', 'desc')->paginate(3);
         }
@@ -53,7 +55,7 @@ class IngresoController extends Controller
         $ingreso = Ingreso::join('personas','ingresos.idproveedor','=','personas.id')
         ->join('users','ingresos.idusuario','=','users.id')
         ->select('ingresos.id','ingresos.tipo_comprobante','ingresos.serie_comprobante',
-        'ingresos.num_comprobante','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
+        'ingresos.num_comprobante','ingresos.tipo_ingreso','ingresos.fecha_hora','ingresos.impuesto','ingresos.total',
         'ingresos.estado','personas.nombre','users.usuario')
         ->where('ingresos.id','=',$id)
         ->orderBy('ingresos.id', 'desc')->take(1)->get();
@@ -75,6 +77,7 @@ class IngresoController extends Controller
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+        $id_usuario = Auth::user()->id;
 
         try{
             DB::beginTransaction();
@@ -87,6 +90,7 @@ class IngresoController extends Controller
             $ingreso->tipo_comprobante = $request->tipo_comprobante;
             $ingreso->serie_comprobante = $request->serie_comprobante;
             $ingreso->num_comprobante = $request->num_comprobante;
+            $ingreso->tipo_ingreso = $request->tipo_ingreso;
             $ingreso->fecha_hora = $mytime->toDateString();
             $ingreso->impuesto = $request->impuesto;
             $ingreso->total = $request->total;
@@ -102,9 +106,18 @@ class IngresoController extends Controller
                 $detalle->idingreso = $ingreso->id;
                 $detalle->idarticulo = $det['idarticulo'];
                 $detalle->cantidad = $det['cantidad'];
-                $detalle->precio = $det['precio'];          
+                $detalle->precio = $det['precio'];  
+                $detalle->id_usuario = $id_usuario;        
                 $detalle->save();
-            }          
+
+                $stock = new Stock();
+                $stock->id_producto = $det['idarticulo'];
+                $stock->id_usuario = $id_usuario;
+                $stock->cantidad = $det['cantidad'];
+                $stock->tipo_movimiento = $request->tipo_movimiento;
+                $stock->sumatoria = $request->sumatoria;
+                $stock->save();
+            }
 
             DB::commit();
         } catch (Exception $e){
