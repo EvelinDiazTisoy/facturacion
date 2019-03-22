@@ -25,4 +25,7 @@ class Articulo extends Model
     public function presentacion(){
         return $this->belongsTo('App\Presentacion');
     }
+    public function detalle_factura(){
+        return $this->belongsTo('App\DetalleFacturacion');
+    }
 }

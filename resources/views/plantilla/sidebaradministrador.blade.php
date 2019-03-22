@@ -49,6 +49,9 @@
                             <li @click="menu=34" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-wallet"></i> Egresos</a>
                             </li>
+                            <li @click="menu=35" class="nav-item">
+                                <a class="nav-link" href="#"><i class="icon-wallet"></i> Facturación</a>
+                            </li>
                             <li @click="menu=5" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-basket-loaded"></i> Ventas</a>
                             </li>

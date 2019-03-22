@@ -186,6 +186,22 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/ingreso/desactivar', 'IngresoController@desactivar');
         Route::get('/ingreso/obtenerCabecera', 'IngresoController@obtenerCabecera');
         Route::get('/ingreso/obtenerDetalles', 'IngresoController@obtenerDetalles');
+
+        Route::get('/egreso', 'EgresoController@index');
+        Route::post('/egreso/registrar', 'EgresoController@store');
+        Route::put('/egreso/desactivar', 'EgresoController@desactivar');
+        Route::get('/egreso/obtenerCabecera', 'EgresoController@obtenerCabecera');
+        Route::get('/egreso/obtenerDetalles', 'EgresoController@obtenerDetalles');
+        
+        Route::get('/facturacion', 'FacturacionController@index');
+        Route::post('/facturacion/registrar', 'FacturacionController@store');
+        Route::put('/facturacion/actualizar', 'FacturacionController@update');
+        Route::get('/facturacion/buscarFacturacion', 'FacturacionController@buscarFacturacion');
+
+        Route::get('/detalle_facturacion', 'DetalleFacturacionController@index');
+        Route::post('/detalle_facturacion/registrar', 'DetalleFacturacionController@store');
+        Route::put('/detalle_facturacion/actualizar', 'DetalleFacturacionController@update');
+        Route::get('/detalle_facturacion/buscarDetalleFacturacion', 'DetalleFacturacionController@buscarDetalleFacturacion');
         
         Route::get('/cliente', 'ClienteController@index');
         Route::post('/cliente/registrar', 'ClienteController@store');
