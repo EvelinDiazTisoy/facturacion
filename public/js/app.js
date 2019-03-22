@@ -48255,19 +48255,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48321,7 +48308,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tercero: '',
             id_tercero: '',
             tituloModal2: ''
-        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'arrayFacturacion', []), _ref;
+        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'arrayFacturacion', []), _ref;
     },
 
     components: {
@@ -49049,10 +49036,66 @@ var render = function() {
               ? [
                   _c("div", { staticClass: "card-body" }, [
                     _c("div", { staticClass: "form-group row border" }, [
-                      _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", [_vm._v("Fecha")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.fecha,
+                                expression: "fecha"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "date" },
+                            domProps: { value: _vm.fecha },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.fecha = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", [_vm._v("N° factura")]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.num_factura,
+                                expression: "num_factura"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "number" },
+                            domProps: { value: _vm.num_factura },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.num_factura = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
                         _c("div", { staticClass: "form-group" }, [
                           _c("label", { attrs: { for: "" } }, [
-                            _vm._v("Proveedor(*)")
+                            _vm._v("Tercero(*)")
                           ]),
                           _vm._v(" "),
                           _c("div", { staticClass: "form-inline" }, [
@@ -49114,36 +49157,35 @@ var render = function() {
                         ])
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "col-md-3" }, [
                         _c("div", { staticClass: "form-group" }, [
-                          _c("label", [_vm._v("Tipo ingreso")]),
+                          _c("label", [_vm._v("Detalle")]),
                           _vm._v(" "),
-                          _c("div", {}, [
-                            _c("input", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.tipo_ingreso,
-                                  expression: "tipo_ingreso"
-                                }
-                              ],
-                              attrs: { type: "text" },
-                              domProps: { value: _vm.tipo_ingreso },
-                              on: {
-                                input: function($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.tipo_ingreso = $event.target.value
-                                }
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.detalle,
+                                expression: "detalle"
                               }
-                            })
-                          ])
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text" },
+                            domProps: { value: _vm.detalle },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.detalle = $event.target.value
+                              }
+                            }
+                          })
                         ])
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-md-12" }, [
+                      _c("div", { staticClass: "row" }, [
                         _c(
                           "div",
                           {
@@ -49176,7 +49218,7 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group row border" }, [
-                      _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "col-md-4" }, [
                         _c("div", { staticClass: "form-group" }, [
                           _c("label", [
                             _vm._v("Artículo "),
@@ -49207,7 +49249,7 @@ var render = function() {
                                   expression: "codigo"
                                 }
                               ],
-                              staticClass: "form-control",
+                              staticClass: "form-control col-md-4",
                               attrs: {
                                 type: "text",
                                 placeholder: "Ingrese artículo"
@@ -49259,7 +49301,7 @@ var render = function() {
                                   expression: "articulo"
                                 }
                               ],
-                              staticClass: "form-control",
+                              staticClass: "form-control col-md-4",
                               attrs: { type: "text", readonly: "" },
                               domProps: { value: _vm.articulo },
                               on: {
@@ -49351,7 +49393,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
-                            attrs: { type: "number", value: "0", disabled: "" },
+                            attrs: { type: "number", value: "0" },
                             domProps: { value: _vm.cantidad },
                             on: {
                               input: function($event) {
@@ -49359,6 +49401,51 @@ var render = function() {
                                   return
                                 }
                                 _vm.cantidad = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-2" }, [
+                        _c("div", { staticClass: "form-group" }, [
+                          _c("label", [
+                            _vm._v("Descuento "),
+                            _c(
+                              "span",
+                              {
+                                directives: [
+                                  {
+                                    name: "show",
+                                    rawName: "v-show",
+                                    value: _vm.descuento == 0,
+                                    expression: "descuento==0"
+                                  }
+                                ],
+                                staticStyle: { color: "red" }
+                              },
+                              [_vm._v("(*Ingrese)")]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.descuento,
+                                expression: "descuento"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "number", value: "0" },
+                            domProps: { value: _vm.descuento },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.descuento = $event.target.value
                               }
                             }
                           })

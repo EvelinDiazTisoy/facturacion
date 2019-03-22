@@ -90,9 +90,21 @@
                     <template v-else-if="listado==0">
                     <div class="card-body">
                         <div class="form-group row border">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="">Proveedor(*)</label>
+                                    <label>Fecha</label>
+                                    <input type="date" class="form-control" v-model="fecha">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>N° factura</label>
+                                    <input type="number" class="form-control" v-model="num_factura">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="">Tercero(*)</label>
                                     <div class="form-inline">
                                         <input type="text" readonly style="    max-width: 90px;" class="form-control" name="cuenta_fin" v-model="tercero">
                                         <button @click="abrirModalT()" style="    min-width: 30px;" class="btn btn-primary form-control">...</button>
@@ -102,44 +114,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Tipo ingreso</label>
-                                    <div class="">
-                                        <input type="text" v-model="tipo_ingreso">
-                                    </div>
-                                </div>
-                            </div>
-                            <!--
                             <div class="col-md-3">
-                                <label for="">Impuesto(*)</label>
-                                <input type="text" class="form-control" v-model="impuesto">
-                            </div>
-                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Tipo Comprobante(*)</label>
-                                    <select class="form-control" v-model="tipo_comprobante">
-                                        <option value="0">Seleccione</option>
-                                        <option value="BOLETA">Boleta</option>
-                                        <option value="FACTURA">Factura</option>
-                                        <option value="TICKET">Ticket</option>
-                                    </select>
+                                    <label>Detalle</label>
+                                    <input type="text" class="form-control" v-model="detalle">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <input type="text" class="form-control" v-model="serie_comprobante" placeholder="000x">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número Comprobante(*)</label>
-                                    <input type="text" class="form-control" v-model="num_comprobante" placeholder="000xx">
-                                </div>
-                            </div>
-                            -->
-                            <div class="col-md-12">
+                            <div class="row">
                                 <div v-show="errorIngreso" class="form-group row div-error">
                                     <div class="text-center text-error">
                                         <div v-for="error in errorMostrarMsjIngreso" :key="error" v-text="error">
@@ -150,13 +131,13 @@
                             </div>
                         </div>
                         <div class="form-group row border">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Artículo <span style="color:red;" v-show="idarticulo==0">(*Seleccione)</span></label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
+                                        <input type="text" class="form-control col-md-4" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
                                         <button @click="abrirModal()" class="btn btn-primary">...</button>
-                                        <input type="text" readonly class="form-control" v-model="articulo">
+                                        <input type="text" readonly class="form-control col-md-4" v-model="articulo">
                                     </div>                                    
                                 </div>
                             </div>
@@ -169,7 +150,13 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Cantidad <span style="color:red;" v-show="cantidad==0">(*Ingrese)</span></label>
-                                    <input type="number" value="0" disabled  class="form-control" v-model="cantidad">
+                                    <input type="number" value="0" class="form-control" v-model="cantidad">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Descuento <span style="color:red;" v-show="descuento==0">(*Ingrese)</span></label>
+                                    <input type="number" value="0" class="form-control" v-model="descuento">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -525,6 +512,24 @@
                 id_cuenta_fin : '',
 
                 // variables nuevas
+
+                facturacion_id:0,
+                num_factura:0,
+                id_tercero_facturacion:0,
+                tercero_facturacion:'',
+                id_usuario:0,
+                fec_edita:'',
+                subtotal:0.0,
+                valor_iva:0.0,
+                total:0.0,
+                abono:0.0,
+                saldo:0.0,
+                detalle:'',
+                descuento:0.0,
+                fec_registra:'',
+                fec_envia:'',
+                fec_anula:'',
+                fecha : '',
 
                 arrayFacturacion : [],
 
