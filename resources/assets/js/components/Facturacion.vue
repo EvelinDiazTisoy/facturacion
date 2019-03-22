@@ -8,7 +8,7 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Ingresos
+                        <i class="fa fa-align-justify"></i> Facturacion
                         <button type="button" @click="mostrarDetalle()" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
@@ -24,8 +24,8 @@
                                       <option value="num_comprobante">Número Comprobante</option>
                                       <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarIngreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <input type="text" v-model="buscar" @keyup.enter="listarFacturacion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listarFacturacion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -33,43 +33,39 @@
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
                                     <tr>
-                                        <th>Opciones</th>
-                                        <th>Usuario</th>
-                                        <th>Proveedor</th>
-                                        <!--
-                                        <th>Tipo Comprobante</th>
-                                        <th>Serie Comprobante</th>
-                                        <th>Número Comprobante</th>
-                                        -->
-                                        <th>Fecha Hora</th>
+                                        <th>#</th>
+                                        <th>N° factura</th>
+                                        <th>Tercero</th>
+                                        <th>Fecha</th>
+                                        <th>Subtotal</th>
+                                        <th>Descuento</th>
+                                        <th>Iva</th>
                                         <th>Total</th>
-                                        <!-- <th>Impuesto</th> -->
                                         <th>Estado</th>
+                                        <th>Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
+                                    <tr v-for="facturacion in arrayFacturacion" :key="facturacion.id">
+                                        <td v-text="facturacion.id"></td>
+                                        <td v-text="facturacion.num_factura"></td>
+                                        <td v-text="facturacion.nom_tercero"></td>
+                                        <td v-text="facturacion.fecha"></td>
+                                        <td v-text="facturacion.subtotal"></td>
+                                        <td v-text="facturacion.descuento"></td>
+                                        <td v-text="facturacion.iva"></td>
+                                        <td v-text="facturacion.total"></td>
+                                        <td v-text="facturacion.estado"></td>
                                         <td>
-                                            <button type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm">
+                                            <button type="button" @click="verIngreso(facturacion.id)" class="btn btn-success btn-sm">
                                             <i class="icon-eye"></i>
                                             </button> &nbsp;
-                                            <template v-if="ingreso.estado=='Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(ingreso.id)">
+                                            <template v-if="facturacion.estado=='Registrado'">
+                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(facturacion.id)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
                                         </td>
-                                        <td v-text="ingreso.usuario"></td>
-                                        <td v-text="ingreso.nombre"></td>
-                                        <!--
-                                        <td v-text="ingreso.tipo_comprobante"></td>
-                                        <td v-text="ingreso.serie_comprobante"></td>
-                                        <td v-text="ingreso.num_comprobante"></td>
-                                        -->
-                                        <td v-text="ingreso.fecha_hora"></td>
-                                        <td v-text="ingreso.total"></td>
-                                        <!-- <td v-text="ingreso.impuesto"></td> -->
-                                        <td v-text="ingreso.estado"></td>
                                     </tr>                                
                                 </tbody>
                             </table>
@@ -526,7 +522,12 @@
                 cuenta_ini : '',
                 id_cuenta_ini : '',
                 cuenta_fin : '',
-                id_cuenta_fin : ''
+                id_cuenta_fin : '',
+
+                // variables nuevas
+
+                arrayFacturacion : [],
+
             }
         },
         components: {
@@ -568,12 +569,12 @@
             }
         },
         methods : {
-            listarIngreso (page,buscar,criterio){
+            listarFacturacion (page,buscar,criterio){
                 let me=this;
-                var url= this.ruta +'/ingreso?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= this.ruta +'/facturacion?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayIngreso = respuesta.ingresos.data;
+                    me.arrayFacturacion = respuesta.facturacion.data;
                     me.pagination= respuesta.pagination;
                 })
                 .catch(function (error) {
@@ -630,7 +631,7 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarIngreso(page,buscar,criterio);
+                me.listarFacturacion(page,buscar,criterio);
             },
             encuentra(id){
                 var sw=0;
@@ -729,7 +730,7 @@
                     'sumatoria' : 0
                 }).then(function (response) {
                     me.listado=1;
-                    me.listarIngreso(1,'','num_comprobante');
+                    me.listarFacturacion(1,'','num_comprobante');
                     me.id_tercero=0;
                     // me.tipo_comprobante='BOLETA';
                     me.tipo_comprobante='';
@@ -846,7 +847,7 @@
                     axios.put(this.ruta +'/ingreso/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarIngreso(1,'','num_comprobante');
+                        me.listarFacturacion(1,'','num_comprobante');
                         swal(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
@@ -920,7 +921,7 @@
             }
         },
         mounted() {
-            this.listarIngreso(1,this.buscar,this.criterio);
+            this.listarFacturacion(1,this.buscar,this.criterio);
         }
     }
 </script>

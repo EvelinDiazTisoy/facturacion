@@ -48268,10 +48268,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48325,7 +48321,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tercero: '',
             id_tercero: '',
             tituloModal2: ''
-        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _ref;
+        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'arrayFacturacion', []), _ref;
     },
 
     components: {
@@ -48367,12 +48363,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
     methods: {
-        listarIngreso: function listarIngreso(page, buscar, criterio) {
+        listarFacturacion: function listarFacturacion(page, buscar, criterio) {
             var me = this;
-            var url = this.ruta + '/ingreso?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+            var url = this.ruta + '/facturacion?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayIngreso = respuesta.ingresos.data;
+                me.arrayFacturacion = respuesta.facturacion.data;
                 me.pagination = respuesta.pagination;
             }).catch(function (error) {
                 console.log(error);
@@ -48424,7 +48420,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             //Actualiza la página actual
             me.pagination.current_page = page;
             //Envia la petición para visualizar la data de esa página
-            me.listarIngreso(page, buscar, criterio);
+            me.listarFacturacion(page, buscar, criterio);
         },
         encuentra: function encuentra(id) {
             var sw = 0;
@@ -48516,7 +48512,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 'sumatoria': 0
             }).then(function (response) {
                 me.listado = 1;
-                me.listarIngreso(1, '', 'num_comprobante');
+                me.listarFacturacion(1, '', 'num_comprobante');
                 me.id_tercero = 0;
                 // me.tipo_comprobante='BOLETA';
                 me.tipo_comprobante = '';
@@ -48631,7 +48627,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     axios.put(_this.ruta + '/ingreso/desactivar', {
                         'id': id
                     }).then(function (response) {
-                        me.listarIngreso(1, '', 'num_comprobante');
+                        me.listarFacturacion(1, '', 'num_comprobante');
                         swal('Anulado!', 'El ingreso ha sido anulado con éxito.', 'success');
                     }).catch(function (error) {
                         console.log(error);
@@ -48692,7 +48688,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
     mounted: function mounted() {
-        this.listarIngreso(1, this.buscar, this.criterio);
+        this.listarFacturacion(1, this.buscar, this.criterio);
     }
 });
 
@@ -48714,7 +48710,7 @@ var render = function() {
         [
           _c("div", { staticClass: "card-header" }, [
             _c("i", { staticClass: "fa fa-align-justify" }),
-            _vm._v(" Ingresos\n                "),
+            _vm._v(" Facturacion\n                "),
             _c(
               "button",
               {
@@ -48809,7 +48805,7 @@ var render = function() {
                               ) {
                                 return null
                               }
-                              _vm.listarIngreso(1, _vm.buscar, _vm.criterio)
+                              _vm.listarFacturacion(1, _vm.buscar, _vm.criterio)
                             },
                             input: function($event) {
                               if ($event.target.composing) {
@@ -48827,7 +48823,11 @@ var render = function() {
                             attrs: { type: "submit" },
                             on: {
                               click: function($event) {
-                                _vm.listarIngreso(1, _vm.buscar, _vm.criterio)
+                                _vm.listarFacturacion(
+                                  1,
+                                  _vm.buscar,
+                                  _vm.criterio
+                                )
                               }
                             }
                           },
@@ -48852,8 +48852,62 @@ var render = function() {
                         _vm._v(" "),
                         _c(
                           "tbody",
-                          _vm._l(_vm.arrayIngreso, function(ingreso) {
-                            return _c("tr", { key: ingreso.id }, [
+                          _vm._l(_vm.arrayFacturacion, function(facturacion) {
+                            return _c("tr", { key: facturacion.id }, [
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.id)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.num_factura)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.nom_tercero)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.fecha)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.subtotal)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.descuento)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.iva)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.total)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(facturacion.estado)
+                                }
+                              }),
+                              _vm._v(" "),
                               _c(
                                 "td",
                                 [
@@ -48864,7 +48918,7 @@ var render = function() {
                                       attrs: { type: "button" },
                                       on: {
                                         click: function($event) {
-                                          _vm.verIngreso(ingreso.id)
+                                          _vm.verIngreso(facturacion.id)
                                         }
                                       }
                                     },
@@ -48873,7 +48927,7 @@ var render = function() {
                                   _vm._v(
                                     "  \n                                    "
                                   ),
-                                  ingreso.estado == "Registrado"
+                                  facturacion.estado == "Registrado"
                                     ? [
                                         _c(
                                           "button",
@@ -48884,7 +48938,7 @@ var render = function() {
                                             on: {
                                               click: function($event) {
                                                 _vm.desactivarIngreso(
-                                                  ingreso.id
+                                                  facturacion.id
                                                 )
                                               }
                                             }
@@ -48899,35 +48953,7 @@ var render = function() {
                                     : _vm._e()
                                 ],
                                 2
-                              ),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(ingreso.usuario)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(ingreso.nombre)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(ingreso.fecha_hora)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: { textContent: _vm._s(ingreso.total) }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(ingreso.estado)
-                                }
-                              })
+                              )
                             ])
                           })
                         )
@@ -50109,17 +50135,25 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Opciones")]),
+        _c("th", [_vm._v("#")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Usuario")]),
+        _c("th", [_vm._v("N° factura")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Proveedor")]),
+        _c("th", [_vm._v("Tercero")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Fecha Hora")]),
+        _c("th", [_vm._v("Fecha")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Subtotal")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Descuento")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Iva")]),
         _vm._v(" "),
         _c("th", [_vm._v("Total")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estado")])
+        _c("th", [_vm._v("Estado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Opciones")])
       ])
     ])
   },
