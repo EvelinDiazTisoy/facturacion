@@ -15,6 +15,6 @@ class Facturacion extends Model
     }
     public function detalleFactura()
     {
-        return $this->hasMany('App\DetalleFacturacion');
+        return $this->belongsTo('App\DetalleFacturacion');
     }
 }

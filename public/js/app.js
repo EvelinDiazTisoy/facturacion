@@ -48229,32 +48229,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48308,7 +48282,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tercero: '',
             id_tercero: '',
             tituloModal2: ''
-        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'arrayFacturacion', []), _ref;
+        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'valorSubtotalDetalle', 0.0), _defineProperty(_ref, 'valorIvaDetalle', 0.0), _defineProperty(_ref, 'valorDescuentoDetalle', 0.0), _defineProperty(_ref, 'valorFinalDetalle', 0.0), _defineProperty(_ref, 'valor_subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'valor_descuento', 0.0), _defineProperty(_ref, 'valor_final', 0.0), _defineProperty(_ref, 'arrayFacturacion', []), _defineProperty(_ref, 'iva', 0), _ref;
     },
 
     components: {
@@ -48344,7 +48318,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         calcularTotal: function calcularTotal() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado = resultado + this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad;
+                resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad + this.arrayDetalle[i].precio / 100 * this.arrayDetalle[i].iva - this.arrayDetalle[i].valor_descuento);
+            }
+            return resultado;
+        },
+        calcularTotalIva: function calcularTotalIva() {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado = resultado + this.arrayDetalle[i].precio / 100 * this.arrayDetalle[i].iva;
             }
             return resultado;
         }
@@ -48357,6 +48338,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 var respuesta = response.data;
                 me.arrayFacturacion = respuesta.facturacion.data;
                 me.pagination = respuesta.pagination;
+                console.log(me.arrayFacturacion);
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48392,6 +48374,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     me.articulo = me.arrayArticulo[0]['nombre'];
                     me.idarticulo = me.arrayArticulo[0]['id'];
                     me.cantidad = me.arrayArticulo[0]['stock'];
+                    me.valorIvaDetalle = me.arrayArticulo[0]['iva'];
                 } else {
                     me.articulo = 'No existe artículo';
                     me.idarticulo = 0;
@@ -48436,7 +48419,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                         idarticulo: me.idarticulo,
                         articulo: me.articulo,
                         cantidad: me.cantidad,
-                        precio: me.precio
+                        valor_descuento: me.valor_descuento,
+                        precio: me.precio,
+                        iva: me.iva
                     });
                     me.codigo = "";
                     me.idarticulo = 0;
@@ -48450,6 +48435,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
             var me = this;
+
             if (me.encuentra(data['id'])) {
                 swal({
                     type: 'error',
@@ -48461,7 +48447,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     idarticulo: data['id'],
                     articulo: data['nombre'],
                     cantidad: 1,
-                    precio: 1
+                    valor_descuento: 0,
+                    precio: data['precio_venta'],
+                    iva: data['iva']
+                    // valor_final: parseFloat(data['precio_venta'])+((parseFloat(data['precio_venta'])/100)*parseFloat(data['iva'])),
                 });
             }
         },
@@ -48475,44 +48464,46 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 console.log(error);
             });
         },
-        registrarIngreso: function registrarIngreso() {
+        registrarFacturacion: function registrarFacturacion() {
             // if (this.validarIngreso()){
             //     return;
             // }
 
             var me = this;
-            me.tipo_comprobante = null;
-            me.serie_comprobante = null;
-            me.num_comprobante = null;
-            me.impuesto = null;
 
-            axios.post(this.ruta + '/ingreso/registrar', {
-                'idproveedor': this.id_tercero,
-                'tipo_comprobante': this.tipo_comprobante,
-                'serie_comprobante': this.serie_comprobante,
-                'num_comprobante': this.num_comprobante,
-                'tipo_ingreso': this.tipo_ingreso,
-                'impuesto': this.impuesto,
-                'total': this.total,
-                'data': this.arrayDetalle,
-                'tipo_movimiento': 2,
-                'sumatoria': 0
+            for (var i = 0; i < me.arrayDetalle.length; i++) {
+                me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
+                me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
+                me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+            }
+            me.total += parseFloat(me.subtotal) + parseFloat(me.iva);
+
+            axios.post(this.ruta + '/facturacion/registrar', {
+                'num_factura': me.num_factura,
+                'id_tercero': me.id_tercero,
+                'fec_edita': null,
+                'usu_edita': null,
+                'subtotal': me.subtotal,
+                'valor_iva': me.iva,
+                'total': me.total,
+                'abono': me.abono,
+                'saldo': me.saldo,
+                'detalle': me.detalle,
+                'descuento': me.descuento,
+                'fec_registra': null,
+                'fec_envia': null,
+                'fec_anula': null,
+                'usu_registra': null,
+                'usu_envia': null,
+                'usu_anula': null,
+                'fecha': me.fecha,
+                'data': me.arrayDetalle
             }).then(function (response) {
                 me.listado = 1;
-                me.listarFacturacion(1, '', 'num_comprobante');
-                me.id_tercero = 0;
-                // me.tipo_comprobante='BOLETA';
-                me.tipo_comprobante = '';
-                me.serie_comprobante = '';
-                me.num_comprobante = '';
-                me.impuesto = '';
-                me.total = 0.0;
-                me.idarticulo = 0;
-                me.articulo = '';
-                me.cantidad = 0;
-                me.precio = 0;
-                me.arrayDetalle = [];
-                me.id_tercero = 0, me.tipo_ingreso = 0, me.arrayTerceros = [];
+                me.arrayFacturacion = [];
+                me.listarFacturacion(1, '', '');
+                me.num_factura = 0, me.id_tercero_facturacion = 0, me.tercero_facturacion = '', me.id_usuario = 0, me.fec_edita = '', me.subtotal = 0.0, me.valor_iva = 0.0, me.total = 0.0, me.abono = 0.0, me.saldo = 0.0, me.detalle = '', me.descuento = 0.0, me.fec_registra = '', me.fec_envia = '', me.fec_anula = '', me.fecha = '', me.arrayDetalle = [];
+                me.arrayTerceros = [];
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48531,21 +48522,54 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             return this.errorIngreso;
         },
-        mostrarDetalle: function mostrarDetalle() {
+        mostrarDetalle: function mostrarDetalle(modelo, accion) {
+            var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
             var me = this;
             me.listado = 0;
 
-            me.idproveedor = 0;
-            me.tipo_comprobante = 'BOLETA';
-            me.serie_comprobante = '';
-            me.num_comprobante = '';
-            me.impuesto = 0.18;
-            me.total = 0.0;
-            me.idarticulo = 0;
-            me.articulo = '';
-            me.cantidad = 0;
-            me.precio = 0;
-            me.arrayDetalle = [];
+            switch (modelo) {
+                case 'facturacion':
+                    {
+                        switch (accion) {
+                            case 'registrar':
+                                {
+                                    me.facturacion_id = 0;
+                                    me.num_factura = 0;
+                                    me.id_tercero_facturacion = 0;
+                                    me.tercero_facturacion = '';
+                                    me.id_usuario = 0;
+                                    me.fec_edita = '';
+                                    me.subtotal = 0.0;
+                                    me.valor_iva = 0.0;
+                                    me.total = 0.0;
+                                    me.abono = 0.0;
+                                    me.saldo = 0.0;
+                                    me.detalle = '';
+                                    me.descuento = 0.0;
+                                    me.fec_registra = '';
+                                    me.fec_envia = '';
+                                    me.fec_anula = '';
+                                    me.fecha = '';
+                                    me.valor_subtotal = 0.0;
+                                    me.valor_iva = 0.0;
+                                    me.valor_descuento = 0.0;
+                                    me.valor_final = 0.0;
+                                    me.iva = 0;
+
+                                    me.valorSubtotalDetalle = 0.0;
+                                    me.valorIvaDetalle = 0.0;
+                                    me.valorDescuentoDetalle = 0.0;
+                                    me.valorFinalDetalle = 0.0;
+
+                                    me.arrayFacturacion = [];
+                                    me.arrayArticulo = [];
+                                    me.arrayDetalle = [];
+                                    me.arrayTerceros = [];
+                                };
+                        }
+                    }
+            }
         },
         ocultarDetalle: function ocultarDetalle() {
             this.listado = 1;
@@ -48614,7 +48638,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     axios.put(_this.ruta + '/ingreso/desactivar', {
                         'id': id
                     }).then(function (response) {
-                        me.listarFacturacion(1, '', 'num_comprobante');
+                        me.listarFacturacion(1, '', '');
                         swal('Anulado!', 'El ingreso ha sido anulado con éxito.', 'success');
                     }).catch(function (error) {
                         console.log(error);
@@ -48701,6 +48725,14 @@ var render = function() {
             _c(
               "button",
               {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.listado == 1,
+                    expression: "listado==1"
+                  }
+                ],
                 staticClass: "btn btn-secondary",
                 attrs: { type: "button" },
                 on: {
@@ -48879,7 +48911,7 @@ var render = function() {
                               _vm._v(" "),
                               _c("td", {
                                 domProps: {
-                                  textContent: _vm._s(facturacion.iva)
+                                  textContent: _vm._s(facturacion.valor_iva)
                                 }
                               }),
                               _vm._v(" "),
@@ -48937,7 +48969,27 @@ var render = function() {
                                           ]
                                         )
                                       ]
-                                    : _vm._e()
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-warning btn-sm",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.mostrarDetalle(
+                                              "facturacion",
+                                              "actualizar",
+                                              facturacion
+                                            )
+                                          }
+                                        }
+                                      },
+                                      [_c("i", { staticClass: "icon-pencil" })]
+                                    )
+                                  ]
                                 ],
                                 2
                               )
@@ -49521,34 +49573,11 @@ var render = function() {
                                         }),
                                         _vm._v(" "),
                                         _c("td", [
-                                          _c("input", {
-                                            directives: [
-                                              {
-                                                name: "model",
-                                                rawName: "v-model",
-                                                value: detalle.precio,
-                                                expression: "detalle.precio"
-                                              }
-                                            ],
-                                            staticClass: "form-control",
-                                            attrs: {
-                                              type: "number",
-                                              value: "3"
-                                            },
-                                            domProps: { value: detalle.precio },
-                                            on: {
-                                              input: function($event) {
-                                                if ($event.target.composing) {
-                                                  return
-                                                }
-                                                _vm.$set(
-                                                  detalle,
-                                                  "precio",
-                                                  $event.target.value
-                                                )
-                                              }
-                                            }
-                                          })
+                                          _vm._v(
+                                            "\n                                        " +
+                                              _vm._s(detalle.precio) +
+                                              "\n                                    "
+                                          )
                                         ]),
                                         _vm._v(" "),
                                         _c("td", [
@@ -49562,10 +49591,7 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            attrs: {
-                                              type: "number",
-                                              value: "2"
-                                            },
+                                            attrs: { type: "number" },
                                             domProps: {
                                               value: detalle.cantidad
                                             },
@@ -49585,11 +49611,57 @@ var render = function() {
                                         ]),
                                         _vm._v(" "),
                                         _c("td", [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: detalle.valor_descuento,
+                                                expression:
+                                                  "detalle.valor_descuento"
+                                              }
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: { type: "number" },
+                                            domProps: {
+                                              value: detalle.valor_descuento
+                                            },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.$set(
+                                                  detalle,
+                                                  "valor_descuento",
+                                                  $event.target.value
+                                                )
+                                              }
+                                            }
+                                          })
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("td", [
+                                          _vm._v(
+                                            "\n                                        $ " +
+                                              _vm._s(
+                                                (detalle.valor_iva =
+                                                  detalle.precio /
+                                                  100 *
+                                                  detalle.iva)
+                                              ) +
+                                              "\n                                    "
+                                          )
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("td", [
                                           _vm._v(
                                             "\n                                        " +
                                               _vm._s(
-                                                detalle.precio *
-                                                  detalle.cantidad
+                                                (detalle.valor_subtotal =
+                                                  detalle.precio *
+                                                    detalle.cantidad -
+                                                  detalle.valor_descuento)
                                               ) +
                                               "\n                                    "
                                           )
@@ -49611,7 +49683,30 @@ var render = function() {
                                           _vm._v(
                                             "$ " +
                                               _vm._s(
-                                                (_vm.total = _vm.calcularTotal)
+                                                (_vm.detalle.valor_iva =
+                                                  _vm.calcularTotalIva)
+                                              )
+                                          )
+                                        ])
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tr",
+                                      {
+                                        staticStyle: {
+                                          "background-color": "#CEECF5"
+                                        }
+                                      },
+                                      [
+                                        _vm._m(4),
+                                        _vm._v(" "),
+                                        _c("td", [
+                                          _vm._v(
+                                            "$ " +
+                                              _vm._s(
+                                                (_vm.detalle.valor_final =
+                                                  _vm.calcularTotal)
                                               )
                                           )
                                         ])
@@ -49620,7 +49715,7 @@ var render = function() {
                                   ],
                                   2
                                 )
-                              : _c("tbody", [_vm._m(4)])
+                              : _c("tbody", [_vm._m(5)])
                           ]
                         )
                       ])
@@ -49649,11 +49744,11 @@ var render = function() {
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
-                                _vm.registrarIngreso()
+                                _vm.registrarFacturacion()
                               }
                             }
                           },
-                          [_vm._v("Registrar Ingreso")]
+                          [_vm._v("Registrar Factura")]
                         )
                       ])
                     ])
@@ -49688,7 +49783,7 @@ var render = function() {
                                   "table table-bordered table-striped table-sm"
                               },
                               [
-                                _vm._m(5),
+                                _vm._m(6),
                                 _vm._v(" "),
                                 _vm.arrayDetalle.length
                                   ? _c(
@@ -49743,7 +49838,7 @@ var render = function() {
                                             }
                                           },
                                           [
-                                            _vm._m(6),
+                                            _vm._m(7),
                                             _vm._v(" "),
                                             _c("td", [
                                               _vm._v("$ " + _vm._s(_vm.total))
@@ -49753,7 +49848,7 @@ var render = function() {
                                       ],
                                       2
                                     )
-                                  : _c("tbody", [_vm._m(7)])
+                                  : _c("tbody", [_vm._m(8)])
                               ]
                             )
                           ]
@@ -49937,7 +50032,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(8),
+                      _vm._m(9),
                       _vm._v(" "),
                       _c(
                         "tbody",
@@ -50110,7 +50205,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group row" }, [
-                  _vm._m(9),
+                  _vm._m(10),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-3" }, [
                     _c("div", { staticClass: "input-group" }, [
@@ -50149,7 +50244,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(10),
+                      _vm._m(11),
                       _vm._v(" "),
                       _vm._l(_vm.arrayTerceros, function(tercero) {
                         return _c("tr", { key: tercero.id }, [
@@ -50258,6 +50353,10 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Cantidad")]),
         _vm._v(" "),
+        _c("th", [_vm._v("Descuento")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Iva")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Subtotal")])
       ])
     ])
@@ -50266,7 +50365,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", { attrs: { colspan: "4", align: "right" } }, [
+    return _c("td", { attrs: { colspan: "6", align: "right" } }, [
+      _c("strong", [_vm._v("Total iva:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "6", align: "right" } }, [
       _c("strong", [_vm._v("Total Neto:")])
     ])
   },
@@ -50274,8 +50381,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("tr", [
-      _c("td", { attrs: { colspan: "5" } }, [
+    return _c("tr", { staticClass: "container-fluid" }, [
+      _c("td", { attrs: { colspan: "7" } }, [
         _vm._v(
           "\n                                        NO hay artículos agregados\n                                    "
         )

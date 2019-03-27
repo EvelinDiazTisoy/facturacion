@@ -23,21 +23,19 @@ class FacturacionController extends Controller
         
         if ($buscar==''){
             $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')
-            ->join('detalle_facturacion', 'facturacion.id','=','detalle_facturacion.id_factura')
-            ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado','detalle_facturacion.valor_venta')
+            ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado')
             ->orderBy('id', 'desc')
             ->paginate(3);
         }
         else{
             $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')
-            ->join('detalle_facturacion', 'facturacion.id','=','detalle_facturacion.id_factura')
-            ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado','detalle_facturacion.valor_venta')
+            ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado')
             ->where($criterio, 'like', '%'. $buscar . '%')
             ->orderBy('id', 'desc')
             ->paginate(3);
         }
         
-
+        
         return [
             'pagination' => [
                 'total'        => $facturacion->total(),
@@ -104,21 +102,25 @@ class FacturacionController extends Controller
 
         foreach($detalles as $ep=>$det)
         {
-            $detalle = new DetalleIngreso();
-            $detalle->idingreso = $ingreso->id;
-            $detalle->idarticulo = $det['idarticulo'];
+            $detalle = new DetalleFacturacion();
+            $detalle->id_factura = $facturacion->id;
+            $detalle->id_producto = $det['idarticulo'];
+            $detalle->valor_venta = $det['precio'];
             $detalle->cantidad = $det['cantidad'];
-            $detalle->precio = $det['precio'];  
-            $detalle->id_usuario = $id_usuario;        
+            $detalle->valor_iva = $det['valor_iva'];
+            $detalle->valor_descuento = $det['valor_descuento'];
+            $detalle->porcentaje_iva = $det['iva'];
+            $detalle->valor_subtotal = $det['valor_subtotal'];  
+            $detalle->valor_final = $det['valor_subtotal']+$det['valor_iva'];
             $detalle->save();
 
-            $stock = new Stock();
-            $stock->id_producto = $det['idarticulo'];
-            $stock->id_usuario = $id_usuario;
-            $stock->cantidad = $det['cantidad'];
-            $stock->tipo_movimiento = $request->tipo_movimiento;
-            $stock->sumatoria = $request->sumatoria;
-            $stock->save();
+            // $stock = new Stock();
+            // $stock->id_producto = $det['idarticulo'];
+            // $stock->id_usuario = $id_usuario;
+            // $stock->cantidad = $det['cantidad'];
+            // $stock->tipo_movimiento = $request->tipo_movimiento;
+            // $stock->sumatoria = $request->sumatoria;
+            // $stock->save();
         }
     }
   

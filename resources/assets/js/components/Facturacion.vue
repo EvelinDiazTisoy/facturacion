@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Facturacion
-                        <button type="button" @click="mostrarDetalle()" class="btn btn-secondary">
+                        <button type="button" @click="mostrarDetalle()" v-show="listado==1" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -53,7 +53,7 @@
                                         <td v-text="facturacion.fecha"></td>
                                         <td v-text="facturacion.subtotal"></td>
                                         <td v-text="facturacion.descuento"></td>
-                                        <td v-text="facturacion.iva"></td>
+                                        <td v-text="facturacion.valor_iva"></td>
                                         <td v-text="facturacion.total"></td>
                                         <td v-text="facturacion.estado"></td>
                                         <td>
@@ -63,6 +63,11 @@
                                             <template v-if="facturacion.estado=='Registrado'">
                                                 <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(facturacion.id)">
                                                     <i class="icon-trash"></i>
+                                                </button>
+                                            </template>
+                                            <template>
+                                                <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm">
+                                                    <i class="icon-pencil"></i>
                                                 </button>
                                             </template>
                                         </td>
@@ -174,6 +179,8 @@
                                             <th>Artículo</th>
                                             <th>Precio</th>
                                             <th>Cantidad</th>
+                                            <th>Descuento</th>
+                                            <th>Iva</th>
                                             <th>Subtotal</th>
                                         </tr>
                                     </thead>
@@ -187,33 +194,34 @@
                                             <td v-text="detalle.articulo">
                                             </td>
                                             <td>
-                                                <input v-model="detalle.precio" type="number" value="3" class="form-control">
+                                                <!-- <input v-model="detalle.precio" type="number" disabled value="3" class="form-control"> -->
+                                                {{detalle.precio}}
                                             </td>
                                             <td>
-                                                <input v-model="detalle.cantidad" type="number" value="2" class="form-control">
+                                                <input v-model="detalle.cantidad" type="number" class="form-control">
                                             </td>
                                             <td>
-                                                {{detalle.precio*detalle.cantidad}}
+                                                <input v-model="detalle.valor_descuento" type="number" class="form-control">
+                                            </td>
+                                            <td>
+                                                $ {{detalle.valor_iva=(detalle.precio/100)*detalle.iva}}
+                                            </td>
+                                            <td>
+                                                {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_descuento}}
                                             </td>
                                         </tr>
-                                        <!--
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{totalParcial=(total-totalImpuesto).toFixed(2)}}</td>
+                                            <td colspan="6" align="right"><strong>Total iva:</strong></td>
+                                            <td>$ {{detalle.valor_iva=calcularTotalIva}}</td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{totalImpuesto=((total*impuesto)/(1+impuesto)).toFixed(2)}}</td>
-                                        </tr>
-                                        -->
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="4" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{total=calcularTotal}}</td>
+                                            <td colspan="6" align="right"><strong>Total Neto:</strong></td>
+                                            <td>$ {{detalle.valor_final=calcularTotal}}</td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
-                                        <tr>
-                                            <td colspan="5">
+                                        <tr class="container-fluid">
+                                            <td colspan="7">
                                                 NO hay artículos agregados
                                             </td>
                                         </tr>
@@ -224,7 +232,7 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="registrarIngreso()">Registrar Ingreso</button>
+                                <button type="button" class="btn btn-primary" @click="registrarFacturacion()">Registrar Factura</button>
                             </div>
                         </div>
                     </div>
@@ -240,30 +248,6 @@
                                     <p v-text="proveedor"></p>
                                 </div>
                             </div>
-                            <!--
-                            <div class="col-md-3">
-                                <label for="">Impuesto</label>
-                                <p v-text="impuesto"></p>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Tipo Comprobante</label>
-                                    <p v-text="tipo_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Serie Comprobante</label>
-                                    <p v-text="serie_comprobante"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número Comprobante</label>
-                                    <p v-text="num_comprobante"></p>
-                                </div>
-                            </div>
-                            -->
                         </div>
                         <div class="form-group row border">
                             <div class="table-responsive col-md-12">
@@ -288,16 +272,6 @@
                                                 {{detalle.precio*detalle.cantidad}}
                                             </td>
                                         </tr>
-                                        <!--
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Parcial:</strong></td>
-                                            <td>$ {{totalParcial=(total-totalImpuesto).toFixed(2)}}</td>
-                                        </tr>
-                                        <tr style="background-color: #CEECF5;">
-                                            <td colspan="3" align="right"><strong>Total Impuesto:</strong></td>
-                                            <td>$ {{totalImpuesto=((total*impuesto)).toFixed(2)}}</td>
-                                        </tr>
-                                        -->
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="3" align="right"><strong>Total Neto:</strong></td>
                                             <td>$ {{total}}</td>
@@ -531,7 +505,18 @@
                 fec_anula:'',
                 fecha : '',
 
+                valorSubtotalDetalle:0.0,
+                valorIvaDetalle:0.0,
+                valorDescuentoDetalle:0.0,
+                valorFinalDetalle:0.0,
+                valor_subtotal:0.0,
+                valor_iva:0.0,
+                valor_descuento:0.0,
+                valor_final:0.0,
+
                 arrayFacturacion : [],
+
+                iva:0
 
             }
         },
@@ -568,10 +553,17 @@
             calcularTotal: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    resultado=resultado+(this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)
+                    resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
                 }
                 return resultado;
-            }
+            },
+            calcularTotalIva: function(){
+                var resultado=0.0;
+                for(var i=0;i<this.arrayDetalle.length;i++){
+                    resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
+                }
+                return resultado;
+            },
         },
         methods : {
             listarFacturacion (page,buscar,criterio){
@@ -581,6 +573,7 @@
                     var respuesta= response.data;
                     me.arrayFacturacion = respuesta.facturacion.data;
                     me.pagination= respuesta.pagination;
+                    console.log(me.arrayFacturacion);
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -618,6 +611,7 @@
                         me.articulo=me.arrayArticulo[0]['nombre'];
                         me.idarticulo=me.arrayArticulo[0]['id'];
                         me.cantidad=me.arrayArticulo[0]['stock'];
+                        me.valorIvaDetalle=me.arrayArticulo[0]['iva'];
                     }
                     else{
                         me.articulo='No existe artículo';
@@ -668,7 +662,9 @@
                             idarticulo: me.idarticulo,
                             articulo: me.articulo,
                             cantidad: me.cantidad,
-                            precio: me.precio
+                            valor_descuento: me.valor_descuento,
+                            precio: me.precio,
+                            iva: me.iva
                         });
                         me.codigo="";
                         me.idarticulo=0;
@@ -684,21 +680,25 @@
             },
             agregarDetalleModal(data =[]){
                 let me=this;
+                
                 if(me.encuentra(data['id'])){
-                        swal({
-                            type: 'error',
-                            title: 'Error...',
-                            text: 'Ese artículo ya se encuentra agregado!',
-                            })
-                    }
-                    else{
-                       me.arrayDetalle.push({
-                            idarticulo: data['id'],
-                            articulo: data['nombre'],
-                            cantidad: 1,
-                            precio: 1
-                        }); 
-                    }
+                    swal({
+                        type: 'error',
+                        title: 'Error...',
+                        text: 'Ese artículo ya se encuentra agregado!',
+                        })
+                }
+                else{
+                    me.arrayDetalle.push({
+                        idarticulo: data['id'],
+                        articulo: data['nombre'],
+                        cantidad: 1,
+                        valor_descuento: 0,
+                        precio: data['precio_venta'],
+                        iva: data['iva'],
+                        // valor_final: parseFloat(data['precio_venta'])+((parseFloat(data['precio_venta'])/100)*parseFloat(data['iva'])),
+                    }); 
+                }
             },
             listarArticulo (buscar,criterio){
                 let me=this;
@@ -711,45 +711,62 @@
                     console.log(error);
                 });
             },
-            registrarIngreso(){
+            registrarFacturacion(){
                 // if (this.validarIngreso()){
                 //     return;
                 // }
                 
                 let me = this;
-                me.tipo_comprobante = null;
-                me.serie_comprobante = null;
-                me.num_comprobante = null;
-                me.impuesto = null;
+                
+                for(var i=0; i<me.arrayDetalle.length; i++)
+                {
+                    me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
+                    me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
+                    me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+                }
+                me.total += parseFloat(me.subtotal)+parseFloat(me.iva);
 
-                axios.post(this.ruta +'/ingreso/registrar',{
-                    'idproveedor': this.id_tercero,
-                    'tipo_comprobante': this.tipo_comprobante,
-                    'serie_comprobante' : this.serie_comprobante,
-                    'num_comprobante' : this.num_comprobante,
-                    'tipo_ingreso' : this.tipo_ingreso,
-                    'impuesto' : this.impuesto,
-                    'total' : this.total,
-                    'data': this.arrayDetalle,
-                    'tipo_movimiento' : 2,
-                    'sumatoria' : 0
+                axios.post(this.ruta +'/facturacion/registrar',{
+                    'num_factura': me.num_factura,
+                    'id_tercero': me.id_tercero,
+                    'fec_edita': null,
+                    'usu_edita': null,
+                    'subtotal': me.subtotal,
+                    'valor_iva': me.iva,
+                    'total': me.total,
+                    'abono': me.abono,
+                    'saldo': me.saldo,
+                    'detalle': me.detalle,
+                    'descuento': me.descuento,
+                    'fec_registra': null,
+                    'fec_envia': null,
+                    'fec_anula': null,
+                    'usu_registra': null,
+                    'usu_envia': null,
+                    'usu_anula': null,
+                    'fecha': me.fecha,
+                    'data': me.arrayDetalle
                 }).then(function (response) {
                     me.listado=1;
-                    me.listarFacturacion(1,'','num_comprobante');
-                    me.id_tercero=0;
-                    // me.tipo_comprobante='BOLETA';
-                    me.tipo_comprobante='';
-                    me.serie_comprobante='';
-                    me.num_comprobante='';
-                    me.impuesto='';
-                    me.total=0.0;
-                    me.idarticulo=0;
-                    me.articulo='';
-                    me.cantidad=0;
-                    me.precio=0;
+                    me.arrayFacturacion=[];
+                    me.listarFacturacion(1,'','');
+                    me.num_factura=0,
+                    me.id_tercero_facturacion=0,
+                    me.tercero_facturacion='',
+                    me.id_usuario=0,
+                    me.fec_edita='',
+                    me.subtotal=0.0,
+                    me.valor_iva=0.0,
+                    me.total=0.0,
+                    me.abono=0.0,
+                    me.saldo=0.0,
+                    me.detalle='',
+                    me.descuento=0.0,
+                    me.fec_registra='',
+                    me.fec_envia='',
+                    me.fec_anula='',
+                    me.fecha = '',
                     me.arrayDetalle=[];
-                    me.id_tercero = 0,
-                    me.tipo_ingreso = 0,
                     me.arrayTerceros=[];
                 }).catch(function (error) {
                     console.log(error);
@@ -769,21 +786,50 @@
 
                 return this.errorIngreso;
             },
-            mostrarDetalle(){
+            mostrarDetalle(modelo, accion, data=[]){
                 let me=this;
                 me.listado=0;
 
-                me.idproveedor=0;
-                me.tipo_comprobante='BOLETA';
-                me.serie_comprobante='';
-                me.num_comprobante='';
-                me.impuesto=0.18;
-                me.total=0.0;
-                me.idarticulo=0;
-                me.articulo='';
-                me.cantidad=0;
-                me.precio=0;
-                me.arrayDetalle=[];
+                switch(modelo){
+                    case 'facturacion':{
+                        switch(accion){
+                            case 'registrar':{
+                                me.facturacion_id=0;
+                                me.num_factura=0;
+                                me.id_tercero_facturacion=0;
+                                me.tercero_facturacion='';
+                                me.id_usuario=0;
+                                me.fec_edita='';
+                                me.subtotal=0.0;
+                                me.valor_iva=0.0;
+                                me.total=0.0;
+                                me.abono=0.0;
+                                me.saldo=0.0;
+                                me.detalle='';
+                                me.descuento=0.0;
+                                me.fec_registra='';
+                                me.fec_envia='';
+                                me.fec_anula='';
+                                me.fecha = '';
+                                me.valor_subtotal=0.0;
+                                me.valor_iva=0.0;
+                                me.valor_descuento=0.0;
+                                me.valor_final=0.0;
+                                me.iva=0;
+
+                                me.valorSubtotalDetalle=0.0;
+                                me.valorIvaDetalle=0.0;
+                                me.valorDescuentoDetalle=0.0;
+                                me.valorFinalDetalle=0.0;
+
+                                me.arrayFacturacion = [];
+                                me.arrayArticulo=[];
+                                me.arrayDetalle=[];
+                                me.arrayTerceros=[];
+                            };
+                        }
+                    }
+                }
             },
             ocultarDetalle(){
                 this.listado=1;
@@ -852,7 +898,7 @@
                     axios.put(this.ruta +'/ingreso/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarFacturacion(1,'','num_comprobante');
+                        me.listarFacturacion(1,'','');
                         swal(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
