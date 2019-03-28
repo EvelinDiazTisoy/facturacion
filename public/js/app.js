@@ -48229,6 +48229,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48318,15 +48326,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         calcularTotal: function calcularTotal() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad + this.arrayDetalle[i].precio / 100 * this.arrayDetalle[i].iva - this.arrayDetalle[i].valor_descuento);
+                // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
+                resultado = resultado + (this.arrayDetalle[i].valor_subtotal + this.arrayDetalle[i].valor_iva) - this.arrayDetalle[i].valor_descuento;
             }
             return resultado;
         },
         calcularTotalIva: function calcularTotalIva() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado = resultado + this.arrayDetalle[i].precio / 100 * this.arrayDetalle[i].iva;
+                // resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
+                resultado = Math.round(resultado + this.arrayDetalle[i].valor_iva);
             }
+            return resultado;
+        },
+        calcularSaldo: function calcularSaldo() {
+            var resultado = 0.0;
+
+            resultado = resultado + (this.calcularTotal - this.abono);
+
             return resultado;
         }
     },
@@ -49645,10 +49662,11 @@ var render = function() {
                                           _vm._v(
                                             "\n                                        $ " +
                                               _vm._s(
-                                                (detalle.valor_iva =
-                                                  detalle.precio /
-                                                  100 *
-                                                  detalle.iva)
+                                                (detalle.valor_iva = Math.round(
+                                                  detalle.precio -
+                                                    detalle.precio /
+                                                      (detalle.iva / 100 + 1)
+                                                ))
                                               ) +
                                               "\n                                    "
                                           )
@@ -49661,6 +49679,7 @@ var render = function() {
                                                 (detalle.valor_subtotal =
                                                   detalle.precio *
                                                     detalle.cantidad -
+                                                  detalle.valor_iva -
                                                   detalle.valor_descuento)
                                               ) +
                                               "\n                                    "
@@ -49711,11 +49730,68 @@ var render = function() {
                                           )
                                         ])
                                       ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tr",
+                                      {
+                                        staticStyle: {
+                                          "background-color": "#CEECF5"
+                                        }
+                                      },
+                                      [
+                                        _vm._m(5),
+                                        _vm._v(" "),
+                                        _c("td", [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: _vm.abono,
+                                                expression: "abono"
+                                              }
+                                            ],
+                                            staticClass: "form-control",
+                                            attrs: { min: "0", type: "number" },
+                                            domProps: { value: _vm.abono },
+                                            on: {
+                                              input: function($event) {
+                                                if ($event.target.composing) {
+                                                  return
+                                                }
+                                                _vm.abono = $event.target.value
+                                              }
+                                            }
+                                          })
+                                        ])
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tr",
+                                      {
+                                        staticStyle: {
+                                          "background-color": "#CEECF5"
+                                        }
+                                      },
+                                      [
+                                        _vm._m(6),
+                                        _vm._v(" "),
+                                        _c("td", [
+                                          _vm._v(
+                                            "$ " +
+                                              _vm._s(
+                                                (_vm.saldo = _vm.calcularSaldo)
+                                              )
+                                          )
+                                        ])
+                                      ]
                                     )
                                   ],
                                   2
                                 )
-                              : _c("tbody", [_vm._m(5)])
+                              : _c("tbody", [_vm._m(7)])
                           ]
                         )
                       ])
@@ -49783,7 +49859,7 @@ var render = function() {
                                   "table table-bordered table-striped table-sm"
                               },
                               [
-                                _vm._m(6),
+                                _vm._m(8),
                                 _vm._v(" "),
                                 _vm.arrayDetalle.length
                                   ? _c(
@@ -49838,7 +49914,7 @@ var render = function() {
                                             }
                                           },
                                           [
-                                            _vm._m(7),
+                                            _vm._m(9),
                                             _vm._v(" "),
                                             _c("td", [
                                               _vm._v("$ " + _vm._s(_vm.total))
@@ -49848,7 +49924,7 @@ var render = function() {
                                       ],
                                       2
                                     )
-                                  : _c("tbody", [_vm._m(8)])
+                                  : _c("tbody", [_vm._m(10)])
                               ]
                             )
                           ]
@@ -50032,7 +50108,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(9),
+                      _vm._m(11),
                       _vm._v(" "),
                       _c(
                         "tbody",
@@ -50205,7 +50281,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group row" }, [
-                  _vm._m(10),
+                  _vm._m(12),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-3" }, [
                     _c("div", { staticClass: "input-group" }, [
@@ -50244,7 +50320,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(11),
+                      _vm._m(13),
                       _vm._v(" "),
                       _vm._l(_vm.arrayTerceros, function(tercero) {
                         return _c("tr", { key: tercero.id }, [
@@ -50375,6 +50451,22 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("td", { attrs: { colspan: "6", align: "right" } }, [
       _c("strong", [_vm._v("Total Neto:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "6", align: "right" } }, [
+      _c("strong", [_vm._v("Abono:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "6", align: "right" } }, [
+      _c("strong", [_vm._v("Saldo:")])
     ])
   },
   function() {

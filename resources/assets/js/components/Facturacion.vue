@@ -204,10 +204,10 @@
                                                 <input v-model="detalle.valor_descuento" type="number" class="form-control">
                                             </td>
                                             <td>
-                                                $ {{detalle.valor_iva=(detalle.precio/100)*detalle.iva}}
+                                                $ {{detalle.valor_iva=Math.round(detalle.precio-(detalle.precio/((detalle.iva/100)+1)))}}
                                             </td>
                                             <td>
-                                                {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_descuento}}
+                                                {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento}}
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
@@ -217,6 +217,14 @@
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="6" align="right"><strong>Total Neto:</strong></td>
                                             <td>$ {{detalle.valor_final=calcularTotal}}</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="6" align="right"><strong>Abono:</strong></td>
+                                            <td><input v-model="abono" min="0" type="number" class="form-control"></td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5;">
+                                            <td colspan="6" align="right"><strong>Saldo:</strong></td>
+                                            <td>$ {{saldo=calcularSaldo}}</td>
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
@@ -553,15 +561,24 @@
             calcularTotal: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
+                    // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
+                    resultado=resultado+(this.arrayDetalle[i].valor_subtotal+this.arrayDetalle[i].valor_iva)-this.arrayDetalle[i].valor_descuento
                 }
                 return resultado;
             },
             calcularTotalIva: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
+                    // resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
+                    resultado=Math.round(resultado+(this.arrayDetalle[i].valor_iva));
                 }
+                return resultado;
+            },
+            calcularSaldo: function(){
+                var resultado=0.0;
+
+                resultado=resultado+(this.calcularTotal-this.abono);
+                
                 return resultado;
             },
         },
