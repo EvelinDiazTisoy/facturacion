@@ -25,14 +25,14 @@ class FacturacionController extends Controller
             $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')
             ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado')
             ->orderBy('id', 'desc')
-            ->paginate(3);
+            ->paginate(6);
         }
         else{
             $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')
             ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado')
             ->where($criterio, 'like', '%'. $buscar . '%')
             ->orderBy('id', 'desc')
-            ->paginate(3);
+            ->paginate(6);
         }
         
         
@@ -136,11 +136,10 @@ class FacturacionController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
-        $facturacion = new Facturacion();
+        $facturacion = Facturacion::findOrFail($request->id);
         $facturacion->num_factura = $request->num_factura;
         $facturacion->id_tercero = $request->id_tercero;
-        $facturacion->fec_edita = $request->id_tercero;
-        $facturacion->id_usuario = $request->id_usu;
+        $facturacion->fec_edita = $request->fec_edita;
         $facturacion->usu_edita = $id_usuario;
         $facturacion->subtotal = $request->subtotal;
         $facturacion->valor_iva = $request->valor_iva;
@@ -156,7 +155,7 @@ class FacturacionController extends Controller
         $facturacion->usu_envia = null;
         $facturacion->usu_anula = null;
         $facturacion->fecha = $request->fecha;
-        $facturacion->estado = '1';
+        $facturacion->estado = $request->estado;
         $facturacion->save();
 
         $detalles = $request->data;//Array de detalles
@@ -164,22 +163,48 @@ class FacturacionController extends Controller
 
         foreach($detalles as $ep=>$det)
         {
-            $detalle = new DetalleIngreso();
-            $detalle->idingreso = $ingreso->id;
-            $detalle->idarticulo = $det['idarticulo'];
+            $detalle = new DetalleFacturacion();
+            $detalle = DetalleFacturacion::findOrFail($det['id']);
+            $detalle->id_producto = $det['id_articulo'];
+            $detalle->valor_venta = $det['precio'];
             $detalle->cantidad = $det['cantidad'];
-            $detalle->precio = $det['precio'];  
-            $detalle->id_usuario = $id_usuario;        
+            $detalle->valor_iva = $det['valor_iva'];
+            $detalle->valor_descuento = $det['valor_descuento'];
+            $detalle->porcentaje_iva = $det['iva'];
+            $detalle->valor_subtotal = $det['valor_subtotal'];  
+            $detalle->valor_final = $det['valor_subtotal']+$det['valor_iva'];
             $detalle->save();
 
-            $stock = new Stock();
-            $stock->id_producto = $det['idarticulo'];
-            $stock->id_usuario = $id_usuario;
-            $stock->cantidad = $det['cantidad'];
-            $stock->tipo_movimiento = $request->tipo_movimiento;
-            $stock->sumatoria = $request->sumatoria;
-            $stock->save();
+            // $stock = new Stock();
+            // $stock->id_producto = $det['idarticulo'];
+            // $stock->id_usuario = $id_usuario;
+            // $stock->cantidad = $det['cantidad'];
+            // $stock->tipo_movimiento = $request->tipo_movimiento;
+            // $stock->sumatoria = $request->sumatoria;
+            // $stock->save();
         }
+    }
+
+    public function cambiarEstado(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $facturacion = Facturacion::findOrFail($request->id);
+        $facturacion->estado = $request->estado;
+        $facturacion->save();
+    }
+
+    public function buscarNumFacturaSugerida(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        
+        $facturacion = Facturacion::select('num_factura')
+        ->orderBy('num_factura', 'desc')
+        ->take(1)
+        ->get();
+        
+        return [
+            'facturacion' => $facturacion
+        ];
     }
 
     public function desactivar(Request $request)

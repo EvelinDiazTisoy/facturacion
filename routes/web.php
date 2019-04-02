@@ -197,6 +197,8 @@ Route::group(['middleware'=>['auth']],function(){
         Route::post('/facturacion/registrar', 'FacturacionController@store');
         Route::put('/facturacion/actualizar', 'FacturacionController@update');
         Route::get('/facturacion/buscarFacturacion', 'FacturacionController@buscarFacturacion');
+        Route::put('/facturacion/cambiarEstado', 'FacturacionController@cambiarEstado');
+        Route::get('/facturacion/buscarNumFacturaSugerida', 'FacturacionController@buscarNumFacturaSugerida');
 
         Route::get('/detalle_facturacion', 'DetalleFacturacionController@index');
         Route::post('/detalle_facturacion/registrar', 'DetalleFacturacionController@store');

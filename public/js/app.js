@@ -48237,6 +48237,46 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48263,6 +48303,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             modal: 0,
             tituloModal: '',
             tipoAccion: 0,
+            tipoAccion2: 0,
             errorIngreso: 0,
             errorMostrarMsjIngreso: [],
             pagination: {
@@ -48290,7 +48331,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tercero: '',
             id_tercero: '',
             tituloModal2: ''
-        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'valorSubtotalDetalle', 0.0), _defineProperty(_ref, 'valorIvaDetalle', 0.0), _defineProperty(_ref, 'valorDescuentoDetalle', 0.0), _defineProperty(_ref, 'valorFinalDetalle', 0.0), _defineProperty(_ref, 'valor_subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'valor_descuento', 0.0), _defineProperty(_ref, 'valor_final', 0.0), _defineProperty(_ref, 'arrayFacturacion', []), _defineProperty(_ref, 'iva', 0), _ref;
+        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'valorSubtotalDetalle', 0.0), _defineProperty(_ref, 'valorIvaDetalle', 0.0), _defineProperty(_ref, 'valorDescuentoDetalle', 0.0), _defineProperty(_ref, 'valorFinalDetalle', 0.0), _defineProperty(_ref, 'valor_subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'valor_descuento', 0.0), _defineProperty(_ref, 'valor_final', 0.0), _defineProperty(_ref, 'arrayFacturacion', []), _defineProperty(_ref, 'iva', 0), _defineProperty(_ref, 'fechaActual', ''), _defineProperty(_ref, 'fechaHoraActual', ''), _defineProperty(_ref, 'estado', 0), _defineProperty(_ref, 'cambiarEstado', 0), _ref;
     },
 
     components: {
@@ -48327,16 +48368,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
                 // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
-                resultado = resultado + (this.arrayDetalle[i].valor_subtotal + this.arrayDetalle[i].valor_iva) - this.arrayDetalle[i].valor_descuento;
+                resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].valor_descuento);
             }
             return resultado;
         },
         calcularTotalIva: function calcularTotalIva() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                // resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
-                resultado = Math.round(resultado + this.arrayDetalle[i].valor_iva);
+                resultado = resultado + (this.calcularTotal - this.arrayDetalle[i].valor_subtotal);
             }
+            resultado = Math.round(resultado);
             return resultado;
         },
         calcularSaldo: function calcularSaldo() {
@@ -48355,7 +48396,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 var respuesta = response.data;
                 me.arrayFacturacion = respuesta.facturacion.data;
                 me.pagination = respuesta.pagination;
-                console.log(me.arrayFacturacion);
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        listarDetalle: function listarDetalle(id_factura) {
+            var me = this;
+            var url = this.ruta + '/detalle_facturacion/buscarDetalleFacturacion?id_factura=' + id_factura;
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayDetalle = respuesta.detalles;
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48402,6 +48452,48 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 console.log(error);
             });
         },
+        sugerirNumFactura: function sugerirNumFactura() {
+            var me = this;
+            var url = this.ruta + '/facturacion/buscarNumFacturaSugerida';
+
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.num_factura = parseInt(respuesta.facturacion[0].num_factura) + 1;
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        cambiarEstadoFacturacion: function cambiarEstadoFacturacion(id_factura, accion) {
+            var me = this;
+            var cambiarEstado = '';
+
+            switch (accion) {
+                case 'registrar':
+                    {
+                        cambiarEstado = '2';
+                        break;
+                    };
+                case 'enviar':
+                    {
+                        cambiarEstado = '3';
+                        break;
+                    };
+                case 'anular':
+                    {
+                        cambiarEstado = '4';
+                        break;
+                    };
+            }
+
+            axios.put(this.ruta + '/facturacion/cambiarEstado', {
+                'estado': cambiarEstado,
+                'id': id_factura
+            }).then(function (response) {
+                me.listarFacturacion(1, '', '');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
         cambiarPagina: function cambiarPagina(page, buscar, criterio) {
             var me = this;
             //Actualiza la página actual
@@ -48436,7 +48528,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                         idarticulo: me.idarticulo,
                         articulo: me.articulo,
                         cantidad: me.cantidad,
-                        valor_descuento: me.valor_descuento,
+                        descuento: me.descuento,
                         precio: me.precio,
                         iva: me.iva
                     });
@@ -48467,7 +48559,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     valor_descuento: 0,
                     precio: data['precio_venta'],
                     iva: data['iva']
-                    // valor_final: parseFloat(data['precio_venta'])+((parseFloat(data['precio_venta'])/100)*parseFloat(data['iva'])),
                 });
             }
         },
@@ -48494,6 +48585,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
             }
             me.total += parseFloat(me.subtotal) + parseFloat(me.iva);
+            me.sugerirNumFactura();
 
             axios.post(this.ruta + '/facturacion/registrar', {
                 'num_factura': me.num_factura,
@@ -48519,8 +48611,51 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 me.listado = 1;
                 me.arrayFacturacion = [];
                 me.listarFacturacion(1, '', '');
-                me.num_factura = 0, me.id_tercero_facturacion = 0, me.tercero_facturacion = '', me.id_usuario = 0, me.fec_edita = '', me.subtotal = 0.0, me.valor_iva = 0.0, me.total = 0.0, me.abono = 0.0, me.saldo = 0.0, me.detalle = '', me.descuento = 0.0, me.fec_registra = '', me.fec_envia = '', me.fec_anula = '', me.fecha = '', me.arrayDetalle = [];
+                me.num_factura = 0, me.id_tercero = 0, me.tercero_facturacion = '', me.id_usuario = 0, me.fec_edita = '', me.subtotal = 0.0, me.valor_iva = 0.0, me.total = 0.0, me.abono = 0.0, me.saldo = 0.0, me.detalle = '', me.descuento = 0.0, me.fec_registra = '', me.fec_envia = '', me.fec_anula = '', me.fecha = '', me.arrayDetalle = [];
                 me.arrayTerceros = [];
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        actualizarFacturacion: function actualizarFacturacion() {
+            // if (this.validarIngreso()){
+            //     return;
+            // }
+
+            var me = this;
+
+            for (var i = 0; i < me.arrayDetalle.length; i++) {
+                me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
+                me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
+                me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+            }
+            me.total += parseFloat(me.subtotal) + parseFloat(me.iva);
+            me.sugerirNumFactura();
+
+            axios.put(this.ruta + '/facturacion/actualizar', {
+                'num_factura': me.num_factura,
+                'id_tercero': me.id_tercero,
+                'fec_edita': me.fechaHoraActual,
+                'subtotal': me.subtotal,
+                'valor_iva': me.iva,
+                'total': me.total,
+                'abono': me.abono,
+                'saldo': me.saldo,
+                'detalle': me.detalle,
+                'descuento': me.descuento,
+                'fec_registra': null,
+                'fec_envia': null,
+                'fec_anula': null,
+                'usu_registra': null,
+                'usu_envia': null,
+                'usu_anula': null,
+                'fecha': me.fecha,
+                'estado': me.estado,
+                'data': me.arrayDetalle,
+                'id': me.facturacion_id
+            }).then(function (response) {
+                me.ocultarDetalle();
+                me.listarFacturacion(1, '', '');
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48551,11 +48686,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                         switch (accion) {
                             case 'registrar':
                                 {
+                                    me.sugerirNumFactura();
+                                    me.tipoAccion2 = 1;
                                     me.facturacion_id = 0;
                                     me.num_factura = 0;
-                                    me.id_tercero_facturacion = 0;
+                                    me.id_tercero = 0;
                                     me.tercero_facturacion = '';
-                                    me.id_usuario = 0;
                                     me.fec_edita = '';
                                     me.subtotal = 0.0;
                                     me.valor_iva = 0.0;
@@ -48568,21 +48704,40 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                                     me.fec_envia = '';
                                     me.fec_anula = '';
                                     me.fecha = '';
-                                    me.valor_subtotal = 0.0;
-                                    me.valor_iva = 0.0;
-                                    me.valor_descuento = 0.0;
-                                    me.valor_final = 0.0;
-                                    me.iva = 0;
 
-                                    me.valorSubtotalDetalle = 0.0;
-                                    me.valorIvaDetalle = 0.0;
-                                    me.valorDescuentoDetalle = 0.0;
-                                    me.valorFinalDetalle = 0.0;
-
-                                    me.arrayFacturacion = [];
                                     me.arrayArticulo = [];
                                     me.arrayDetalle = [];
                                     me.arrayTerceros = [];
+                                    me.listarFacturacion(1, '', '');
+                                    break;
+                                };
+                            case 'actualizar':
+                                {
+                                    me.tipoAccion2 = 2;
+                                    me.facturacion_id = data['id'];
+                                    me.num_factura = data['num_factura'];
+                                    me.id_tercero = data['id_tercero'];
+                                    me.tercero_facturacion = data['nom_tercero'];
+                                    me.fec_edita = me.fechaHoraActual;
+                                    me.subtotal = data['subtotal'];
+                                    me.valor_iva = data['valor_iva'];
+                                    me.total = data['total'];
+                                    me.abono = data['abono'];
+                                    me.saldo = data['saldo'];
+                                    me.detalle = data['detalle'];
+                                    me.descuento = data['descuento'];
+                                    me.fec_registra = data['fec_registra'];
+                                    me.fec_envia = data['fec_envia'];
+                                    me.fec_anula = data['fec_anula'];
+                                    me.fecha = data['fecha'];
+                                    me.estado = data['estado'];
+
+                                    me.arrayArticulo = [];
+                                    me.arrayTerceros = [];
+                                    me.arrayDetalle = [];
+                                    // me.listarFacturacion(1,'','');
+                                    me.listarDetalle(data['id']);
+                                    break;
                                 };
                         }
                     }
@@ -48590,6 +48745,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         },
         ocultarDetalle: function ocultarDetalle() {
             this.listado = 1;
+            this.tipoAccion2 = 0;
         },
         verIngreso: function verIngreso(id) {
             var me = this;
@@ -48716,6 +48872,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
     mounted: function mounted() {
+        var d = new Date();
+
+        var dd = d.getDate();
+        var mm = d.getMonth() + 1;
+        var yyyy = d.getFullYear();
+        var h = d.getHours();
+        var min = d.getMinutes();
+        var sec = d.getSeconds();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        d = yyyy + '-' + mm + '-' + dd;
+        this.fechaActual = d;
+        this.fechaHoraActual = d + ' ' + h + ':' + min + ':' + sec;
+
         this.listarFacturacion(1, this.buscar, this.criterio);
     }
 });
@@ -48754,7 +48929,7 @@ var render = function() {
                 attrs: { type: "button" },
                 on: {
                   click: function($event) {
-                    _vm.mostrarDetalle()
+                    _vm.mostrarDetalle("facturacion", "registrar")
                   }
                 }
               },
@@ -48938,11 +49113,21 @@ var render = function() {
                                 }
                               }),
                               _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.estado)
-                                }
-                              }),
+                              facturacion.estado == 1
+                                ? _c("td", [_c("span", [_vm._v("Activa")])])
+                                : facturacion.estado == 2
+                                  ? _c("td", [
+                                      _c("span", [_vm._v("Registrada")])
+                                    ])
+                                  : facturacion.estado == 3
+                                    ? _c("td", [
+                                        _c("span", [_vm._v("Enviada")])
+                                      ])
+                                    : facturacion.estado == 4
+                                      ? _c("td", [
+                                          _c("span", [_vm._v("Anulada")])
+                                        ])
+                                      : _vm._e(),
                               _vm._v(" "),
                               _c(
                                 "td",
@@ -48960,12 +49145,50 @@ var render = function() {
                                     },
                                     [_c("i", { staticClass: "icon-eye" })]
                                   ),
-                                  _vm._v(
-                                    "  \n                                    "
-                                  ),
-                                  facturacion.estado == "Registrado"
-                                    ? [
-                                        _c(
+                                  _vm._v(" "),
+                                  [
+                                    facturacion.estado != 3
+                                      ? _c(
+                                          "button",
+                                          {
+                                            staticClass:
+                                              "btn btn-warning btn-sm",
+                                            attrs: { type: "button" },
+                                            on: {
+                                              click: function($event) {
+                                                _vm.mostrarDetalle(
+                                                  "facturacion",
+                                                  "actualizar",
+                                                  facturacion
+                                                )
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "icon-pencil"
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "button",
+                                          {
+                                            staticClass:
+                                              "btn btn-default btn-sm",
+                                            attrs: { type: "button" }
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "icon-pencil"
+                                            })
+                                          ]
+                                        )
+                                  ],
+                                  _vm._v(" "),
+                                  [
+                                    facturacion.estado != 4 &&
+                                    facturacion.estado != 3
+                                      ? _c(
                                           "button",
                                           {
                                             staticClass:
@@ -48973,39 +49196,32 @@ var render = function() {
                                             attrs: { type: "button" },
                                             on: {
                                               click: function($event) {
-                                                _vm.desactivarIngreso(
-                                                  facturacion.id
+                                                _vm.cambiarEstadoFacturacion(
+                                                  facturacion.id,
+                                                  "anular"
                                                 )
                                               }
                                             }
                                           },
                                           [
                                             _c("i", {
-                                              staticClass: "icon-trash"
+                                              staticClass: "fa fa-eye-slash"
                                             })
                                           ]
                                         )
-                                      ]
-                                    : _vm._e(),
-                                  _vm._v(" "),
-                                  [
-                                    _c(
-                                      "button",
-                                      {
-                                        staticClass: "btn btn-warning btn-sm",
-                                        attrs: { type: "button" },
-                                        on: {
-                                          click: function($event) {
-                                            _vm.mostrarDetalle(
-                                              "facturacion",
-                                              "actualizar",
-                                              facturacion
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [_c("i", { staticClass: "icon-pencil" })]
-                                    )
+                                      : _c(
+                                          "button",
+                                          {
+                                            staticClass:
+                                              "btn btn-default btn-sm",
+                                            attrs: { type: "button" }
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "fa fa-eye-slash"
+                                            })
+                                          ]
+                                        )
                                   ]
                                 ],
                                 2
@@ -49283,7 +49499,87 @@ var render = function() {
                             )
                           ]
                         )
-                      ])
+                      ]),
+                      _vm._v(" "),
+                      _vm.estado
+                        ? _c("div", { staticClass: "col-md-3" }, [
+                            _c("div", { staticClass: "form-group" }, [
+                              _c("label", [_vm._v("Estado")]),
+                              _vm._v(" "),
+                              _vm.estado != 3
+                                ? _c(
+                                    "select",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: _vm.estado,
+                                          expression: "estado"
+                                        }
+                                      ],
+                                      staticClass: "form-control",
+                                      on: {
+                                        change: function($event) {
+                                          var $$selectedVal = Array.prototype.filter
+                                            .call(
+                                              $event.target.options,
+                                              function(o) {
+                                                return o.selected
+                                              }
+                                            )
+                                            .map(function(o) {
+                                              var val =
+                                                "_value" in o
+                                                  ? o._value
+                                                  : o.value
+                                              return val
+                                            })
+                                          _vm.estado = $event.target.multiple
+                                            ? $$selectedVal
+                                            : $$selectedVal[0]
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _vm.estado == 1
+                                        ? _c(
+                                            "option",
+                                            {
+                                              attrs: {
+                                                value: "1",
+                                                disabled: "",
+                                                selected: ""
+                                              }
+                                            },
+                                            [_vm._v("Creada")]
+                                          )
+                                        : _vm._e(),
+                                      _vm._v(" "),
+                                      _c("option", { attrs: { value: "2" } }, [
+                                        _vm._v("Registrada")
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("option", { attrs: { value: "3" } }, [
+                                        _vm._v("Enviada")
+                                      ]),
+                                      _vm._v(" "),
+                                      _c("option", { attrs: { value: "4" } }, [
+                                        _vm._v("Anulada")
+                                      ])
+                                    ]
+                                  )
+                                : _c("input", {
+                                    staticClass: "form-control",
+                                    attrs: {
+                                      type: "text",
+                                      disabled: "",
+                                      value: "Enviada"
+                                    }
+                                  })
+                            ])
+                          ])
+                        : _vm._e()
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "form-group row border" }, [
@@ -49608,7 +49904,12 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            attrs: { type: "number" },
+                                            staticStyle: { width: "9em" },
+                                            attrs: {
+                                              type: "number",
+                                              min: 1,
+                                              max: detalle.stock
+                                            },
                                             domProps: {
                                               value: detalle.cantidad
                                             },
@@ -49639,7 +49940,12 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            attrs: { type: "number" },
+                                            staticStyle: { width: "9em" },
+                                            attrs: {
+                                              type: "number",
+                                              min: 0,
+                                              max: detalle.valor_subtotal
+                                            },
                                             domProps: {
                                               value: detalle.valor_descuento
                                             },
@@ -49663,8 +49969,10 @@ var render = function() {
                                             "\n                                        $ " +
                                               _vm._s(
                                                 (detalle.valor_iva = Math.round(
-                                                  detalle.precio -
-                                                    detalle.precio /
+                                                  detalle.precio *
+                                                    detalle.cantidad -
+                                                    detalle.precio *
+                                                      detalle.cantidad /
                                                       (detalle.iva / 100 + 1)
                                                 ))
                                               ) +
@@ -49753,7 +50061,12 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            attrs: { min: "0", type: "number" },
+                                            staticStyle: { width: "9em" },
+                                            attrs: {
+                                              min: 0,
+                                              max: _vm.calcularTotal,
+                                              type: "number"
+                                            },
                                             domProps: { value: _vm.abono },
                                             on: {
                                               input: function($event) {
@@ -49813,19 +50126,35 @@ var render = function() {
                           [_vm._v("Cerrar")]
                         ),
                         _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.registrarFacturacion()
-                              }
-                            }
-                          },
-                          [_vm._v("Registrar Factura")]
-                        )
+                        _vm.tipoAccion2 == 1
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-primary",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.registrarFacturacion()
+                                  }
+                                }
+                              },
+                              [_vm._v("Registrar Factura")]
+                            )
+                          : _vm.tipoAccion2 == 2
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      _vm.actualizarFacturacion()
+                                    }
+                                  }
+                                },
+                                [_vm._v("Actualizar Factura")]
+                              )
+                            : _vm._e()
                       ])
                     ])
                   ])
@@ -50427,13 +50756,13 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Precio")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Cantidad")]),
+        _c("th", { staticStyle: { width: "9em" } }, [_vm._v("Cantidad")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Descuento")]),
+        _c("th", { staticStyle: { width: "9em" } }, [_vm._v("Descuento")]),
         _vm._v(" "),
         _c("th", [_vm._v("Iva")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Subtotal")])
+        _c("th", { staticStyle: { width: "9em" } }, [_vm._v("Subtotal")])
       ])
     ])
   },

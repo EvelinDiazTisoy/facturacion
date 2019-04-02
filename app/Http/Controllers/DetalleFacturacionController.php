@@ -56,11 +56,11 @@ class DetalleFacturacionController extends Controller
         $id_factura = $request->id_factura;
         $detalle_facturacion = DetalleFacturacion::join('facturacion', 'detalle_facturacion.id_factura','=','facturacion.id')
         ->join('articulos', 'detalle_facturacion.id_producto','=','articulos.id')
-        ->select('detalle_facturacion.id','detalle_facturacion.id_factura','facturacion.num_factura as num_factura','detalle_facturacion.id_producto','articulos.id as id_articulo','articulos.codigo as codigo_articulo','articulos.nombre as articulo','articulos.precio_venta','articulos.stock','detalle_facturacion.valor_venta','detalle_facturacion.cantidad','detalle_facturacion.valor_iva','detalle_facturacion.valor_descuento','detalle_facturacion.porcentaje_iva','detalle_facturacion.valor_subtotal','detalle_facturacion.valor_final')
+        ->select('detalle_facturacion.id','detalle_facturacion.id_factura','facturacion.num_factura as num_factura','detalle_facturacion.id_producto','articulos.id as id_articulo','articulos.codigo as codigo_articulo','articulos.nombre as articulo','articulos.precio_venta as precio','articulos.stock','detalle_facturacion.valor_venta','detalle_facturacion.cantidad','detalle_facturacion.valor_iva','detalle_facturacion.valor_descuento','detalle_facturacion.porcentaje_iva as iva','detalle_facturacion.valor_subtotal','detalle_facturacion.valor_final')
         ->where('detalle_facturacion.id_factura','=', $id_factura)
         ->get();
 
-        return ['detalle_facturacion' => $detalle_facturacion];
+        return ['detalles' => $detalle_facturacion];
     }
     
     public function redirect_log(){

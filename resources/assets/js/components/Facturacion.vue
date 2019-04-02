@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Facturacion
-                        <button type="button" @click="mostrarDetalle()" v-show="listado==1" class="btn btn-secondary">
+                        <button type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -55,19 +55,45 @@
                                         <td v-text="facturacion.descuento"></td>
                                         <td v-text="facturacion.valor_iva"></td>
                                         <td v-text="facturacion.total"></td>
-                                        <td v-text="facturacion.estado"></td>
+                                        <td v-if="facturacion.estado==1"><span>Activa</span></td>
+                                        <td v-else-if="facturacion.estado==2"><span>Registrada</span></td>
+                                        <td v-else-if="facturacion.estado==3"><span>Enviada</span></td>
+                                        <td v-else-if="facturacion.estado==4"><span>Anulada</span></td>
                                         <td>
                                             <button type="button" @click="verIngreso(facturacion.id)" class="btn btn-success btn-sm">
-                                            <i class="icon-eye"></i>
-                                            </button> &nbsp;
-                                            <template v-if="facturacion.estado=='Registrado'">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(facturacion.id)">
-                                                    <i class="icon-trash"></i>
+                                                <i class="icon-eye"></i>
+                                            </button>
+                                            <template>
+                                                <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm" v-if="facturacion.estado!=3">
+                                                    <i class="icon-pencil"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-sm" v-else>
+                                                    <i class="icon-pencil"></i>
                                                 </button>
                                             </template>
+                                            <!--
+                                            <template v-if="facturacion.estado==1">
+                                                <button type="button" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
+                                                    <i class="fa fa-registered"></i>
+                                                </button>
+                                            </template>
+                                            <template v-else-if="facturacion.estado==2">
+                                                <button type="button" class="btn btn-primary btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'enviar')">
+                                                    <i class="fa fa-share-square"></i>
+                                                </button>
+                                            </template>
+                                            <template v-if="facturacion.estado==3">
+                                                <button type="button" class="btn btn-default btn-sm">
+                                                    <i class="fa fa-share-square"></i>
+                                                </button>
+                                            </template>
+                                            -->
                                             <template>
-                                                <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm">
-                                                    <i class="icon-pencil"></i>
+                                                <button type="button" class="btn btn-danger btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'anular')" v-if="facturacion.estado!=4 && facturacion.estado!=3">
+                                                    <i class="fa fa-eye-slash"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-sm" v-else>
+                                                    <i class="fa fa-eye-slash"></i>
                                                 </button>
                                             </template>
                                         </td>
@@ -134,6 +160,18 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-3" v-if="estado">
+                                <div class="form-group">
+                                    <label>Estado</label>
+                                    <select v-if="estado!=3" v-model="estado" class="form-control">
+                                        <option value="1" v-if="estado==1" disabled selected>Creada</option>
+                                        <option value="2">Registrada</option>
+                                        <option value="3">Enviada</option>
+                                        <option value="4">Anulada</option>
+                                    </select>
+                                    <input type="text" disabled v-else value="Enviada" class="form-control">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group row border">
                             <div class="col-md-4">
@@ -178,10 +216,10 @@
                                             <th>Opciones</th>
                                             <th>Artículo</th>
                                             <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th>Descuento</th>
+                                            <th style="width: 9em;">Cantidad</th>
+                                            <th style="width: 9em;">Descuento</th>
                                             <th>Iva</th>
-                                            <th>Subtotal</th>
+                                            <th style="width: 9em;">Subtotal</th>
                                         </tr>
                                     </thead>
                                     <tbody v-if="arrayDetalle.length">
@@ -198,13 +236,14 @@
                                                 {{detalle.precio}}
                                             </td>
                                             <td>
-                                                <input v-model="detalle.cantidad" type="number" class="form-control">
+                                                <input v-model="detalle.cantidad" type="number" class="form-control" style="width: 9em;" :min="1" :max="detalle.stock">
                                             </td>
                                             <td>
-                                                <input v-model="detalle.valor_descuento" type="number" class="form-control">
+                                                <input v-model="detalle.valor_descuento" type="number" class="form-control" style="width: 9em;" :min="0" :max="detalle.valor_subtotal">
                                             </td>
                                             <td>
-                                                $ {{detalle.valor_iva=Math.round(detalle.precio-(detalle.precio/((detalle.iva/100)+1)))}}
+                                                <!-- $ {{detalle.valor_iva=Math.round(detalle.precio-(detalle.precio/((detalle.iva/100)+1)))}} -->
+                                                $ {{detalle.valor_iva=Math.round((detalle.precio*detalle.cantidad)-((detalle.precio*detalle.cantidad)/((detalle.iva/100)+1)))}}
                                             </td>
                                             <td>
                                                 {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento}}
@@ -220,7 +259,7 @@
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="6" align="right"><strong>Abono:</strong></td>
-                                            <td><input v-model="abono" min="0" type="number" class="form-control"></td>
+                                            <td><input v-model="abono" :min="0" :max="calcularTotal" type="number" class="form-control" style="width: 9em;"></td>
                                         </tr>
                                         <tr style="background-color: #CEECF5;">
                                             <td colspan="6" align="right"><strong>Saldo:</strong></td>
@@ -240,7 +279,8 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
-                                <button type="button" class="btn btn-primary" @click="registrarFacturacion()">Registrar Factura</button>
+                                <button type="button" class="btn btn-primary" v-if="tipoAccion2==1" @click="registrarFacturacion()">Registrar Factura</button>
+                                <button type="button" v-else-if="tipoAccion2==2" class="btn btn-primary" @click="actualizarFacturacion()">Actualizar Factura</button>
                             </div>
                         </div>
                     </div>
@@ -453,6 +493,7 @@
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
+                tipoAccion2 : 0,
                 errorIngreso : 0,
                 errorMostrarMsjIngreso : [],
                 pagination : {
@@ -524,8 +565,13 @@
 
                 arrayFacturacion : [],
 
-                iva:0
+                iva:0,
 
+                fechaActual: '',
+                fechaHoraActual:'',
+
+                estado: 0,
+                cambiarEstado: 0,
             }
         },
         components: {
@@ -562,16 +608,16 @@
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
                     // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
-                    resultado=resultado+(this.arrayDetalle[i].valor_subtotal+this.arrayDetalle[i].valor_iva)-this.arrayDetalle[i].valor_descuento
+                    resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)-this.arrayDetalle[i].valor_descuento)
                 }
                 return resultado;
             },
             calcularTotalIva: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    // resultado=resultado+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)
-                    resultado=Math.round(resultado+(this.arrayDetalle[i].valor_iva));
+                    resultado = resultado+(this.calcularTotal-this.arrayDetalle[i].valor_subtotal);
                 }
+                resultado = Math.round(resultado);
                 return resultado;
             },
             calcularSaldo: function(){
@@ -590,7 +636,17 @@
                     var respuesta= response.data;
                     me.arrayFacturacion = respuesta.facturacion.data;
                     me.pagination= respuesta.pagination;
-                    console.log(me.arrayFacturacion);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            listarDetalle(id_factura){
+                let me=this;
+                var url= this.ruta +'/detalle_facturacion/buscarDetalleFacturacion?id_factura=' + id_factura;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayDetalle = respuesta.detalles;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -641,7 +697,47 @@
                     console.log(error);
                 });
             },
+            sugerirNumFactura(){
+                let me=this;
+                var url= this.ruta +'/facturacion/buscarNumFacturaSugerida';
 
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.num_factura = parseInt(respuesta.facturacion[0].num_factura)+1;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            cambiarEstadoFacturacion(id_factura, accion){
+                let me=this;
+                var cambiarEstado = '';
+
+                switch(accion)
+                {
+                    case 'registrar':{
+                        cambiarEstado = '2';
+                        break;
+                    };
+                    case 'enviar':{
+                        cambiarEstado = '3';
+                        break;
+                    };
+                    case 'anular':{
+                        cambiarEstado = '4';
+                        break;
+                    };
+                }
+
+                axios.put(this.ruta +'/facturacion/cambiarEstado',{
+                    'estado': cambiarEstado,
+                    'id': id_factura
+                }).then(function (response) {
+                    me.listarFacturacion(1,'','');
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -679,7 +775,7 @@
                             idarticulo: me.idarticulo,
                             articulo: me.articulo,
                             cantidad: me.cantidad,
-                            valor_descuento: me.valor_descuento,
+                            descuento: me.descuento,
                             precio: me.precio,
                             iva: me.iva
                         });
@@ -713,7 +809,6 @@
                         valor_descuento: 0,
                         precio: data['precio_venta'],
                         iva: data['iva'],
-                        // valor_final: parseFloat(data['precio_venta'])+((parseFloat(data['precio_venta'])/100)*parseFloat(data['iva'])),
                     }); 
                 }
             },
@@ -742,6 +837,7 @@
                     me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
                 }
                 me.total += parseFloat(me.subtotal)+parseFloat(me.iva);
+                me.sugerirNumFactura();
 
                 axios.post(this.ruta +'/facturacion/registrar',{
                     'num_factura': me.num_factura,
@@ -768,7 +864,7 @@
                     me.arrayFacturacion=[];
                     me.listarFacturacion(1,'','');
                     me.num_factura=0,
-                    me.id_tercero_facturacion=0,
+                    me.id_tercero=0,
                     me.tercero_facturacion='',
                     me.id_usuario=0,
                     me.fec_edita='',
@@ -785,6 +881,50 @@
                     me.fecha = '',
                     me.arrayDetalle=[];
                     me.arrayTerceros=[];
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            actualizarFacturacion(){
+                // if (this.validarIngreso()){
+                //     return;
+                // }
+                
+                let me = this;
+                
+                for(var i=0; i<me.arrayDetalle.length; i++)
+                {
+                    me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
+                    me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
+                    me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+                }
+                me.total += parseFloat(me.subtotal)+parseFloat(me.iva);
+                me.sugerirNumFactura();
+                
+                axios.put(this.ruta +'/facturacion/actualizar',{
+                    'num_factura': me.num_factura,
+                    'id_tercero': me.id_tercero,
+                    'fec_edita': me.fechaHoraActual,
+                    'subtotal': me.subtotal,
+                    'valor_iva': me.iva,
+                    'total': me.total,
+                    'abono': me.abono,
+                    'saldo': me.saldo,
+                    'detalle': me.detalle,
+                    'descuento': me.descuento,
+                    'fec_registra': null,
+                    'fec_envia': null,
+                    'fec_anula': null,
+                    'usu_registra': null,
+                    'usu_envia': null,
+                    'usu_anula': null,
+                    'fecha': me.fecha,
+                    'estado': me.estado,
+                    'data': me.arrayDetalle,
+                    'id' : me.facturacion_id
+                }).then(function (response) {
+                    me.ocultarDetalle();
+                    me.listarFacturacion(1,'','');
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -806,16 +946,17 @@
             mostrarDetalle(modelo, accion, data=[]){
                 let me=this;
                 me.listado=0;
-
+                
                 switch(modelo){
                     case 'facturacion':{
                         switch(accion){
                             case 'registrar':{
+                                me.sugerirNumFactura();
+                                me.tipoAccion2 = 1;
                                 me.facturacion_id=0;
                                 me.num_factura=0;
-                                me.id_tercero_facturacion=0;
+                                me.id_tercero=0;
                                 me.tercero_facturacion='';
-                                me.id_usuario=0;
                                 me.fec_edita='';
                                 me.subtotal=0.0;
                                 me.valor_iva=0.0;
@@ -828,21 +969,39 @@
                                 me.fec_envia='';
                                 me.fec_anula='';
                                 me.fecha = '';
-                                me.valor_subtotal=0.0;
-                                me.valor_iva=0.0;
-                                me.valor_descuento=0.0;
-                                me.valor_final=0.0;
-                                me.iva=0;
 
-                                me.valorSubtotalDetalle=0.0;
-                                me.valorIvaDetalle=0.0;
-                                me.valorDescuentoDetalle=0.0;
-                                me.valorFinalDetalle=0.0;
-
-                                me.arrayFacturacion = [];
                                 me.arrayArticulo=[];
                                 me.arrayDetalle=[];
                                 me.arrayTerceros=[];
+                                me.listarFacturacion(1,'','');
+                                break;
+                            };
+                            case 'actualizar':{
+                                me.tipoAccion2 = 2;
+                                me.facturacion_id=data['id'];
+                                me.num_factura=data['num_factura'];
+                                me.id_tercero=data['id_tercero'];
+                                me.tercero_facturacion=data['nom_tercero'];
+                                me.fec_edita=me.fechaHoraActual;
+                                me.subtotal=data['subtotal'];
+                                me.valor_iva=data['valor_iva'];
+                                me.total=data['total'];
+                                me.abono=data['abono'];
+                                me.saldo=data['saldo'];
+                                me.detalle=data['detalle'];
+                                me.descuento=data['descuento'];
+                                me.fec_registra=data['fec_registra'];
+                                me.fec_envia=data['fec_envia'];
+                                me.fec_anula=data['fec_anula'];
+                                me.fecha =data['fecha'];
+                                me.estado = data['estado'];
+
+                                me.arrayArticulo=[];
+                                me.arrayTerceros=[];
+                                me.arrayDetalle=[]
+                                // me.listarFacturacion(1,'','');
+                                me.listarDetalle(data['id']);
+                                break;
                             };
                         }
                     }
@@ -850,6 +1009,7 @@
             },
             ocultarDetalle(){
                 this.listado=1;
+                this.tipoAccion2=0;
             },
             verIngreso(id){
                 let me=this;
@@ -989,6 +1149,26 @@
             }
         },
         mounted() {
+            var d = new Date();
+            
+            
+            var dd = d.getDate();
+            var mm = d.getMonth()+1;
+            var yyyy = d.getFullYear();
+            var h = d.getHours();
+            var min = d.getMinutes();
+            var sec = d.getSeconds();
+            
+            if(dd<10){
+                dd='0'+dd;
+            } 
+            if(mm<10){
+                mm='0'+mm;
+            } 
+            d = yyyy+'-'+mm+'-'+dd;
+            this.fechaActual = d;
+            this.fechaHoraActual = d+' '+h+':'+min+':'+sec;
+
             this.listarFacturacion(1,this.buscar,this.criterio);
         }
     }
