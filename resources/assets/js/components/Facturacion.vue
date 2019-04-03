@@ -16,18 +16,86 @@
                     <!-- Listado-->
                     <template v-if="listado==1">
                     <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="row">
+                                <!--
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterio">
-                                      <option value="tipo_comprobante">Tipo Comprobante</option>
-                                      <option value="num_comprobante">Número Comprobante</option>
-                                      <option value="fecha_hora">Fecha-Hora</option>
+                                        <option value="tipo_comprobante">Tipo Comprobante</option>
+                                        <option value="num_comprobante">Número Comprobante</option>
+                                        <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <input type="text" v-model="buscar" @keyup.enter="listarFacturacion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <button type="submit" @click="listarFacturacion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
+                                -->
+                                <div class="form-group col-md-3">
+                                    <label class="float-left">N° factura</label>
+                                    <div class="col-md-8 float-right">
+                                        <input type="number" :min=0 class="form-control" v-model="numFacturaFiltro">
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label class="float-left">Estado</label>
+                                    <div class="col-md-8 float-right">
+                                        <select class="form-control" v-model="estadoFiltro">
+                                            <option value="0">Todas</option>
+                                            <option value="1">Activa</option>
+                                            <option value="2">Registrada</option>
+                                            <option value="3">Enviada</option>
+                                            <option value="4">Anulada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="" class="float-left">Tercero(*) </label>
+                                    <div class="form-inline float-right">
+                                        <input type="text" readonly style="max-width: 85px;" class="form-control" name="cuenta_fin" v-model="terceroFiltro">
+                                        <button @click="abrirModalT('tercero_filtro')" style="min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                        <button @click="quitar(4)" style="min-width: 30px;" class="btn btn-danger form-control">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="float-left">Orden</label>
+                                    <div class="col-md-8 float-right">
+                                        <select v-model="ordenFiltro" class="form-control">
+                                            <option value="num_factura">N° Factura</option>
+                                            <option value="nom_tercero">Tercero</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="float-left">Desde:</label>
+                                    <div class="col-md-8 float-right">
+                                        <input type="date" class="form-control" v-model="desdeFiltro">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="float-left">Hasta:</label>
+                                    <div class="col-md-8 float-right">
+                                        <input type="date" class="form-control" v-model="hastaFiltro">
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="" class="float-left">Vendedor(*) </label>
+                                    <div class="form-inline float-right">
+                                        <input type="text" readonly style="max-width: 85px;" class="form-control" name="cuenta_fin" v-model="vendedorFiltro">
+                                        <button @click="abrirModalT('vendedor_filtro')" style="min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                        <button @click="quitar(5)" style="min-width: 30px;" class="btn btn-danger form-control">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" @click="listarFacturacion(1,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro)" class="btn btn-primary">
+                                        <i class="fa fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>  
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-sm">
@@ -138,7 +206,7 @@
                                     <label for="">Tercero(*)</label>
                                     <div class="form-inline">
                                         <input type="text" readonly style="    max-width: 90px;" class="form-control" name="cuenta_fin" v-model="tercero">
-                                        <button @click="abrirModalT()" style="    min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                        <button @click="abrirModalT('terceros')" style="    min-width: 30px;" class="btn btn-primary form-control">...</button>
                                         <button @click="quitar(3)" style="    min-width: 30px;" class="btn btn-danger form-control">
                                             <i class="icon-trash"></i>
                                         </button>
@@ -494,6 +562,7 @@
                 tituloModal : '',
                 tipoAccion : 0,
                 tipoAccion2 : 0,
+                tipoAccionModalTerceros : 0,
                 errorIngreso : 0,
                 errorMostrarMsjIngreso : [],
                 pagination : {
@@ -554,15 +623,6 @@
                 fec_anula:'',
                 fecha : '',
 
-                valorSubtotalDetalle:0.0,
-                valorIvaDetalle:0.0,
-                valorDescuentoDetalle:0.0,
-                valorFinalDetalle:0.0,
-                valor_subtotal:0.0,
-                valor_iva:0.0,
-                valor_descuento:0.0,
-                valor_final:0.0,
-
                 arrayFacturacion : [],
 
                 iva:0,
@@ -572,6 +632,18 @@
 
                 estado: 0,
                 cambiarEstado: 0,
+
+                // Variables filtro
+                numFacturaFiltro : '',
+                estadoFiltro : '',
+                idTerceroFiltro : '',
+                terceroFiltro : '',
+                desdeFiltro : '2019-01-01',
+                hastaFiltro : '',
+                ordenFiltro : '',
+                idVendedorFiltro : '',
+                vendedorFiltro : '',
+                
             }
         },
         components: {
@@ -629,9 +701,10 @@
             },
         },
         methods : {
-            listarFacturacion (page,buscar,criterio){
+            listarFacturacion (page,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro){
                 let me=this;
-                var url= this.ruta +'/facturacion?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                
+                var url= this.ruta +'/facturacion?page=' + page + '&numFacturaFiltro='+ numFacturaFiltro + '&estadoFiltro='+ estadoFiltro + '&idTerceroFiltro='+ idTerceroFiltro + '&ordenFiltro='+ ordenFiltro + '&desdeFiltro='+ desdeFiltro + '&hastaFiltro='+ hastaFiltro + '&idVendedorFiltro='+ idVendedorFiltro;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayFacturacion = respuesta.facturacion.data;
@@ -733,7 +806,7 @@
                     'estado': cambiarEstado,
                     'id': id_factura
                 }).then(function (response) {
-                    me.listarFacturacion(1,'','');
+                    me.listarFacturacion(1,'','','','','','','');
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -743,7 +816,7 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarFacturacion(page,buscar,criterio);
+                me.listarFacturacion(1,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro);
             },
             encuentra(id){
                 var sw=0;
@@ -862,7 +935,7 @@
                 }).then(function (response) {
                     me.listado=1;
                     me.arrayFacturacion=[];
-                    me.listarFacturacion(1,'','');
+                    me.listarFacturacion(1,'','','','','','','');
                     me.num_factura=0,
                     me.id_tercero=0,
                     me.tercero_facturacion='',
@@ -924,7 +997,7 @@
                     'id' : me.facturacion_id
                 }).then(function (response) {
                     me.ocultarDetalle();
-                    me.listarFacturacion(1,'','');
+                    me.listarFacturacion(1,'','','','','','','');
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -973,7 +1046,7 @@
                                 me.arrayArticulo=[];
                                 me.arrayDetalle=[];
                                 me.arrayTerceros=[];
-                                me.listarFacturacion(1,'','');
+                                me.listarFacturacion(1,'','','','','','','');
                                 break;
                             };
                             case 'actualizar':{
@@ -999,7 +1072,7 @@
                                 me.arrayArticulo=[];
                                 me.arrayTerceros=[];
                                 me.arrayDetalle=[]
-                                // me.listarFacturacion(1,'','');
+                                // me.listarFacturacion(1,'','','','','','','');
                                 me.listarDetalle(data['id']);
                                 break;
                             };
@@ -1075,7 +1148,7 @@
                     axios.put(this.ruta +'/ingreso/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarFacturacion(1,'','');
+                        me.listarFacturacion(1,'','','','','','','');
                         swal(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
@@ -1096,11 +1169,26 @@
             },
 
             // funcion abrir modal proveedores
-            abrirModalT(tipo_cta){               
+            abrirModalT(accion){               
                 this.arrayTerceros=[];
                 this.modal2 = 1;
-                this.tipo_cta = tipo_cta;
-                this.tituloModal = 'Seleccione un tercero';
+                switch(accion){
+                    case 'terceros':{
+                        this.tituloModal2 = 'Seleccione un tercero';
+                        this.tipoAccionModalTerceros = 1;
+                        break;
+                    }
+                    case 'tercero_filtro':{
+                        this.tituloModal2 = 'Seleccione un tercero para el filtro';
+                        this.tipoAccionModalTerceros = 2;
+                        break;
+                    }
+                    case 'vendedor_filtro':{
+                        this.tituloModal2 = 'Seleccione un vendedor';
+                        this.tipoAccionModalTerceros = 3;
+                        break;
+                    }
+                }
             },
             cerrarModalT(){
                 this.modal2=0;
@@ -1108,9 +1196,22 @@
                 this.terc_busq = '';
             },
             cargarTercero(tercero){
-                
-                this.tercero = tercero['num_documento'];
-                this.id_tercero = tercero['id'];                
+                if(this.tipoAccionModalTerceros==1)
+                {
+                    this.tercero = tercero['num_documento'];
+                    this.id_tercero = tercero['id'];
+                }
+                if(this.tipoAccionModalTerceros==2)
+                {
+                    this.terceroFiltro = tercero['num_documento'];
+                    this.idTerceroFiltro = tercero['id'];
+                }
+                if(this.tipoAccionModalTerceros==3)
+                {
+                    this.vendedorFiltro = tercero['num_documento'];
+                    this.idVendedorFiltro = tercero['id'];
+                }
+
                 this.cerrarModalT();
             },
             buscarTercero(){
@@ -1146,6 +1247,14 @@
                     this.id_tercero = '';
                     this.tercero = '';
                 }
+                if(opc==4){
+                    this.idTerceroFiltro = '';
+                    this.terceroFiltro = '';
+                }
+                if(opc==5){
+                    this.idVendedorFiltro = '';
+                    this.vendedorFiltro = '';
+                }
             }
         },
         mounted() {
@@ -1167,9 +1276,10 @@
             } 
             d = yyyy+'-'+mm+'-'+dd;
             this.fechaActual = d;
+            this.hastaFiltro = d;
             this.fechaHoraActual = d+' '+h+':'+min+':'+sec;
 
-            this.listarFacturacion(1,this.buscar,this.criterio);
+            this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
         }
     }
 </script>

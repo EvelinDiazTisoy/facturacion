@@ -48277,6 +48277,74 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48304,6 +48372,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tituloModal: '',
             tipoAccion: 0,
             tipoAccion2: 0,
+            tipoAccionModalTerceros: 0,
             errorIngreso: 0,
             errorMostrarMsjIngreso: [],
             pagination: {
@@ -48331,7 +48400,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             tercero: '',
             id_tercero: '',
             tituloModal2: ''
-        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'valorSubtotalDetalle', 0.0), _defineProperty(_ref, 'valorIvaDetalle', 0.0), _defineProperty(_ref, 'valorDescuentoDetalle', 0.0), _defineProperty(_ref, 'valorFinalDetalle', 0.0), _defineProperty(_ref, 'valor_subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'valor_descuento', 0.0), _defineProperty(_ref, 'valor_final', 0.0), _defineProperty(_ref, 'arrayFacturacion', []), _defineProperty(_ref, 'iva', 0), _defineProperty(_ref, 'fechaActual', ''), _defineProperty(_ref, 'fechaHoraActual', ''), _defineProperty(_ref, 'estado', 0), _defineProperty(_ref, 'cambiarEstado', 0), _ref;
+        }, _defineProperty(_ref, 'buscar', ''), _defineProperty(_ref, 'ctn_ban', 0), _defineProperty(_ref, 'tipo_cta', ''), _defineProperty(_ref, 'cta_busq', ''), _defineProperty(_ref, 'terc_busq', ''), _defineProperty(_ref, 'tipo_ingreso', ''), _defineProperty(_ref, 'arrayTerceros', []), _defineProperty(_ref, 'cuenta_ini', ''), _defineProperty(_ref, 'id_cuenta_ini', ''), _defineProperty(_ref, 'cuenta_fin', ''), _defineProperty(_ref, 'id_cuenta_fin', ''), _defineProperty(_ref, 'facturacion_id', 0), _defineProperty(_ref, 'num_factura', 0), _defineProperty(_ref, 'id_tercero_facturacion', 0), _defineProperty(_ref, 'tercero_facturacion', ''), _defineProperty(_ref, 'id_usuario', 0), _defineProperty(_ref, 'fec_edita', ''), _defineProperty(_ref, 'subtotal', 0.0), _defineProperty(_ref, 'valor_iva', 0.0), _defineProperty(_ref, 'total', 0.0), _defineProperty(_ref, 'abono', 0.0), _defineProperty(_ref, 'saldo', 0.0), _defineProperty(_ref, 'detalle', ''), _defineProperty(_ref, 'descuento', 0.0), _defineProperty(_ref, 'fec_registra', ''), _defineProperty(_ref, 'fec_envia', ''), _defineProperty(_ref, 'fec_anula', ''), _defineProperty(_ref, 'fecha', ''), _defineProperty(_ref, 'arrayFacturacion', []), _defineProperty(_ref, 'iva', 0), _defineProperty(_ref, 'fechaActual', ''), _defineProperty(_ref, 'fechaHoraActual', ''), _defineProperty(_ref, 'estado', 0), _defineProperty(_ref, 'cambiarEstado', 0), _defineProperty(_ref, 'numFacturaFiltro', ''), _defineProperty(_ref, 'estadoFiltro', ''), _defineProperty(_ref, 'idTerceroFiltro', ''), _defineProperty(_ref, 'terceroFiltro', ''), _defineProperty(_ref, 'desdeFiltro', '2019-01-01'), _defineProperty(_ref, 'hastaFiltro', ''), _defineProperty(_ref, 'ordenFiltro', ''), _defineProperty(_ref, 'idVendedorFiltro', ''), _defineProperty(_ref, 'vendedorFiltro', ''), _ref;
     },
 
     components: {
@@ -48389,9 +48458,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
     methods: {
-        listarFacturacion: function listarFacturacion(page, buscar, criterio) {
+        listarFacturacion: function listarFacturacion(page, numFacturaFiltro, estadoFiltro, idTerceroFiltro, ordenFiltro, desdeFiltro, hastaFiltro, idVendedorFiltro) {
             var me = this;
-            var url = this.ruta + '/facturacion?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
+
+            var url = this.ruta + '/facturacion?page=' + page + '&numFacturaFiltro=' + numFacturaFiltro + '&estadoFiltro=' + estadoFiltro + '&idTerceroFiltro=' + idTerceroFiltro + '&ordenFiltro=' + ordenFiltro + '&desdeFiltro=' + desdeFiltro + '&hastaFiltro=' + hastaFiltro + '&idVendedorFiltro=' + idVendedorFiltro;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
                 me.arrayFacturacion = respuesta.facturacion.data;
@@ -48489,7 +48559,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 'estado': cambiarEstado,
                 'id': id_factura
             }).then(function (response) {
-                me.listarFacturacion(1, '', '');
+                me.listarFacturacion(1, '', '', '', '', '', '', '');
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48499,7 +48569,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             //Actualiza la página actual
             me.pagination.current_page = page;
             //Envia la petición para visualizar la data de esa página
-            me.listarFacturacion(page, buscar, criterio);
+            me.listarFacturacion(1, numFacturaFiltro, estadoFiltro, idTerceroFiltro, ordenFiltro, desdeFiltro, hastaFiltro, idVendedorFiltro);
         },
         encuentra: function encuentra(id) {
             var sw = 0;
@@ -48610,7 +48680,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }).then(function (response) {
                 me.listado = 1;
                 me.arrayFacturacion = [];
-                me.listarFacturacion(1, '', '');
+                me.listarFacturacion(1, '', '', '', '', '', '', '');
                 me.num_factura = 0, me.id_tercero = 0, me.tercero_facturacion = '', me.id_usuario = 0, me.fec_edita = '', me.subtotal = 0.0, me.valor_iva = 0.0, me.total = 0.0, me.abono = 0.0, me.saldo = 0.0, me.detalle = '', me.descuento = 0.0, me.fec_registra = '', me.fec_envia = '', me.fec_anula = '', me.fecha = '', me.arrayDetalle = [];
                 me.arrayTerceros = [];
             }).catch(function (error) {
@@ -48655,7 +48725,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 'id': me.facturacion_id
             }).then(function (response) {
                 me.ocultarDetalle();
-                me.listarFacturacion(1, '', '');
+                me.listarFacturacion(1, '', '', '', '', '', '', '');
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48708,7 +48778,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                                     me.arrayArticulo = [];
                                     me.arrayDetalle = [];
                                     me.arrayTerceros = [];
-                                    me.listarFacturacion(1, '', '');
+                                    me.listarFacturacion(1, '', '', '', '', '', '', '');
                                     break;
                                 };
                             case 'actualizar':
@@ -48735,7 +48805,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                                     me.arrayArticulo = [];
                                     me.arrayTerceros = [];
                                     me.arrayDetalle = [];
-                                    // me.listarFacturacion(1,'','');
+                                    // me.listarFacturacion(1,'','','','','','','');
                                     me.listarDetalle(data['id']);
                                     break;
                                 };
@@ -48811,7 +48881,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     axios.put(_this.ruta + '/ingreso/desactivar', {
                         'id': id
                     }).then(function (response) {
-                        me.listarFacturacion(1, '', '');
+                        me.listarFacturacion(1, '', '', '', '', '', '', '');
                         swal('Anulado!', 'El ingreso ha sido anulado con éxito.', 'success');
                     }).catch(function (error) {
                         console.log(error);
@@ -48824,11 +48894,29 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
         // funcion abrir modal proveedores
-        abrirModalT: function abrirModalT(tipo_cta) {
+        abrirModalT: function abrirModalT(accion) {
             this.arrayTerceros = [];
             this.modal2 = 1;
-            this.tipo_cta = tipo_cta;
-            this.tituloModal = 'Seleccione un tercero';
+            switch (accion) {
+                case 'terceros':
+                    {
+                        this.tituloModal2 = 'Seleccione un tercero';
+                        this.tipoAccionModalTerceros = 1;
+                        break;
+                    }
+                case 'tercero_filtro':
+                    {
+                        this.tituloModal2 = 'Seleccione un tercero para el filtro';
+                        this.tipoAccionModalTerceros = 2;
+                        break;
+                    }
+                case 'vendedor_filtro':
+                    {
+                        this.tituloModal2 = 'Seleccione un vendedor';
+                        this.tipoAccionModalTerceros = 3;
+                        break;
+                    }
+            }
         },
         cerrarModalT: function cerrarModalT() {
             this.modal2 = 0;
@@ -48836,9 +48924,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             this.terc_busq = '';
         },
         cargarTercero: function cargarTercero(tercero) {
+            if (this.tipoAccionModalTerceros == 1) {
+                this.tercero = tercero['num_documento'];
+                this.id_tercero = tercero['id'];
+            }
+            if (this.tipoAccionModalTerceros == 2) {
+                this.terceroFiltro = tercero['num_documento'];
+                this.idTerceroFiltro = tercero['id'];
+            }
+            if (this.tipoAccionModalTerceros == 3) {
+                this.vendedorFiltro = tercero['num_documento'];
+                this.idVendedorFiltro = tercero['id'];
+            }
 
-            this.tercero = tercero['num_documento'];
-            this.id_tercero = tercero['id'];
             this.cerrarModalT();
         },
         buscarTercero: function buscarTercero() {
@@ -48869,6 +48967,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 this.id_tercero = '';
                 this.tercero = '';
             }
+            if (opc == 4) {
+                this.idTerceroFiltro = '';
+                this.terceroFiltro = '';
+            }
+            if (opc == 5) {
+                this.idVendedorFiltro = '';
+                this.vendedorFiltro = '';
+            }
         }
     },
     mounted: function mounted() {
@@ -48889,9 +48995,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
         d = yyyy + '-' + mm + '-' + dd;
         this.fechaActual = d;
+        this.hastaFiltro = d;
         this.fechaHoraActual = d + ' ' + h + ':' + min + ':' + sec;
 
-        this.listarFacturacion(1, this.buscar, this.criterio);
+        this.listarFacturacion(1, this.numFacturaFiltro, this.estadoFiltro, this.idTerceroFiltro, this.ordenFiltro, this.desdeFiltro, this.hastaFiltro, this.idVendedorFiltro);
     }
 });
 
@@ -48943,90 +49050,343 @@ var render = function() {
           _vm.listado == 1
             ? [
                 _c("div", { staticClass: "card-body" }, [
-                  _c("div", { staticClass: "form-group row" }, [
-                    _c("div", { staticClass: "col-md-6" }, [
-                      _c("div", { staticClass: "input-group" }, [
-                        _c(
-                          "select",
-                          {
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-3" }, [
+                        _c("label", { staticClass: "float-left" }, [
+                          _vm._v("N° factura")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-8 float-right" }, [
+                          _c("input", {
                             directives: [
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.criterio,
-                                expression: "criterio"
+                                value: _vm.numFacturaFiltro,
+                                expression: "numFacturaFiltro"
                               }
                             ],
-                            staticClass: "form-control col-md-3",
+                            staticClass: "form-control",
+                            attrs: { type: "number", min: 0 },
+                            domProps: { value: _vm.numFacturaFiltro },
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.criterio = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.numFacturaFiltro = $event.target.value
                               }
                             }
-                          },
-                          [
-                            _c(
-                              "option",
-                              { attrs: { value: "tipo_comprobante" } },
-                              [_vm._v("Tipo Comprobante")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "option",
-                              { attrs: { value: "num_comprobante" } },
-                              [_vm._v("Número Comprobante")]
-                            ),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "fecha_hora" } }, [
-                              _vm._v("Fecha-Hora")
-                            ])
-                          ]
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-3" }, [
+                        _c("label", { staticClass: "float-left" }, [
+                          _vm._v("Estado")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-8 float-right" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.estadoFiltro,
+                                  expression: "estadoFiltro"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.estadoFiltro = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c("option", { attrs: { value: "0" } }, [
+                                _vm._v("Todas")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "1" } }, [
+                                _vm._v("Activa")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "2" } }, [
+                                _vm._v("Registrada")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "3" } }, [
+                                _vm._v("Enviada")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "4" } }, [
+                                _vm._v("Anulada")
+                              ])
+                            ]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-3" }, [
+                        _c(
+                          "label",
+                          { staticClass: "float-left", attrs: { for: "" } },
+                          [_vm._v("Tercero(*) ")]
                         ),
                         _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.buscar,
-                              expression: "buscar"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: "Texto a buscar"
-                          },
-                          domProps: { value: _vm.buscar },
-                          on: {
-                            keyup: function($event) {
-                              if (
-                                !("button" in $event) &&
-                                _vm._k($event.keyCode, "enter", 13, $event.key)
-                              ) {
-                                return null
+                        _c("div", { staticClass: "form-inline float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.terceroFiltro,
+                                expression: "terceroFiltro"
                               }
-                              _vm.listarFacturacion(1, _vm.buscar, _vm.criterio)
+                            ],
+                            staticClass: "form-control",
+                            staticStyle: { "max-width": "85px" },
+                            attrs: {
+                              type: "text",
+                              readonly: "",
+                              name: "cuenta_fin"
                             },
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                            domProps: { value: _vm.terceroFiltro },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.terceroFiltro = $event.target.value
                               }
-                              _vm.buscar = $event.target.value
                             }
-                          }
-                        }),
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary form-control",
+                              staticStyle: { "min-width": "30px" },
+                              on: {
+                                click: function($event) {
+                                  _vm.abrirModalT("tercero_filtro")
+                                }
+                              }
+                            },
+                            [_vm._v("...")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger form-control",
+                              staticStyle: { "min-width": "30px" },
+                              on: {
+                                click: function($event) {
+                                  _vm.quitar(4)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "icon-trash" })]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("label", { staticClass: "float-left" }, [
+                          _vm._v("Orden")
+                        ]),
                         _vm._v(" "),
+                        _c("div", { staticClass: "col-md-8 float-right" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.ordenFiltro,
+                                  expression: "ordenFiltro"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.ordenFiltro = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "num_factura" } },
+                                [_vm._v("N° Factura")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "option",
+                                { attrs: { value: "nom_tercero" } },
+                                [_vm._v("Tercero")]
+                              )
+                            ]
+                          )
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("label", { staticClass: "float-left" }, [
+                          _vm._v("Desde:")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-8 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.desdeFiltro,
+                                expression: "desdeFiltro"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "date" },
+                            domProps: { value: _vm.desdeFiltro },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.desdeFiltro = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
+                        _c("label", { staticClass: "float-left" }, [
+                          _vm._v("Hasta:")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-8 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.hastaFiltro,
+                                expression: "hastaFiltro"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "date" },
+                            domProps: { value: _vm.hastaFiltro },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.hastaFiltro = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-3" }, [
+                        _c(
+                          "label",
+                          { staticClass: "float-left", attrs: { for: "" } },
+                          [_vm._v("Vendedor(*) ")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-inline float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.vendedorFiltro,
+                                expression: "vendedorFiltro"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            staticStyle: { "max-width": "85px" },
+                            attrs: {
+                              type: "text",
+                              readonly: "",
+                              name: "cuenta_fin"
+                            },
+                            domProps: { value: _vm.vendedorFiltro },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.vendedorFiltro = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-primary form-control",
+                              staticStyle: { "min-width": "30px" },
+                              on: {
+                                click: function($event) {
+                                  _vm.abrirModalT("vendedor_filtro")
+                                }
+                              }
+                            },
+                            [_vm._v("...")]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger form-control",
+                              staticStyle: { "min-width": "30px" },
+                              on: {
+                                click: function($event) {
+                                  _vm.quitar(5)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "icon-trash" })]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-3" }, [
                         _c(
                           "button",
                           {
@@ -49036,15 +49396,20 @@ var render = function() {
                               click: function($event) {
                                 _vm.listarFacturacion(
                                   1,
-                                  _vm.buscar,
-                                  _vm.criterio
+                                  _vm.numFacturaFiltro,
+                                  _vm.estadoFiltro,
+                                  _vm.idTerceroFiltro,
+                                  _vm.ordenFiltro,
+                                  _vm.desdeFiltro,
+                                  _vm.hastaFiltro,
+                                  _vm.idVendedorFiltro
                                 )
                               }
                             }
                           },
                           [
                             _c("i", { staticClass: "fa fa-search" }),
-                            _vm._v(" Buscar")
+                            _vm._v(" Buscar\n                            ")
                           ]
                         )
                       ])
@@ -49418,7 +49783,7 @@ var render = function() {
                                 staticStyle: { "min-width": "30px" },
                                 on: {
                                   click: function($event) {
-                                    _vm.abrirModalT()
+                                    _vm.abrirModalT("terceros")
                                   }
                                 }
                               },
