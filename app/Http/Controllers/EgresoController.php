@@ -68,7 +68,7 @@ class EgresoController extends Controller
         $id = $request->id;
         $detalles = DetalleEgreso::join('articulos','detalle_egresos.idarticulo','=','articulos.id')
         ->select('detalle_egresos.cantidad','detalle_egresos.precio','articulos.nombre as articulo')
-        ->where('detalle_egresos.idingreso','=',$id)
+        ->where('detalle_egresos.idegreso','=',$id)
         ->orderBy('detalle_egresos.id', 'desc')->get();
         
         return ['detalles' => $detalles];

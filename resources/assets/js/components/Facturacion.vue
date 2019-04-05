@@ -114,7 +114,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="facturacion in arrayFacturacion" :key="facturacion.id">
+                                    <tr v-for="facturacion in arrayFacturacion" :key="facturacion.id" style="text-align: right;">
                                         <td v-text="facturacion.id"></td>
                                         <td v-text="facturacion.num_factura"></td>
                                         <td v-text="facturacion.nom_tercero"></td>
@@ -198,7 +198,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>N° factura</label>
-                                    <input type="number" class="form-control" v-model="num_factura">
+                                    <input type="number" disabled class="form-control" v-model="num_factura">
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -287,7 +287,7 @@
                                             <th style="width: 9em;">Cantidad</th>
                                             <th style="width: 9em;">Descuento</th>
                                             <th>Iva</th>
-                                            <th style="width: 9em;">Subtotal</th>
+                                            <th style="width: 9em;">Vr sin iva</th>
                                         </tr>
                                     </thead>
                                     <tbody v-if="arrayDetalle.length">
@@ -299,37 +299,39 @@
                                             </td>
                                             <td v-text="detalle.articulo">
                                             </td>
-                                            <td>
-                                                <!-- <input v-model="detalle.precio" type="number" disabled value="3" class="form-control"> -->
-                                                {{detalle.precio}}
+                                            <td style="text-align: right;">
+                                                $ {{detalle.precio}}
                                             </td>
                                             <td>
-                                                <input v-model="detalle.cantidad" type="number" class="form-control" style="width: 9em;" :min="1" :max="detalle.stock">
+                                                <input v-model="detalle.cantidad" type="number" class="form-control" style="width: 9em; text-align: right;" :min="1" :max="detalle.stock">
                                             </td>
                                             <td>
-                                                <input v-model="detalle.valor_descuento" type="number" class="form-control" style="width: 9em;" :min="0" :max="detalle.valor_subtotal">
+                                                <input v-model="detalle.valor_descuento" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="detalle.valor_subtotal">
                                             </td>
-                                            <td>
-                                                <!-- $ {{detalle.valor_iva=Math.round(detalle.precio-(detalle.precio/((detalle.iva/100)+1)))}} -->
+                                            <td style="text-align: right;">
                                                 $ {{detalle.valor_iva=Math.round((detalle.precio*detalle.cantidad)-((detalle.precio*detalle.cantidad)/((detalle.iva/100)+1)))}}
                                             </td>
-                                            <td>
-                                                {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento}}
+                                            <td style="text-align: right;">
+                                                $ {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento}}
                                             </td>
                                         </tr>
-                                        <tr style="background-color: #CEECF5;">
+                                        <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Total iva:</strong></td>
-                                            <td>$ {{detalle.valor_iva=calcularTotalIva}}</td>
+                                            <td>$ {{valor_iva=calcularTotalIva}}</td>
                                         </tr>
-                                        <tr style="background-color: #CEECF5;">
+                                        <tr style="background-color: #CEECF5; text-align: right;">
+                                            <td colspan="6" align="right"><strong>Total sin iva:</strong></td>
+                                            <td>$ {{subtotal=calcularSubtotal}}</td>
+                                        </tr>
+                                        <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Total Neto:</strong></td>
-                                            <td>$ {{detalle.valor_final=calcularTotal}}</td>
+                                            <td>$ {{valor_final=calcularTotal}}</td>
                                         </tr>
-                                        <tr style="background-color: #CEECF5;">
+                                        <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Abono:</strong></td>
-                                            <td><input v-model="abono" :min="0" :max="calcularTotal" type="number" class="form-control" style="width: 9em;"></td>
+                                            <td><input v-model="abono" :min="0" :max="calcularTotal" type="number" class="form-control" style="width: 9em; text-align: right;"></td>
                                         </tr>
-                                        <tr style="background-color: #CEECF5;">
+                                        <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Saldo:</strong></td>
                                             <td>$ {{saldo=calcularSaldo}}</td>
                                         </tr>
@@ -676,10 +678,17 @@
                 }
                 return pagesArray;
             },
+            calcularSubtotal: function(){
+                var resultado=0.0;
+                for(var i=0;i<this.arrayDetalle.length;i++){
+                    resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)-this.arrayDetalle[i].valor_descuento);
+                }
+                resultado = resultado-this.calcularTotalIva;
+                return resultado;
+            },
             calcularTotal: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
                     resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)-this.arrayDetalle[i].valor_descuento)
                 }
                 return resultado;
@@ -687,8 +696,9 @@
             calcularTotalIva: function(){
                 var resultado=0.0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    resultado = resultado+(this.calcularTotal-this.arrayDetalle[i].valor_subtotal);
+                    resultado += this.arrayDetalle[i].valor_iva;
                 }
+                // resultado = this.total-resultado;
                 resultado = Math.round(resultado);
                 return resultado;
             },
@@ -703,7 +713,7 @@
         methods : {
             listarFacturacion (page,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro){
                 let me=this;
-                
+
                 var url= this.ruta +'/facturacion?page=' + page + '&numFacturaFiltro='+ numFacturaFiltro + '&estadoFiltro='+ estadoFiltro + '&idTerceroFiltro='+ idTerceroFiltro + '&ordenFiltro='+ ordenFiltro + '&desdeFiltro='+ desdeFiltro + '&hastaFiltro='+ hastaFiltro + '&idVendedorFiltro='+ idVendedorFiltro;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
@@ -773,10 +783,18 @@
             sugerirNumFactura(){
                 let me=this;
                 var url= this.ruta +'/facturacion/buscarNumFacturaSugerida';
-
+                
                 axios.get(url).then(function (response) {
-                    var respuesta= response.data;
-                    me.num_factura = parseInt(respuesta.facturacion[0].num_factura)+1;
+                    var respuesta= response.data.facturacion;
+                    
+                    if(respuesta.length)
+                    {
+                        me.num_factura = parseInt(respuesta[0].num_factura)+1;
+                    }
+                    else
+                    {
+                        me.num_factura = 1;
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -964,14 +982,18 @@
                 // }
                 
                 let me = this;
-                
+                me.subtotal = 0;
+                me.iva = 0;
+                me.descuento = 0;
+                me.total = 0;
                 for(var i=0; i<me.arrayDetalle.length; i++)
                 {
-                    me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
-                    me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
-                    me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+                    me.descuento += parseFloat(me.arrayDetalle[i].valor_descuento);
+                    me.iva += parseFloat(me.arrayDetalle[i].valor_iva);
+                    me.subtotal += parseFloat(me.arrayDetalle[i].valor_subtotal);
                 }
-                me.total += parseFloat(me.subtotal)+parseFloat(me.iva);
+                
+                me.total = parseFloat(me.subtotal)+parseFloat(me.iva);
                 me.sugerirNumFactura();
                 
                 axios.put(this.ruta +'/facturacion/actualizar',{
@@ -1029,6 +1051,7 @@
                                 me.facturacion_id=0;
                                 me.num_factura=0;
                                 me.id_tercero=0;
+                                me.tercero = '';
                                 me.tercero_facturacion='';
                                 me.fec_edita='';
                                 me.subtotal=0.0;
@@ -1041,7 +1064,6 @@
                                 me.fec_registra='';
                                 me.fec_envia='';
                                 me.fec_anula='';
-                                me.fecha = '';
 
                                 me.arrayArticulo=[];
                                 me.arrayDetalle=[];
@@ -1068,6 +1090,7 @@
                                 me.fec_anula=data['fec_anula'];
                                 me.fecha =data['fecha'];
                                 me.estado = data['estado'];
+                                
 
                                 me.arrayArticulo=[];
                                 me.arrayTerceros=[];
@@ -1083,6 +1106,8 @@
             ocultarDetalle(){
                 this.listado=1;
                 this.tipoAccion2=0;
+                this.subtotal = 0;
+                this.iva = 0;
             },
             verIngreso(id){
                 let me=this;
@@ -1122,6 +1147,7 @@
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal='';
+                this.buscar = '';
             }, 
             abrirModal(){               
                 this.arrayArticulo=[];
@@ -1258,6 +1284,7 @@
             }
         },
         mounted() {
+            let me= this;
             var d = new Date();
             
             
@@ -1275,11 +1302,12 @@
                 mm='0'+mm;
             } 
             d = yyyy+'-'+mm+'-'+dd;
-            this.fechaActual = d;
-            this.hastaFiltro = d;
-            this.fechaHoraActual = d+' '+h+':'+min+':'+sec;
+            me.fechaActual = d;
+            me.hastaFiltro = d;
+            me.fecha = d;
+            me.fechaHoraActual = d+' '+h+':'+min+':'+sec;
 
-            this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
+            me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
         }
     }
 </script>

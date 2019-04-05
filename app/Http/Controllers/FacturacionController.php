@@ -25,7 +25,7 @@ class FacturacionController extends Controller
         $desdeFiltro = $request->desdeFiltro;
         $hastaFiltro = $request->hastaFiltro;
         $idVendedorFiltro = $request->idVendedorFiltro;
-        $msg = '';
+        // $msg = '';
         
         /*if ($numFacturaFiltro=='' && $estadoFiltro=='' && $idTerceroFiltro=='' && $ordenFiltro=='' && $desdeFiltro=='' && $hastaFiltro=='' && $vendedorFiltro==''){
             $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')

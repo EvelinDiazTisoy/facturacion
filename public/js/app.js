@@ -48345,6 +48345,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -48433,10 +48435,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             }
             return pagesArray;
         },
+        calcularSubtotal: function calcularSubtotal() {
+            var resultado = 0.0;
+            for (var i = 0; i < this.arrayDetalle.length; i++) {
+                resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].valor_descuento);
+            }
+            resultado = resultado - this.calcularTotalIva;
+            return resultado;
+        },
         calcularTotal: function calcularTotal() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                // resultado=resultado+((this.arrayDetalle[i].precio*this.arrayDetalle[i].cantidad)+((this.arrayDetalle[i].precio/100)*this.arrayDetalle[i].iva)-this.arrayDetalle[i].valor_descuento)
                 resultado = resultado + (this.arrayDetalle[i].precio * this.arrayDetalle[i].cantidad - this.arrayDetalle[i].valor_descuento);
             }
             return resultado;
@@ -48444,8 +48453,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         calcularTotalIva: function calcularTotalIva() {
             var resultado = 0.0;
             for (var i = 0; i < this.arrayDetalle.length; i++) {
-                resultado = resultado + (this.calcularTotal - this.arrayDetalle[i].valor_subtotal);
+                resultado += this.arrayDetalle[i].valor_iva;
             }
+            // resultado = this.total-resultado;
             resultado = Math.round(resultado);
             return resultado;
         },
@@ -48527,8 +48537,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             var url = this.ruta + '/facturacion/buscarNumFacturaSugerida';
 
             axios.get(url).then(function (response) {
-                var respuesta = response.data;
-                me.num_factura = parseInt(respuesta.facturacion[0].num_factura) + 1;
+                var respuesta = response.data.facturacion;
+
+                if (respuesta.length) {
+                    me.num_factura = parseInt(respuesta[0].num_factura) + 1;
+                } else {
+                    me.num_factura = 1;
+                }
             }).catch(function (error) {
                 console.log(error);
             });
@@ -48693,13 +48708,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             // }
 
             var me = this;
-
+            me.subtotal = 0;
+            me.iva = 0;
+            me.descuento = 0;
+            me.total = 0;
             for (var i = 0; i < me.arrayDetalle.length; i++) {
-                me.descuento += parseFloat(me.arrayDetalle[i]['valor_descuento']);
-                me.iva += parseFloat(me.arrayDetalle[i]['valor_iva']);
-                me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
+                me.descuento += parseFloat(me.arrayDetalle[i].valor_descuento);
+                me.iva += parseFloat(me.arrayDetalle[i].valor_iva);
+                me.subtotal += parseFloat(me.arrayDetalle[i].valor_subtotal);
             }
-            me.total += parseFloat(me.subtotal) + parseFloat(me.iva);
+
+            me.total = parseFloat(me.subtotal) + parseFloat(me.iva);
             me.sugerirNumFactura();
 
             axios.put(this.ruta + '/facturacion/actualizar', {
@@ -48761,6 +48780,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                                     me.facturacion_id = 0;
                                     me.num_factura = 0;
                                     me.id_tercero = 0;
+                                    me.tercero = '';
                                     me.tercero_facturacion = '';
                                     me.fec_edita = '';
                                     me.subtotal = 0.0;
@@ -48773,7 +48793,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                                     me.fec_registra = '';
                                     me.fec_envia = '';
                                     me.fec_anula = '';
-                                    me.fecha = '';
 
                                     me.arrayArticulo = [];
                                     me.arrayDetalle = [];
@@ -48816,6 +48835,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         ocultarDetalle: function ocultarDetalle() {
             this.listado = 1;
             this.tipoAccion2 = 0;
+            this.subtotal = 0;
+            this.iva = 0;
         },
         verIngreso: function verIngreso(id) {
             var me = this;
@@ -48853,6 +48874,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         cerrarModal: function cerrarModal() {
             this.modal = 0;
             this.tituloModal = '';
+            this.buscar = '';
         },
         abrirModal: function abrirModal() {
             this.arrayArticulo = [];
@@ -48978,6 +49000,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         }
     },
     mounted: function mounted() {
+        var me = this;
         var d = new Date();
 
         var dd = d.getDate();
@@ -48994,11 +49017,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             mm = '0' + mm;
         }
         d = yyyy + '-' + mm + '-' + dd;
-        this.fechaActual = d;
-        this.hastaFiltro = d;
-        this.fechaHoraActual = d + ' ' + h + ':' + min + ':' + sec;
+        me.fechaActual = d;
+        me.hastaFiltro = d;
+        me.fecha = d;
+        me.fechaHoraActual = d + ' ' + h + ':' + min + ':' + sec;
 
-        this.listarFacturacion(1, this.numFacturaFiltro, this.estadoFiltro, this.idTerceroFiltro, this.ordenFiltro, this.desdeFiltro, this.hastaFiltro, this.idVendedorFiltro);
+        me.listarFacturacion(1, me.numFacturaFiltro, me.estadoFiltro, me.idTerceroFiltro, me.ordenFiltro, me.desdeFiltro, me.hastaFiltro, me.idVendedorFiltro);
     }
 });
 
@@ -49429,169 +49453,176 @@ var render = function() {
                         _c(
                           "tbody",
                           _vm._l(_vm.arrayFacturacion, function(facturacion) {
-                            return _c("tr", { key: facturacion.id }, [
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.id)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.num_factura)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.nom_tercero)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.fecha)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.subtotal)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.descuento)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.valor_iva)
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("td", {
-                                domProps: {
-                                  textContent: _vm._s(facturacion.total)
-                                }
-                              }),
-                              _vm._v(" "),
-                              facturacion.estado == 1
-                                ? _c("td", [_c("span", [_vm._v("Activa")])])
-                                : facturacion.estado == 2
-                                  ? _c("td", [
-                                      _c("span", [_vm._v("Registrada")])
-                                    ])
-                                  : facturacion.estado == 3
+                            return _c(
+                              "tr",
+                              {
+                                key: facturacion.id,
+                                staticStyle: { "text-align": "right" }
+                              },
+                              [
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.id)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.num_factura)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.nom_tercero)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.fecha)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.subtotal)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.descuento)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.valor_iva)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("td", {
+                                  domProps: {
+                                    textContent: _vm._s(facturacion.total)
+                                  }
+                                }),
+                                _vm._v(" "),
+                                facturacion.estado == 1
+                                  ? _c("td", [_c("span", [_vm._v("Activa")])])
+                                  : facturacion.estado == 2
                                     ? _c("td", [
-                                        _c("span", [_vm._v("Enviada")])
+                                        _c("span", [_vm._v("Registrada")])
                                       ])
-                                    : facturacion.estado == 4
+                                    : facturacion.estado == 3
                                       ? _c("td", [
-                                          _c("span", [_vm._v("Anulada")])
+                                          _c("span", [_vm._v("Enviada")])
                                         ])
-                                      : _vm._e(),
-                              _vm._v(" "),
-                              _c(
-                                "td",
-                                [
-                                  _c(
-                                    "button",
-                                    {
-                                      staticClass: "btn btn-success btn-sm",
-                                      attrs: { type: "button" },
-                                      on: {
-                                        click: function($event) {
-                                          _vm.verIngreso(facturacion.id)
+                                      : facturacion.estado == 4
+                                        ? _c("td", [
+                                            _c("span", [_vm._v("Anulada")])
+                                          ])
+                                        : _vm._e(),
+                                _vm._v(" "),
+                                _c(
+                                  "td",
+                                  [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-success btn-sm",
+                                        attrs: { type: "button" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.verIngreso(facturacion.id)
+                                          }
                                         }
-                                      }
-                                    },
-                                    [_c("i", { staticClass: "icon-eye" })]
-                                  ),
-                                  _vm._v(" "),
-                                  [
-                                    facturacion.estado != 3
-                                      ? _c(
-                                          "button",
-                                          {
-                                            staticClass:
-                                              "btn btn-warning btn-sm",
-                                            attrs: { type: "button" },
-                                            on: {
-                                              click: function($event) {
-                                                _vm.mostrarDetalle(
-                                                  "facturacion",
-                                                  "actualizar",
-                                                  facturacion
-                                                )
+                                      },
+                                      [_c("i", { staticClass: "icon-eye" })]
+                                    ),
+                                    _vm._v(" "),
+                                    [
+                                      facturacion.estado != 3
+                                        ? _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-warning btn-sm",
+                                              attrs: { type: "button" },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.mostrarDetalle(
+                                                    "facturacion",
+                                                    "actualizar",
+                                                    facturacion
+                                                  )
+                                                }
                                               }
-                                            }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "icon-pencil"
-                                            })
-                                          ]
-                                        )
-                                      : _c(
-                                          "button",
-                                          {
-                                            staticClass:
-                                              "btn btn-default btn-sm",
-                                            attrs: { type: "button" }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "icon-pencil"
-                                            })
-                                          ]
-                                        )
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "icon-pencil"
+                                              })
+                                            ]
+                                          )
+                                        : _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-default btn-sm",
+                                              attrs: { type: "button" }
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "icon-pencil"
+                                              })
+                                            ]
+                                          )
+                                    ],
+                                    _vm._v(" "),
+                                    [
+                                      facturacion.estado != 4 &&
+                                      facturacion.estado != 3
+                                        ? _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-danger btn-sm",
+                                              attrs: { type: "button" },
+                                              on: {
+                                                click: function($event) {
+                                                  _vm.cambiarEstadoFacturacion(
+                                                    facturacion.id,
+                                                    "anular"
+                                                  )
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "fa fa-eye-slash"
+                                              })
+                                            ]
+                                          )
+                                        : _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-default btn-sm",
+                                              attrs: { type: "button" }
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "fa fa-eye-slash"
+                                              })
+                                            ]
+                                          )
+                                    ]
                                   ],
-                                  _vm._v(" "),
-                                  [
-                                    facturacion.estado != 4 &&
-                                    facturacion.estado != 3
-                                      ? _c(
-                                          "button",
-                                          {
-                                            staticClass:
-                                              "btn btn-danger btn-sm",
-                                            attrs: { type: "button" },
-                                            on: {
-                                              click: function($event) {
-                                                _vm.cambiarEstadoFacturacion(
-                                                  facturacion.id,
-                                                  "anular"
-                                                )
-                                              }
-                                            }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "fa fa-eye-slash"
-                                            })
-                                          ]
-                                        )
-                                      : _c(
-                                          "button",
-                                          {
-                                            staticClass:
-                                              "btn btn-default btn-sm",
-                                            attrs: { type: "button" }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "fa fa-eye-slash"
-                                            })
-                                          ]
-                                        )
-                                  ]
-                                ],
-                                2
-                              )
-                            ])
+                                  2
+                                )
+                              ]
+                            )
                           })
                         )
                       ]
@@ -49728,7 +49759,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
-                            attrs: { type: "number" },
+                            attrs: { type: "number", disabled: "" },
                             domProps: { value: _vm.num_factura },
                             on: {
                               input: function($event) {
@@ -50250,13 +50281,21 @@ var render = function() {
                                           }
                                         }),
                                         _vm._v(" "),
-                                        _c("td", [
-                                          _vm._v(
-                                            "\n                                        " +
-                                              _vm._s(detalle.precio) +
-                                              "\n                                    "
-                                          )
-                                        ]),
+                                        _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              "text-align": "right"
+                                            }
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                        $ " +
+                                                _vm._s(detalle.precio) +
+                                                "\n                                    "
+                                            )
+                                          ]
+                                        ),
                                         _vm._v(" "),
                                         _c("td", [
                                           _c("input", {
@@ -50269,7 +50308,10 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            staticStyle: { width: "9em" },
+                                            staticStyle: {
+                                              width: "9em",
+                                              "text-align": "right"
+                                            },
                                             attrs: {
                                               type: "number",
                                               min: 1,
@@ -50305,9 +50347,13 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            staticStyle: { width: "9em" },
+                                            staticStyle: {
+                                              width: "9em",
+                                              "text-align": "right"
+                                            },
                                             attrs: {
                                               type: "number",
+                                              value: "0",
                                               min: 0,
                                               max: detalle.valor_subtotal
                                             },
@@ -50329,35 +50375,51 @@ var render = function() {
                                           })
                                         ]),
                                         _vm._v(" "),
-                                        _c("td", [
-                                          _vm._v(
-                                            "\n                                        $ " +
-                                              _vm._s(
-                                                (detalle.valor_iva = Math.round(
-                                                  detalle.precio *
-                                                    detalle.cantidad -
+                                        _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              "text-align": "right"
+                                            }
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                        $ " +
+                                                _vm._s(
+                                                  (detalle.valor_iva = Math.round(
                                                     detalle.precio *
-                                                      detalle.cantidad /
-                                                      (detalle.iva / 100 + 1)
-                                                ))
-                                              ) +
-                                              "\n                                    "
-                                          )
-                                        ]),
+                                                      detalle.cantidad -
+                                                      detalle.precio *
+                                                        detalle.cantidad /
+                                                        (detalle.iva / 100 + 1)
+                                                  ))
+                                                ) +
+                                                "\n                                    "
+                                            )
+                                          ]
+                                        ),
                                         _vm._v(" "),
-                                        _c("td", [
-                                          _vm._v(
-                                            "\n                                        " +
-                                              _vm._s(
-                                                (detalle.valor_subtotal =
-                                                  detalle.precio *
-                                                    detalle.cantidad -
-                                                  detalle.valor_iva -
-                                                  detalle.valor_descuento)
-                                              ) +
-                                              "\n                                    "
-                                          )
-                                        ])
+                                        _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              "text-align": "right"
+                                            }
+                                          },
+                                          [
+                                            _vm._v(
+                                              "\n                                        $ " +
+                                                _vm._s(
+                                                  (detalle.valor_subtotal =
+                                                    detalle.precio *
+                                                      detalle.cantidad -
+                                                    detalle.valor_iva -
+                                                    detalle.valor_descuento)
+                                                ) +
+                                                "\n                                    "
+                                            )
+                                          ]
+                                        )
                                       ])
                                     }),
                                     _vm._v(" "),
@@ -50365,7 +50427,8 @@ var render = function() {
                                       "tr",
                                       {
                                         staticStyle: {
-                                          "background-color": "#CEECF5"
+                                          "background-color": "#CEECF5",
+                                          "text-align": "right"
                                         }
                                       },
                                       [
@@ -50375,7 +50438,7 @@ var render = function() {
                                           _vm._v(
                                             "$ " +
                                               _vm._s(
-                                                (_vm.detalle.valor_iva =
+                                                (_vm.valor_iva =
                                                   _vm.calcularTotalIva)
                                               )
                                           )
@@ -50387,7 +50450,8 @@ var render = function() {
                                       "tr",
                                       {
                                         staticStyle: {
-                                          "background-color": "#CEECF5"
+                                          "background-color": "#CEECF5",
+                                          "text-align": "right"
                                         }
                                       },
                                       [
@@ -50397,7 +50461,30 @@ var render = function() {
                                           _vm._v(
                                             "$ " +
                                               _vm._s(
-                                                (_vm.detalle.valor_final =
+                                                (_vm.subtotal =
+                                                  _vm.calcularSubtotal)
+                                              )
+                                          )
+                                        ])
+                                      ]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "tr",
+                                      {
+                                        staticStyle: {
+                                          "background-color": "#CEECF5",
+                                          "text-align": "right"
+                                        }
+                                      },
+                                      [
+                                        _vm._m(5),
+                                        _vm._v(" "),
+                                        _c("td", [
+                                          _vm._v(
+                                            "$ " +
+                                              _vm._s(
+                                                (_vm.valor_final =
                                                   _vm.calcularTotal)
                                               )
                                           )
@@ -50409,11 +50496,12 @@ var render = function() {
                                       "tr",
                                       {
                                         staticStyle: {
-                                          "background-color": "#CEECF5"
+                                          "background-color": "#CEECF5",
+                                          "text-align": "right"
                                         }
                                       },
                                       [
-                                        _vm._m(5),
+                                        _vm._m(6),
                                         _vm._v(" "),
                                         _c("td", [
                                           _c("input", {
@@ -50426,7 +50514,10 @@ var render = function() {
                                               }
                                             ],
                                             staticClass: "form-control",
-                                            staticStyle: { width: "9em" },
+                                            staticStyle: {
+                                              width: "9em",
+                                              "text-align": "right"
+                                            },
                                             attrs: {
                                               min: 0,
                                               max: _vm.calcularTotal,
@@ -50450,11 +50541,12 @@ var render = function() {
                                       "tr",
                                       {
                                         staticStyle: {
-                                          "background-color": "#CEECF5"
+                                          "background-color": "#CEECF5",
+                                          "text-align": "right"
                                         }
                                       },
                                       [
-                                        _vm._m(6),
+                                        _vm._m(7),
                                         _vm._v(" "),
                                         _c("td", [
                                           _vm._v(
@@ -50469,7 +50561,7 @@ var render = function() {
                                   ],
                                   2
                                 )
-                              : _c("tbody", [_vm._m(7)])
+                              : _c("tbody", [_vm._m(8)])
                           ]
                         )
                       ])
@@ -50553,7 +50645,7 @@ var render = function() {
                                   "table table-bordered table-striped table-sm"
                               },
                               [
-                                _vm._m(8),
+                                _vm._m(9),
                                 _vm._v(" "),
                                 _vm.arrayDetalle.length
                                   ? _c(
@@ -50608,7 +50700,7 @@ var render = function() {
                                             }
                                           },
                                           [
-                                            _vm._m(9),
+                                            _vm._m(10),
                                             _vm._v(" "),
                                             _c("td", [
                                               _vm._v("$ " + _vm._s(_vm.total))
@@ -50618,7 +50710,7 @@ var render = function() {
                                       ],
                                       2
                                     )
-                                  : _c("tbody", [_vm._m(10)])
+                                  : _c("tbody", [_vm._m(11)])
                               ]
                             )
                           ]
@@ -50802,7 +50894,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(11),
+                      _vm._m(12),
                       _vm._v(" "),
                       _c(
                         "tbody",
@@ -50975,7 +51067,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group row" }, [
-                  _vm._m(12),
+                  _vm._m(13),
                   _vm._v(" "),
                   _c("div", { staticClass: "col-md-3" }, [
                     _c("div", { staticClass: "input-group" }, [
@@ -51014,7 +51106,7 @@ var render = function() {
                       staticClass: "table table-bordered table-striped table-sm"
                     },
                     [
-                      _vm._m(13),
+                      _vm._m(14),
                       _vm._v(" "),
                       _vm._l(_vm.arrayTerceros, function(tercero) {
                         return _c("tr", { key: tercero.id }, [
@@ -51127,7 +51219,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Iva")]),
         _vm._v(" "),
-        _c("th", { staticStyle: { width: "9em" } }, [_vm._v("Subtotal")])
+        _c("th", { staticStyle: { width: "9em" } }, [_vm._v("Vr sin iva")])
       ])
     ])
   },
@@ -51137,6 +51229,14 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("td", { attrs: { colspan: "6", align: "right" } }, [
       _c("strong", [_vm._v("Total iva:")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("td", { attrs: { colspan: "6", align: "right" } }, [
+      _c("strong", [_vm._v("Total sin iva:")])
     ])
   },
   function() {

@@ -18,9 +18,12 @@ class StockController extends Controller
 
         $stock = Stock::join('articulos','stock.id_producto','=','articulos.id')
         ->join('users','stock.id_usuario','=','users.id')
-        ->select('stock.id','stock.id_producto','stock.id_usuario','articulos.nombre as nombre_producto', 'articulos.codigo as codigo_producto','users.usuario as nombre_usuario','stock.fec_crea','stock.cantidad','stock.tipo_movimiento','stock.sumatoria','stock.condicion')
-        ->where('id_producto','like', $id_articulo)
-        ->whereBetween('stock.fec_crea', [$fecIni, $fecFin])
+        ->select('stock.id','stock.id_producto','stock.id_usuario','articulos.nombre as nombre_producto', 'articulos.codigo as codigo_producto','users.usuario as nombre_usuario','stock.fec_crea','stock.cantidad','stock.tipo_movimiento','stock.sumatoria','stock.condicion');
+        if($request->id_articulo!='' && $request->id_articulo!=0)
+        {
+            $stock = $stock->where('id_producto','like', $id_articulo);
+        }
+        $stock = $stock->whereBetween('stock.fec_crea', [$fecIni, $fecFin])
         ->orderBy('stock.fec_crea', 'desc')->paginate(12);
 
         return [
