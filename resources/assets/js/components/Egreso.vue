@@ -167,13 +167,13 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Precio <span style="color:red;" v-show="precio==0">(*Ingrese)</span></label>
-                                    <input type="number" value="0" step="any" class="form-control" v-model="precio">
+                                    <input type="number" :min="1" step="any" class="form-control" v-model="precio">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Cantidad <span style="color:red;" v-show="cantidad==0">(*Ingrese)</span></label>
-                                    <input type="number" value="0" disabled  class="form-control" v-model="cantidad">
+                                    <input type="number" :min="1"  class="form-control" v-model="cantidad">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -507,8 +507,8 @@
                 idarticulo: 0,
                 codigo: '',
                 articulo: '',
-                precio: 0,
-                cantidad:0,
+                precio: 1,
+                cantidad:1,
 
                 // variables modal buscar tercero
                 modal2 : '',
@@ -611,7 +611,9 @@
                     if (me.arrayArticulo.length>0){
                         me.articulo=me.arrayArticulo[0]['nombre'];
                         me.idarticulo=me.arrayArticulo[0]['id'];
-                        me.cantidad=me.arrayArticulo[0]['stock'];
+                        me.precio = 1;
+                        me.cantidad = 1;
+                        // me.cantidad=me.arrayArticulo[0]['stock'];
                     }
                     else{
                         me.articulo='No existe artículo';

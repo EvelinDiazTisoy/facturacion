@@ -103,7 +103,7 @@ class ArticuloController extends Controller
 
         $filtro = $request->filtro;
         $articulos = Articulo::where('codigo','=', $filtro)
-        ->select('id','nombre','precio_venta','stock')->orderBy('nombre', 'asc')->take(1)->get();
+        ->select('id','nombre','precio_venta','stock','iva')->orderBy('nombre', 'asc')->take(1)->get();
 
         return ['articulos' => $articulos];
     }

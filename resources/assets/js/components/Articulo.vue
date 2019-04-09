@@ -36,6 +36,7 @@
                                     <th>Precio Venta</th>
                                     <th>Stock</th>
                                     <th>Descripción</th>
+                                    <th>Tipo</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
@@ -57,11 +58,11 @@
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
-                                        <template>
+                                        <!-- <template style="display:none;">
                                             <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" >
                                                 <i class="fa fa-archive"></i>
                                             </button>
-                                        </template>
+                                        </template> -->
                                     </td>
                                     <td v-text="articulo.codigo"></td>
                                     <td v-text="articulo.nombre"></td>
@@ -70,13 +71,23 @@
                                     <td v-text="articulo.stock"></td>
                                     <td v-text="articulo.descripcion"></td>
                                     <td>
+                                        <div v-if="articulo.tipo_articulo==1">
+                                            <span>Suministro</span>
+                                        </div>
+                                        <div v-else-if="articulo.tipo_articulo==2">
+                                            <span>Servicio</span>
+                                        </div>
+                                        <div v-else-if="articulo.tipo_articulo==3">
+                                            <span>Producto simple</span>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div v-if="articulo.condicion">
                                             <span class="badge badge-success">Activo</span>
                                         </div>
                                         <div v-else>
                                             <span class="badge badge-danger">Desactivado</span>
                                         </div>
-                                        
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -165,10 +176,10 @@
                                         <input type="text" v-model="cod_invima" class="form-control" placeholder="Código invima">
                                     </div>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-6" v-if="tipo_articulo==1 || tipo_articulo==3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Lote</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="lote" class="form-control" placeholder="">                                        
+                                        <input type="text" v-model="lote" class="form-control" placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -192,9 +203,9 @@
                                     <div class="col-md-9 float-right">
                                         <select class="form-control" v-model="tipo_articulo">
                                             <option value="0" disabled>Seleccione</option>
-                                            <option value="1">Fisico</option>
-                                            <option value="2">Virtual</option>
-                                            <option value="3">Servicio</option>
+                                            <option value="1">Suministro</option>
+                                            <option value="2">Servicio</option>
+                                            <option value="3">Producto simple</option>
                                         </select>
                                     </div>
                                 </div>
@@ -206,7 +217,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-6" v-if="tipo_articulo==1 || tipo_articulo==3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Und. medida</label>
                                     <div class="col-md-9 float-right">
                                         <select class="form-control col-md-10 float-left" v-model="id_und_medida">
@@ -217,13 +228,9 @@
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label class="col-md-3 form-control-label float-left" for="text-input">Concentración</label>
+                                    <label class="col-md-3 form-control-label float-left" for="email-input">Descripción</label>
                                     <div class="col-md-9 float-right">
-                                        <select class="form-control col-md-10 float-left" v-model="id_concentracion">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option v-for="id_concentracion in arrayConcentracion" :key="id_concentracion.id" :value="id_concentracion.id" v-text="id_concentracion.nombre"></option>
-                                        </select> 
-                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('concentracion')"><i class="fa fa-plus-circle"></i></span>
+                                        <input type="text" v-model="descripcion" class="form-control" placeholder="Ingrese descripción">
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==2}">
@@ -247,7 +254,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row" style="display: none;">
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Presentación</label>
                                     <div class="col-md-9 float-right">
@@ -259,9 +266,13 @@
                                     </div>                   
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label class="col-md-3 form-control-label float-left" for="email-input">Descripción</label>
+                                    <label class="col-md-3 form-control-label float-left" for="text-input">Concentración</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="descripcion" class="form-control" placeholder="Ingrese descripción">
+                                        <select class="form-control col-md-10 float-left" v-model="id_concentracion">
+                                            <option value="0" disabled>Seleccione</option>
+                                            <option v-for="id_concentracion in arrayConcentracion" :key="id_concentracion.id" :value="id_concentracion.id" v-text="id_concentracion.nombre"></option>
+                                        </select> 
+                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('concentracion')"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==4}">
@@ -556,7 +567,6 @@
             listarStock(page_stock,id_articulo){
                 let me=this;
                 this.arrayStock = [];
-                console.log('pagina: '+page_stock);
                 
                 var url= this.ruta + '/stock?page='+page_stock+'&id_articulo='+id_articulo+'&fecIni='+this.fecIni+'&fecFin='+this.fecFin;
                 axios.get(url).then(function (response) {
@@ -826,7 +836,7 @@
 
                 if (this.idcategoria==0) this.errorMostrarMsjArticulo.push("Seleccione una categoría.");
                 if (!this.nombre) this.errorMostrarMsjArticulo.push("El nombre del artículo no puede estar vacío.");
-                if (!this.stock) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser un número y no puede estar vacío.");
+                if (!this.stock) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser un número diferente a '0' y no puede estar vacío.");
                 if (!this.precio_venta) this.errorMostrarMsjArticulo.push("El precio venta del artículo debe ser un número y no puede estar vacío.");
 
                 if (this.errorMostrarMsjArticulo.length) this.errorArticulo = 1;
