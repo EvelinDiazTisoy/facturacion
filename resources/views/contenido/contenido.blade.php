@@ -102,6 +102,9 @@
             <template v-if="menu==35">
                 <facturacion :ruta="ruta"></facturacion>
             </template>
+            <template v-if="menu==36">
+                <configuraciones :ruta="ruta"></configuraciones>
+            </template>
 
             @elseif (Auth::user()->idrol == 2)
             <template v-if="menu==5">

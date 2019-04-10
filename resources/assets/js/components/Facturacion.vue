@@ -107,6 +107,7 @@
                                         <th>Fecha</th>
                                         <th>Subtotal</th>
                                         <th>Descuento</th>
+                                        <th>Lugar</th>
                                         <th>Iva</th>
                                         <th>Total</th>
                                         <th>Estado</th>
@@ -121,6 +122,7 @@
                                         <td v-text="facturacion.fecha"></td>
                                         <td v-text="facturacion.subtotal"></td>
                                         <td v-text="facturacion.descuento"></td>
+                                        <td v-text="facturacion.nom_lugar"></td>
                                         <td v-text="facturacion.valor_iva"></td>
                                         <td v-text="facturacion.total"></td>
                                         <td v-if="facturacion.estado==1"><span>Activa</span></td>
@@ -189,13 +191,13 @@
                     <template v-else-if="listado==0">
                     <div class="card-body">
                         <div class="form-group row border">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Fecha</label>
                                     <input type="date" class="form-control" v-model="fecha">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>N° factura</label>
                                     <input type="number" disabled class="form-control" v-model="num_factura">
@@ -205,7 +207,7 @@
                                 <div class="form-group">
                                     <label for="">Tercero(*)</label>
                                     <div class="form-inline">
-                                        <input type="text" readonly style="    max-width: 90px;" class="form-control" name="cuenta_fin" v-model="tercero">
+                                        <input type="text" readonly style="    max-width: 163px;" class="form-control" name="cuenta_fin" v-model="tercero">
                                         <button @click="abrirModalT('terceros')" style="    min-width: 30px;" class="btn btn-primary form-control">...</button>
                                         <button @click="quitar(3)" style="    min-width: 30px;" class="btn btn-danger form-control">
                                             <i class="icon-trash"></i>
@@ -213,10 +215,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Detalle</label>
                                     <input type="text" class="form-control" v-model="detalle">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Lugar</label>
+                                    <select v-model="lugar" class="form-control">
+                                        <option v-for="configuraciones in arrayConfiguraciones" :key="configuraciones.id" :value="configuraciones.id" v-text="configuraciones.lugar"></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row">
@@ -650,6 +660,9 @@
                 idVendedorFiltro : '',
                 vendedorFiltro : '',
                 
+                // array del select de configuraciones
+                arrayConfiguraciones : [],
+                lugar : '',
             }
         },
         components: {
@@ -978,10 +991,10 @@
                 //     me.subtotal += parseFloat(me.arrayDetalle[i]['valor_subtotal']);
                 // }
                 // me.total += parseFloat(me.subtotal)+parseFloat(me.iva);
-                me.sugerirNumFactura();
+                // me.sugerirNumFactura();
 
                 axios.post(this.ruta +'/facturacion/registrar',{
-                    'num_factura': me.num_factura,
+                    'num_factura': null,
                     'id_tercero': me.id_tercero,
                     'fec_edita': null,
                     'usu_edita': null,
@@ -991,6 +1004,7 @@
                     'abono': me.abono,
                     'saldo': me.saldo,
                     'detalle': me.detalle,
+                    'lugar': me.lugar,
                     'descuento': me.descuento,
                     'fec_registra': null,
                     'fec_envia': null,
@@ -1015,6 +1029,7 @@
                     me.abono=0.0,
                     me.saldo=0.0,
                     me.detalle='',
+                    me.lugar='',
                     me.descuento=0.0,
                     me.fec_registra='',
                     me.fec_envia='',
@@ -1044,7 +1059,10 @@
                 // }
                 
                 // me.total = parseFloat(me.subtotal)+parseFloat(me.iva);
-                me.sugerirNumFactura();
+                if(me.estado==2)
+                {
+                    me.sugerirNumFactura();
+                }
                 
                 axios.put(this.ruta +'/facturacion/actualizar',{
                     'num_factura': me.num_factura,
@@ -1056,6 +1074,7 @@
                     'abono': me.abono,
                     'saldo': me.saldo,
                     'detalle': me.detalle,
+                    'lugar': me.lugar,
                     'descuento': me.descuento,
                     'fec_registra': null,
                     'fec_envia': null,
@@ -1070,6 +1089,28 @@
                 }).then(function (response) {
                     me.ocultarDetalle();
                     me.listarFacturacion(1,'','','','','','','');
+                    me.listado=1;
+                    me.arrayFacturacion=[];
+                    me.listarFacturacion(1,'','','','','','','');
+                    me.num_factura=0,
+                    me.id_tercero=0,
+                    me.tercero_facturacion='',
+                    me.id_usuario=0,
+                    me.fec_edita='',
+                    me.subtotal=0.0,
+                    me.valor_iva=0.0,
+                    me.total=0.0,
+                    me.abono=0.0,
+                    me.saldo=0.0,
+                    me.detalle='',
+                    me.lugar='',
+                    me.descuento=0.0,
+                    me.fec_registra='',
+                    me.fec_envia='',
+                    me.fec_anula='',
+                    me.fecha = '',
+                    me.arrayDetalle=[];
+                    me.arrayTerceros=[];
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -1088,6 +1129,18 @@
 
                 return this.errorIngreso;
             },
+            selectConfiguraciones(){
+                let me=this;
+                var url= this.ruta + '/configuraciones/selectConfiguraciones';
+                axios.get(url).then(function (response) {
+                    //console.log(response);
+                    var respuesta= response.data;
+                    me.arrayConfiguraciones = respuesta.configuraciones;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
             mostrarDetalle(modelo, accion, data=[]){
                 let me=this;
                 me.listado=0;
@@ -1096,10 +1149,10 @@
                     case 'facturacion':{
                         switch(accion){
                             case 'registrar':{
-                                me.sugerirNumFactura();
+                                // me.sugerirNumFactura();
                                 me.tipoAccion2 = 1;
                                 me.facturacion_id=0;
-                                me.num_factura=0;
+                                me.num_factura=null;
                                 me.id_tercero=0;
                                 me.tercero = '';
                                 me.tercero_facturacion='';
@@ -1110,6 +1163,7 @@
                                 me.abono=0.0;
                                 me.saldo=0.0;
                                 me.detalle='';
+                                me.lugar = '',
                                 me.descuento=0.0;
                                 me.fec_registra='';
                                 me.fec_envia='';
@@ -1134,6 +1188,7 @@
                                 me.abono=data['abono'];
                                 me.saldo=data['saldo'];
                                 me.detalle=data['detalle'];
+                                me.lugar = data['lugar'];
                                 me.descuento=data['descuento'];
                                 me.fec_registra=data['fec_registra'];
                                 me.fec_envia=data['fec_envia'];
@@ -1150,6 +1205,7 @@
                                 break;
                             };
                         }
+                        me.selectConfiguraciones();
                     }
                 }
             },

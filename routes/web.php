@@ -210,7 +210,11 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         Route::get('/cliente/selectCliente2', 'ClienteController@selectCliente2');
-              
+        
+        Route::get('/configuraciones', 'ConfiguracionesController@index');
+        Route::post('/configuraciones/registrar', 'ConfiguracionesController@store');
+        Route::put('/configuraciones/actualizar', 'ConfiguracionesController@update');
+        Route::get('/configuraciones/selectConfiguraciones', 'ConfiguracionesController@selectConfiguraciones');
 
         Route::get('/venta', 'VentaController@index');
         Route::post('/venta/registrar', 'VentaController@store');

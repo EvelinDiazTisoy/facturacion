@@ -38,6 +38,7 @@ Vue.component('presentacion', require('./components/Presentacion.vue'));
 Vue.component('und_medida', require('./components/UndMedida.vue'));
 Vue.component('concentracion', require('./components/Concentracion.vue'));
 Vue.component('stock', require('./components/Stock.vue'));
+Vue.component('configuraciones', require('./components/Configuraciones.vue'));
 
 const app = new Vue({
     el: '#app', 
