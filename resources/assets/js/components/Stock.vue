@@ -9,12 +9,12 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Stock
-                        <button type="button" @click="abrirModal('categoria','registrar')" class="btn btn-secondary">
+                        <!-- <button type="button" @click="abrirModal('categoria','registrar')" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
+                        </button> -->
                     </div>
                     <div class="card-body">
-                        <div class="form-group row">
+                        <!-- <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterio">
@@ -25,7 +25,7 @@
                                     <button type="submit" @click="listarCategoria(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>

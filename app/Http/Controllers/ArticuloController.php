@@ -11,7 +11,7 @@ class ArticuloController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
@@ -19,18 +19,20 @@ class ArticuloController extends Controller
         
         if ($buscar==''){
             $articulos = Articulo::join('categorias','articulos.idcategoria','=','categorias.id')
-            ->join('und_medidas','articulos.id_und_medida','=','und_medidas.id')
-            ->join('concentraciones','articulos.id_concentracion','=','concentraciones.id')
-            ->join('presentacion','articulos.id_presentacion','=','presentacion.id')
-            ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','und_medidas.nombre as nombre_und_medida','id_und_medida','concentraciones.nombre as nombre_concentracion','id_concentracion','presentacion.nombre as nombre_presentacion','id_presentacion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
+            // ->join('und_medidas','articulos.id_und_medida','=','und_medidas.id')
+            // ->join('concentraciones','articulos.id_concentracion','=','concentraciones.id')
+            // ->join('presentacion','articulos.id_presentacion','=','presentacion.id')
+            // ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','und_medidas.nombre as nombre_und_medida','id_und_medida','concentraciones.nombre as nombre_concentracion','id_concentracion','presentacion.nombre as nombre_presentacion','id_presentacion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
+            ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','id_und_medida','id_concentracion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
             ->orderBy('articulos.id', 'desc')->paginate(3);
         }
         else{
             $articulos = Articulo::join('categorias','articulos.idcategoria','=','categorias.id')
-            ->join('und_medidas','articulos.id_und_medida','=','und_medidas.id')
-            ->join('concentraciones','articulos.id_concentracion','=','concentraciones.id')
-            ->join('presentacion','articulos.id_presentacion','=','presentacion.id')
-            ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','und_medidas.nombre as nombre_und_medida','id_und_medida','concentraciones.nombre as nombre_concentracion','id_concentracion','presentacion.nombre as nombre_presentacion','id_presentacion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
+            // ->join('und_medidas','articulos.id_und_medida','=','und_medidas.id')
+            // ->join('concentraciones','articulos.id_concentracion','=','concentraciones.id')
+            // ->join('presentacion','articulos.id_presentacion','=','presentacion.id')
+            // ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','und_medidas.nombre as nombre_und_medida','id_und_medida','concentraciones.nombre as nombre_concentracion','id_concentracion','presentacion.nombre as nombre_presentacion','id_presentacion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
+            ->select('articulos.id','articulos.idcategoria','articulos.codigo','articulos.nombre','categorias.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','id_und_medida','id_concentracion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','iva','articulos.descripcion','articulos.condicion')
             ->where('articulos.'.$criterio, 'like', '%'. $buscar . '%')
             ->orderBy('articulos.id', 'desc')->paginate(3);
         }
@@ -46,7 +48,6 @@ class ArticuloController extends Controller
                 'to'           => $articulos->lastItem(),
             ],
             'articulos' => $articulos,
-            'usuario' => $id_usuario
         ];
     }
 

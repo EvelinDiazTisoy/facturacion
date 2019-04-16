@@ -110,7 +110,7 @@
                 <!-- Fin ejemplo de tabla Listado -->
             </div>
             <!--Inicio del modal agregar/actualizar-->
-            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal==1}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-primary modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -554,7 +554,7 @@
         methods : {
             listarArticulo (page,buscar,criterio){
                 let me=this;
-                var url= this.ruta + '/articulo?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= this.ruta + '/articulo/?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayArticulo = respuesta.articulos.data;
@@ -695,10 +695,10 @@
                     'descripcion': this.descripcion,
                     'tipo_movimiento' : 1,
                 }).then(function (response) {
-                    me.idArticuloStock = $response['id'];
-                    me.cantidadStock = $response['stock'];
+                    me.idArticuloStock = response['id'];
+                    me.cantidadStock = response['stock'];
                     me.tipoMovimientoStock = 1;
-                    me.sumatoria = $response['stock'];
+                    me.sumatoria = response['stock'];
                     me.registrarStock();
                     me.cerrarModal();
                     me.listarArticulo(1,'','nombre');

@@ -381,17 +381,17 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                            <td>
+                                            <td v-if="articulo.condicion==1">
                                                 <button type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm">
                                                 <i class="icon-check"></i>
                                                 </button>
                                             </td>
-                                            <td v-text="articulo.codigo"></td>
-                                            <td v-text="articulo.nombre"></td>
-                                            <td v-text="articulo.nombre_categoria"></td>
-                                            <td v-text="articulo.precio_venta"></td>
-                                            <td v-text="articulo.stock"></td>
-                                            <td>
+                                            <td v-text="articulo.codigo" v-if="articulo.condicion==1"></td>
+                                            <td v-text="articulo.nombre" v-if="articulo.condicion==1"></td>
+                                            <td v-text="articulo.nombre_categoria" v-if="articulo.condicion==1"></td>
+                                            <td v-text="articulo.precio_venta" v-if="articulo.condicion==1"></td>
+                                            <td v-text="articulo.stock" v-if="articulo.condicion==1"></td>
+                                            <td v-if="articulo.condicion==1">
                                                 <div v-if="articulo.condicion">
                                                     <span class="badge badge-success">Activo</span>
                                                 </div>
