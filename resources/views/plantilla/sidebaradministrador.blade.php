@@ -7,7 +7,7 @@
                     <li class="nav-title">
                         Menu Principal
                     </li>
-                    <li class="nav-item nav-dropdown">
+                    <!--<li class="nav-item nav-dropdown">
                         <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-bag"></i> Contabilidad</a>
                         <ul class="nav-dropdown-items">
                             <li @click="menu=16" class="nav-item">
@@ -24,90 +24,8 @@
                             </li>
                             
                         </ul>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-bag"></i> Informes Contables</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=21" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Auxiliares</a>
-                            </li>
-                            <li @click="menu=22" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Balances</a>
-                            </li>
-                              
-                        </ul>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-bag"></i> Almacén</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=2" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Artículos</a>
-                            </li>
-                            <li @click="menu=3" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-wallet"></i> Ingresos</a>
-                            </li>
-                            <li @click="menu=34" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-wallet"></i> Egresos</a>
-                            </li>
-                            <li @click="menu=35" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-wallet"></i> Facturación</a>
-                            </li>
-                            <li @click="menu=5" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-basket-loaded"></i> Ventas</a>
-                            </li>
-                            <li @click="menu=33" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Stock</a>
-                            </li>
-                            <li @click="menu=6" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-notebook"></i> Clientes</a>
-                            </li>
-                            <li @click="menu=1" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Categorías</a>
-                            </li>
-                            <li @click="menu=30" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Presentación</a>
-                            </li>
-                            <li @click="menu=31" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Unidad de medida</a>
-                            </li>
-                            <li @click="menu=32" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Concentración</a>
-                            </li>
-                        </ul>
-                    </li>
-                    {{-- <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-wallet"></i> Compras</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=3" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-wallet"></i> Ingresos</a>
-                            </li>
-                            <li @click="menu=4" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-notebook"></i> Proveedores</a>
-                            </li>
-                        </ul>
-                    </li> --}}
-                    {{-- <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-basket"></i> Ventas</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=5" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-basket-loaded"></i> Ventas</a>
-                            </li>
-                            <li @click="menu=6" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-notebook"></i> Clientes</a>
-                            </li>
-                        </ul>
-                    </li> --}}
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-people"></i> Configuraciones</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=36" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-user"></i> Lugar</a>
-                            </li>
-                            {{-- <li @click="menu=37" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-user-following"></i> Roles</a>
-                            </li> --}}
-                        </ul>
-                    </li>
+                    </li>-->
+                    
                     <li class="nav-item nav-dropdown">
                         <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-people"></i> Acceso</a>
                         <ul class="nav-dropdown-items">
@@ -116,17 +34,6 @@
                             </li>
                             <li @click="menu=8" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-user-following"></i> Roles</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item nav-dropdown">
-                        <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-pie-chart"></i> Reportes</a>
-                        <ul class="nav-dropdown-items">
-                            <li @click="menu=9" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-chart"></i> Reporte Ingresos</a>
-                            </li>
-                            <li @click="menu=10" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-chart"></i> Reporte Ventas</a>
                             </li>
                         </ul>
                     </li>
