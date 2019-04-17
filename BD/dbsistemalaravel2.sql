@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-04-2019 a las 23:47:20
+-- Tiempo de generación: 17-04-2019 a las 00:19:46
 -- Versión del servidor: 10.1.30-MariaDB
 -- Versión de PHP: 7.2.1
 
@@ -40,26 +40,9 @@ CREATE TABLE `migrations` (
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (1, '2014_10_12_100000_create_password_resets_table', 1),
-(2, '2018_02_01_171225_create_categorias_table', 1),
 (4, '2018_02_27_143638_create_personas_table', 1),
-(5, '2018_03_06_024616_create_proveedores_table', 1),
 (6, '2018_03_13_133425_create_roles_table', 1),
-(7, '2018_03_14_000000_create_users_table', 1),
-(8, '2018_04_08_140106_create_ingresos_table', 1),
-(9, '2018_04_08_140532_create_detalle_ingresos_table', 1),
-(10, '2018_04_22_212328_create_ventas_table', 1),
-(11, '2018_04_22_212558_create_detalle_ventas_table', 1),
-(12, '2018_05_28_214019_create_plan_cuentas', 2),
-(13, '2018_06_07_080701_create_conf_formatos_table', 3),
-(14, '2018_05_26_001854_create_notifications_table', 4),
-(15, '2018_08_07_050645_create_teachers_table', 5),
-(16, '2019_02_12_163951_create_presentacion_table', 5),
-(17, '2019_02_12_204208_create_und_medida_table', 6),
-(18, '2019_02_12_213902_create_concentraciones_table', 7),
-(22, '2018_02_22_235257_create_articulos_table', 9),
-(23, '2019_02_20_142907_create_stock_table', 10),
-(24, '2019_03_19_201039_create_facturacion_table', 11),
-(25, '2019_03_20_141427_create_detalle_facturacion_table', 12);
+(7, '2018_03_14_000000_create_users_table', 1);
 
 -- --------------------------------------------------------
 
