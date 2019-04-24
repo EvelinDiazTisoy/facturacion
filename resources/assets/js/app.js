@@ -18,11 +18,12 @@ window.Vue = require('vue');
 Vue.component('rol', require('./components/Rol.vue'));
 Vue.component('user', require('./components/User.vue'));
 Vue.component('terceros', require('./components/Terceros.vue'));
+Vue.component('modulo', require('./components/Modulo.vue'));
 
 const app = new Vue({
     el: '#app', 
     data :{
         menu : 0,
-        ruta : 'http://localhost:8081/laravel_estudio/sistema2/public'
+        ruta : 'http://localhost/laravel_estudio/sistema2/public'
     }
 });

@@ -48,6 +48,17 @@
                                         <button type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button>
+
+                                        <template v-if="rol.estado">
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.nombre)">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                        </template>
+                                        <template v-else>
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarRol(rol.nombre)">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -91,7 +102,7 @@
                                         <table class="table table-bordered table-striped table-sm col-md-11">
                                             <thead>
                                                 <tr>
-                                                    <th style="backgroun-color: red !important;">Modulo</th>
+                                                    <th>Modulo</th>
                                                     <th>Ver</th>
                                                     <th>Crear</th>
                                                     <th>Editar</th>
@@ -324,6 +335,84 @@
                 if (me.errorMostrarMsjRol.length) me.errorRol = 1;
 
                 return me.errorRol;
+            },
+            desactivarRol(nombre){
+               swal({
+                title: 'Esta seguro de desactivar este rol?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/rol/desactivar',{
+                        'nombre': nombre
+                    }).then(function (response) {
+                        me.listarRol(1,'','nombre');
+                        swal(
+                        'Desactivado!',
+                        'El rol ha sido desactivado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
+            },
+            activarRol(nombre){
+               swal({
+                title: 'Esta seguro de activar este rol?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/rol/activar',{
+                        'nombre': nombre
+                    }).then(function (response) {
+                        me.listarModulo('','nombre');
+                        swal(
+                        'Activado!',
+                        'El rol ha sido activado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
             },
             cerrarModal(){
                 this.modal=0;

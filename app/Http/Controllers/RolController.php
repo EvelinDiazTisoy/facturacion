@@ -159,4 +159,24 @@ class RolController extends Controller
 
         return ['roles' => $roles];
     }
+
+    public function desactivar(Request $request)
+    {
+        // if (!$request->ajax()) return redirect('/');
+        $roles = Rol::where('nombre','like',$request->nombre)->get();
+        foreach($roles as $r)
+        {
+            $roles[r]['estado'] = 0;
+        }
+        // $roles->estado = '0';
+        $roles->save();
+    }
+
+    public function activar(Request $request)
+    {
+        // if (!$request->ajax()) return redirect('/');
+        $roles = Rol::where('nombre','like',$request->nombre)->all();
+        $roles->estado = '1';
+        $roles->save();
+    }
 }

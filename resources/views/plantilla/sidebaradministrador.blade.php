@@ -35,6 +35,9 @@
                             <li @click="menu=8" class="nav-item">
                                 <a class="nav-link" href="#"><i class="icon-user-following"></i> Roles</a>
                             </li>
+                            <li @click="menu=9" class="nav-item">
+                                <a class="nav-link" href="#"><i class="icon-user-following"></i> Modulos</a>
+                            </li>
                         </ul>
                     </li>
                     <li @click="menu=12" class="nav-item">
