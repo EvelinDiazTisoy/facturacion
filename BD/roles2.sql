@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-04-2019 a las 17:59:39
+-- Tiempo de generación: 22-04-2019 a las 16:20:01
 -- Versión del servidor: 10.1.30-MariaDB
 -- Versión de PHP: 7.2.1
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `dbsistemalaravel2`
+-- Base de datos: `dbsistemalaravel4`
 --
 
 -- --------------------------------------------------------
@@ -31,7 +31,6 @@ SET time_zone = "+00:00";
 CREATE TABLE `roles` (
   `id` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_empresa` int(11) NOT NULL,
   `id_modulo` int(11) NOT NULL,
   `lectura` tinyint(1) NOT NULL,
   `escritura` tinyint(1) NOT NULL,
@@ -48,12 +47,13 @@ CREATE TABLE `roles` (
 -- Volcado de datos para la tabla `roles`
 --
 
-INSERT INTO `roles` (`id`, `nombre`, `id_empresa`, `id_modulo`, `lectura`, `escritura`, `edicion`, `anular`, `imprimir`, `usu_crea`, `estado`, `created_at`, `updated_at`) VALUES
-(1, 'Administrador', 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(2, 'Vendedor', 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(3, 'Almacenero', 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(4, 'Contador', 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(5, 'Aux Contable', 0, 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL);
+INSERT INTO `roles` (`id`, `nombre`, `id_modulo`, `lectura`, `escritura`, `edicion`, `anular`, `imprimir`, `usu_crea`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 'Administrador', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
+(2, 'Vendedor', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
+(3, 'Almacenero', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
+(4, 'Contador', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
+(5, 'Aux Contable', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
+(6, 'ajfoasj', 2, 0, 0, 0, 0, 0, 1, 1, '2019-04-18 00:53:14', '2019-04-18 00:53:14');
 
 --
 -- Índices para tablas volcadas
@@ -66,8 +66,7 @@ ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `roles_nombre_unique` (`nombre`),
   ADD KEY `id_modulo` (`id_modulo`),
-  ADD KEY `usu_crea` (`usu_crea`),
-  ADD KEY `id_empresa` (`id_empresa`);
+  ADD KEY `usu_crea` (`usu_crea`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -77,7 +76,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -30,11 +30,11 @@
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Estado</th>
+                                    <th>Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="rol in arrayRol" :key="rol.id">
-                                    
+                                <tr v-for="rol in arrayNombresRoles" :key="rol.nombre">
                                     <td v-text="rol.nombre"></td>
                                     <td>
                                         <div v-if="rol.estado">
@@ -43,7 +43,11 @@
                                         <div v-else>
                                             <span class="badge badge-danger">Desactivado</span>
                                         </div>
-                                        
+                                    </td>
+                                    <td>
+                                        <button type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -84,15 +88,44 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-md-3 form-control-label" for="text-input">Modulo</label>
-                                        <div class="col-md-9">
-                                            <select v-model="id_modulo" class="form-control">
-                                                <option value="0">--Seleccione</option>
-                                                <option ></option>
-                                            </select>                                    
-                                        </div>
+                                        <table class="table table-bordered table-striped table-sm col-md-11">
+                                            <thead>
+                                                <tr>
+                                                    <th style="backgroun-color: red !important;">Modulo</th>
+                                                    <th>Ver</th>
+                                                    <th>Crear</th>
+                                                    <th>Editar</th>
+                                                    <th>Anular</th>
+                                                    <th>Imprimir</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="modulo in arrayModulos" :key="modulo.id">
+                                                    <td v-if="modulo.tipo==1" v-text="modulo.nombre" style="background: #c2cfd6;"></td>
+                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.lectura"></td>
+                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.escritura"></td>
+                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.edicion"></td>
+                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.anular"></td>
+                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.imprimir"></td>
+                                                    
+                                                    <td v-if="modulo.tipo==2" v-text="modulo.nombre" style="padding-left: 1em; background: #ffffff;"></td>
+                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.lectura"></td>
+                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.escritura"></td>
+                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.edicion"></td>
+                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.anular"></td>
+                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.imprimir"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </form>
+                            </div>
+                            <div v-show="errorRol" class="form-group row div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjRol" :key="error" v-text="error">
+
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
@@ -116,12 +149,15 @@
             return {
                 rol_id: 0,
                 nombre : '',
+                validarNombre : '',
                 id_modulo: 0,
                 lectura : 0,
                 escritura: 0,
                 edicion : 0,
                 imprimir : 0,
                 arrayRol : [],
+                arrayModulos: [],
+                arrayNombresRoles:[],
                 errorRol : [],
                 errorMostrarMsjRol : [],
                 modal : 0,
@@ -175,8 +211,42 @@
                 var url= this.ruta+'/rol?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayRol = respuesta.roles.data;
+                    me.arrayRol = respuesta.roles;
                     me.pagination= respuesta.pagination;
+                    me.arrayNombresRoles = respuesta.roles2.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            listarModulos(page,buscar,criterio){
+                let me=this;
+                var url= this.ruta+'/modulo' ;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayModulos = respuesta.modulos;
+                    // me.pagination= respuesta.pagination;
+                    
+                    if(me.tipoAccion==2)
+                    {
+                        for(var p=0; p<me.arrayRol.length; p++)
+                        {
+                            if(me.arrayRol[p]['nombre'] == me.nombre)
+                            {
+                                for(var m=0; m<me.arrayModulos.length; m++)
+                                {
+                                    if(me.arrayModulos[m]['id']==me.arrayRol[p]['id_modulo'])
+                                    {
+                                        me.arrayModulos[m].lectura = me.arrayRol[p]['lectura'];
+                                        me.arrayModulos[m].escritura = me.arrayRol[p]['escritura'];
+                                        me.arrayModulos[m].edicion = me.arrayRol[p]['edicion'];
+                                        me.arrayModulos[m].anular = me.arrayRol[p]['anular'];
+                                        me.arrayModulos[m].imprimir = me.arrayRol[p]['imprimir'];
+                                    }
+                                }
+                            }
+                        }
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -196,14 +266,15 @@
                 
                 let me = this;
 
-                axios.post(this.ruta +'/cliente/registrar',{
+                axios.post(this.ruta +'/rol/registrar',{
                     'nombre': this.nombre,
-                    'id_rol': this.id_rol,
+                    'id_modulo': this.id_modulo,
                     'lectura': this.lectura,
                     'escritura': this.escritura,
                     'edicion': this.edicion,
                     'anular': this.anular,
-                    'imprimir': this.imprimir
+                    'imprimir': this.imprimir,
+                    'modulos' : this.arrayModulos
                 }).then(function (response) {
                     me.cerrarModal();
                     me.listarRol(1,'','nombre');
@@ -212,37 +283,47 @@
                 });
             },
             actualizarRol(){
-               if (this.validarRol()){
+                if (this.validarRol()){
                     return;
                 }
                 
                 let me = this;
 
-                axios.put(this.ruta +'/cliente/actualizar',{
+                axios.put(this.ruta +'/rol/actualizar',{
                     'nombre': this.nombre,
-                    'id_rol': this.id_rol,
+                    'nombreAnterior': this.validarNombre,
+                    'id_modulo': this.id_modulo,
                     'lectura': this.lectura,
                     'escritura': this.escritura,
                     'edicion': this.edicion,
                     'anular': this.anular,
                     'imprimir': this.imprimir,
+                    'modulos' : this.arrayModulos,
                     'id': this.rol_id
                 }).then(function (response) {
                     me.cerrarModal();
                     me.listarRol(1,'','nombre');
                 }).catch(function (error) {
                     console.log(error);
-                }); 
+                });
             },            
             validarRol(){
-                this.errorRol=0;
-                this.errorMostrarMsjRol =[];
+                let me = this;
+                me.errorRol=0;
+                me.errorMostrarMsjRol =[];
 
-                if (!this.nombre) this.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
+                if (!me.nombre) me.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
+                console.log(me.tipoAccion);
+                for(var r=0; r<me.arrayNombresRoles.length; r++)
+                {
+                    if(me.tipoAccion==1 && me.arrayNombresRoles[r]['nombre']==me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
 
-                if (this.errorMostrarMsjRol.length) this.errorRol = 1;
+                    if(me.tipoAccion==2 && me.validarNombre!=me.nombre && me.nombre==me.arrayNombresRoles[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+                }
 
-                return this.errorRol;
+                if (me.errorMostrarMsjRol.length) me.errorRol = 1;
+
+                return me.errorRol;
             },
             cerrarModal(){
                 this.modal=0;
@@ -255,11 +336,17 @@
                 this.edicion = 0;
                 this.anular = 0;
                 this.imprimir = 0;
+                this.rol_id = 0;
+                this.errorRol = 0;
+                this.errorMostrarMsjRol = [];
+                this.arrayModulos = [];
             },
             abrirModal(modelo, accion, data = []){
+                let me = this;
                 switch(modelo){
                     case "roles":
                     {
+                        this.listarModulos();
                         switch(accion){
                             case 'registrar':
                             {
@@ -282,12 +369,7 @@
                                 this.tituloModal='Actualizar Cliente';
                                 this.tipoAccion=2;
                                 this.nombre = data['nombre'];
-                                this.id_modulo = data['id_modulo'];
-                                this.lectura = data['lectura'];
-                                this.escritura = data['escritura'];
-                                this.edicion = data['edicion'];
-                                this.anular = data['anular'];
-                                this.imprimir = data['imprimir'];
+                                this.validarNombre = data['nombre'];
                                 this.rol_id = data['id'];
                                 break;
                             }

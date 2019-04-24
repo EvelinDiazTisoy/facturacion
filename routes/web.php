@@ -89,6 +89,16 @@ Route::group(['middleware'=>['auth']],function(){
 
         Route::get('/rol', 'RolController@index');
         Route::get('/rol/selectRol', 'RolController@selectRol');
+        Route::post('rol/registrar', 'RolController@store');
+        Route::put('rol/actualizar', 'RolController@update');
+
+        Route::get('/modulo', 'ModuloController@index');
+        Route::get('/modulo/selectModulo', 'ModuloController@selectModulo');
+
+        Route::get('/cliente', 'ClienteController@index');
+        Route::post('/cliente/registrar', 'ClienteController@store');
+        Route::put('/cliente/actualizar', 'ClienteController@update');
+        Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         
         Route::get('/user', 'UserController@index');
         Route::post('/user/registrar', 'UserController@store');

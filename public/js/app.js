@@ -33192,6 +33192,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['ruta'],
@@ -33199,12 +33232,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             rol_id: 0,
             nombre: '',
+            validarNombre: '',
             id_modulo: 0,
             lectura: 0,
             escritura: 0,
             edicion: 0,
             imprimir: 0,
             arrayRol: [],
+            arrayModulos: [],
+            arrayNombresRoles: [],
             errorRol: [],
             errorMostrarMsjRol: [],
             modal: 0,
@@ -33258,8 +33294,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var url = this.ruta + '/rol?page=' + page + '&buscar=' + buscar + '&criterio=' + criterio;
             axios.get(url).then(function (response) {
                 var respuesta = response.data;
-                me.arrayRol = respuesta.roles.data;
+                me.arrayRol = respuesta.roles;
                 me.pagination = respuesta.pagination;
+                me.arrayNombresRoles = respuesta.roles2.data;
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        listarModulos: function listarModulos(page, buscar, criterio) {
+            var me = this;
+            var url = this.ruta + '/modulo';
+            axios.get(url).then(function (response) {
+                var respuesta = response.data;
+                me.arrayModulos = respuesta.modulos;
+                // me.pagination= respuesta.pagination;
+
+                if (me.tipoAccion == 2) {
+                    for (var p = 0; p < me.arrayRol.length; p++) {
+                        if (me.arrayRol[p]['nombre'] == me.nombre) {
+                            for (var m = 0; m < me.arrayModulos.length; m++) {
+                                if (me.arrayModulos[m]['id'] == me.arrayRol[p]['id_modulo']) {
+                                    me.arrayModulos[m].lectura = me.arrayRol[p]['lectura'];
+                                    me.arrayModulos[m].escritura = me.arrayRol[p]['escritura'];
+                                    me.arrayModulos[m].edicion = me.arrayRol[p]['edicion'];
+                                    me.arrayModulos[m].anular = me.arrayRol[p]['anular'];
+                                    me.arrayModulos[m].imprimir = me.arrayRol[p]['imprimir'];
+                                }
+                            }
+                        }
+                    }
+                }
             }).catch(function (error) {
                 console.log(error);
             });
@@ -33278,14 +33342,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             var me = this;
 
-            axios.post(this.ruta + '/cliente/registrar', {
+            axios.post(this.ruta + '/rol/registrar', {
                 'nombre': this.nombre,
-                'id_rol': this.id_rol,
+                'id_modulo': this.id_modulo,
                 'lectura': this.lectura,
                 'escritura': this.escritura,
                 'edicion': this.edicion,
                 'anular': this.anular,
-                'imprimir': this.imprimir
+                'imprimir': this.imprimir,
+                'modulos': this.arrayModulos
             }).then(function (response) {
                 me.cerrarModal();
                 me.listarRol(1, '', 'nombre');
@@ -33300,14 +33365,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             var me = this;
 
-            axios.put(this.ruta + '/cliente/actualizar', {
+            axios.put(this.ruta + '/rol/actualizar', {
                 'nombre': this.nombre,
-                'id_rol': this.id_rol,
+                'nombreAnterior': this.validarNombre,
+                'id_modulo': this.id_modulo,
                 'lectura': this.lectura,
                 'escritura': this.escritura,
                 'edicion': this.edicion,
                 'anular': this.anular,
                 'imprimir': this.imprimir,
+                'modulos': this.arrayModulos,
                 'id': this.rol_id
             }).then(function (response) {
                 me.cerrarModal();
@@ -33317,14 +33384,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         validarRol: function validarRol() {
-            this.errorRol = 0;
-            this.errorMostrarMsjRol = [];
+            var me = this;
+            me.errorRol = 0;
+            me.errorMostrarMsjRol = [];
 
-            if (!this.nombre) this.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
+            if (!me.nombre) me.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
+            console.log(me.tipoAccion);
+            for (var r = 0; r < me.arrayNombresRoles.length; r++) {
+                if (me.tipoAccion == 1 && me.arrayNombresRoles[r]['nombre'] == me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
 
-            if (this.errorMostrarMsjRol.length) this.errorRol = 1;
+                if (me.tipoAccion == 2 && me.validarNombre != me.nombre && me.nombre == me.arrayNombresRoles[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+            }
 
-            return this.errorRol;
+            if (me.errorMostrarMsjRol.length) me.errorRol = 1;
+
+            return me.errorRol;
         },
         cerrarModal: function cerrarModal() {
             this.modal = 0;
@@ -33337,13 +33411,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.edicion = 0;
             this.anular = 0;
             this.imprimir = 0;
+            this.rol_id = 0;
+            this.errorRol = 0;
+            this.errorMostrarMsjRol = [];
+            this.arrayModulos = [];
         },
         abrirModal: function abrirModal(modelo, accion) {
             var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
+            var me = this;
             switch (modelo) {
                 case "roles":
                     {
+                        this.listarModulos();
                         switch (accion) {
                             case 'registrar':
                                 {
@@ -33366,12 +33446,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                     this.tituloModal = 'Actualizar Cliente';
                                     this.tipoAccion = 2;
                                     this.nombre = data['nombre'];
-                                    this.id_modulo = data['id_modulo'];
-                                    this.lectura = data['lectura'];
-                                    this.escritura = data['escritura'];
-                                    this.edicion = data['edicion'];
-                                    this.anular = data['anular'];
-                                    this.imprimir = data['imprimir'];
+                                    this.validarNombre = data['nombre'];
                                     this.rol_id = data['id'];
                                     break;
                                 }
@@ -33514,8 +33589,8 @@ var render = function() {
               _vm._v(" "),
               _c(
                 "tbody",
-                _vm._l(_vm.arrayRol, function(rol) {
-                  return _c("tr", { key: rol.id }, [
+                _vm._l(_vm.arrayNombresRoles, function(rol) {
+                  return _c("tr", { key: rol.nombre }, [
                     _c("td", { domProps: { textContent: _vm._s(rol.nombre) } }),
                     _vm._v(" "),
                     _c("td", [
@@ -33530,6 +33605,22 @@ var render = function() {
                               _vm._v("Desactivado")
                             ])
                           ])
+                    ]),
+                    _vm._v(" "),
+                    _c("td", [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-warning btn-sm",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.abrirModal("roles", "actualizar", rol)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "icon-pencil" })]
+                      )
                     ])
                   ])
                 })
@@ -33717,57 +33808,702 @@ var render = function() {
                       _vm._v(" "),
                       _c("div", { staticClass: "form-group row" }, [
                         _c(
-                          "label",
+                          "table",
                           {
-                            staticClass: "col-md-3 form-control-label",
-                            attrs: { for: "text-input" }
+                            staticClass:
+                              "table table-bordered table-striped table-sm col-md-11"
                           },
-                          [_vm._v("Modulo")]
-                        ),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-md-9" }, [
-                          _c(
-                            "select",
-                            {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.id_modulo,
-                                  expression: "id_modulo"
-                                }
-                              ],
-                              staticClass: "form-control",
-                              on: {
-                                change: function($event) {
-                                  var $$selectedVal = Array.prototype.filter
-                                    .call($event.target.options, function(o) {
-                                      return o.selected
-                                    })
-                                    .map(function(o) {
-                                      var val =
-                                        "_value" in o ? o._value : o.value
-                                      return val
-                                    })
-                                  _vm.id_modulo = $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
-                                }
-                              }
-                            },
-                            [
-                              _c("option", { attrs: { value: "0" } }, [
-                                _vm._v("--Seleccione")
-                              ]),
-                              _vm._v(" "),
-                              _c("option")
-                            ]
-                          )
-                        ])
+                          [
+                            _vm._m(2),
+                            _vm._v(" "),
+                            _c(
+                              "tbody",
+                              _vm._l(_vm.arrayModulos, function(modulo) {
+                                return _c("tr", { key: modulo.id }, [
+                                  modulo.tipo == 1
+                                    ? _c("td", {
+                                        staticStyle: { background: "#c2cfd6" },
+                                        domProps: {
+                                          textContent: _vm._s(modulo.nombre)
+                                        }
+                                      })
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 1
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#c2cfd6" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.lectura,
+                                                expression: "modulo.lectura"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.lectura
+                                              )
+                                                ? _vm._i(modulo.lectura, null) >
+                                                  -1
+                                                : modulo.lectura
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.lectura,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.lectura = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.lectura = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "lectura",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 1
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#c2cfd6" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.escritura,
+                                                expression: "modulo.escritura"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.escritura
+                                              )
+                                                ? _vm._i(
+                                                    modulo.escritura,
+                                                    null
+                                                  ) > -1
+                                                : modulo.escritura
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.escritura,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.escritura = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.escritura = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "escritura",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 1
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#c2cfd6" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.edicion,
+                                                expression: "modulo.edicion"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.edicion
+                                              )
+                                                ? _vm._i(modulo.edicion, null) >
+                                                  -1
+                                                : modulo.edicion
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.edicion,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.edicion = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.edicion = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "edicion",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 1
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#c2cfd6" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.anular,
+                                                expression: "modulo.anular"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.anular
+                                              )
+                                                ? _vm._i(modulo.anular, null) >
+                                                  -1
+                                                : modulo.anular
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.anular,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.anular = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.anular = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "anular",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 1
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#c2cfd6" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.imprimir,
+                                                expression: "modulo.imprimir"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.imprimir
+                                              )
+                                                ? _vm._i(
+                                                    modulo.imprimir,
+                                                    null
+                                                  ) > -1
+                                                : modulo.imprimir
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.imprimir,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.imprimir = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.imprimir = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "imprimir",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c("td", {
+                                        staticStyle: {
+                                          "padding-left": "1em",
+                                          background: "#ffffff"
+                                        },
+                                        domProps: {
+                                          textContent: _vm._s(modulo.nombre)
+                                        }
+                                      })
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#ffffff" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.lectura,
+                                                expression: "modulo.lectura"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.lectura
+                                              )
+                                                ? _vm._i(modulo.lectura, null) >
+                                                  -1
+                                                : modulo.lectura
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.lectura,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.lectura = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.lectura = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "lectura",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#ffffff" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.escritura,
+                                                expression: "modulo.escritura"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.escritura
+                                              )
+                                                ? _vm._i(
+                                                    modulo.escritura,
+                                                    null
+                                                  ) > -1
+                                                : modulo.escritura
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.escritura,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.escritura = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.escritura = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "escritura",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#ffffff" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.edicion,
+                                                expression: "modulo.edicion"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.edicion
+                                              )
+                                                ? _vm._i(modulo.edicion, null) >
+                                                  -1
+                                                : modulo.edicion
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.edicion,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.edicion = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.edicion = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "edicion",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#ffffff" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.anular,
+                                                expression: "modulo.anular"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.anular
+                                              )
+                                                ? _vm._i(modulo.anular, null) >
+                                                  -1
+                                                : modulo.anular
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.anular,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.anular = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.anular = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "anular",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e(),
+                                  _vm._v(" "),
+                                  modulo.tipo == 2
+                                    ? _c(
+                                        "td",
+                                        {
+                                          staticStyle: { background: "#ffffff" }
+                                        },
+                                        [
+                                          _c("input", {
+                                            directives: [
+                                              {
+                                                name: "model",
+                                                rawName: "v-model",
+                                                value: modulo.imprimir,
+                                                expression: "modulo.imprimir"
+                                              }
+                                            ],
+                                            attrs: { type: "checkbox" },
+                                            domProps: {
+                                              checked: Array.isArray(
+                                                modulo.imprimir
+                                              )
+                                                ? _vm._i(
+                                                    modulo.imprimir,
+                                                    null
+                                                  ) > -1
+                                                : modulo.imprimir
+                                            },
+                                            on: {
+                                              change: function($event) {
+                                                var $$a = modulo.imprimir,
+                                                  $$el = $event.target,
+                                                  $$c = $$el.checked
+                                                    ? true
+                                                    : false
+                                                if (Array.isArray($$a)) {
+                                                  var $$v = null,
+                                                    $$i = _vm._i($$a, $$v)
+                                                  if ($$el.checked) {
+                                                    $$i < 0 &&
+                                                      (modulo.imprimir = $$a.concat(
+                                                        [$$v]
+                                                      ))
+                                                  } else {
+                                                    $$i > -1 &&
+                                                      (modulo.imprimir = $$a
+                                                        .slice(0, $$i)
+                                                        .concat(
+                                                          $$a.slice($$i + 1)
+                                                        ))
+                                                  }
+                                                } else {
+                                                  _vm.$set(
+                                                    modulo,
+                                                    "imprimir",
+                                                    $$c
+                                                  )
+                                                }
+                                              }
+                                            }
+                                          })
+                                        ]
+                                      )
+                                    : _vm._e()
+                                ])
+                              })
+                            )
+                          ]
+                        )
                       ])
                     ]
                   )
                 ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.errorRol,
+                        expression: "errorRol"
+                      }
+                    ],
+                    staticClass: "form-group row div-error"
+                  },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "text-center text-error" },
+                      _vm._l(_vm.errorMostrarMsjRol, function(error) {
+                        return _c("div", {
+                          key: error,
+                          domProps: { textContent: _vm._s(error) }
+                        })
+                      })
+                    )
+                  ]
+                ),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-footer" }, [
                   _c(
@@ -33843,7 +34579,31 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("Nombre")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Estado")])
+        _c("th", [_vm._v("Estado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Opciones")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { staticStyle: { "backgroun-color": "red !important" } }, [
+          _vm._v("Modulo")
+        ]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Ver")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Crear")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Editar")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Anular")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Imprimir")])
       ])
     ])
   }

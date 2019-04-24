@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-04-2019 a las 00:45:23
+-- Tiempo de generación: 22-04-2019 a las 16:25:07
 -- Versión del servidor: 10.1.30-MariaDB
 -- Versión de PHP: 7.2.1
 
@@ -182,7 +182,7 @@ INSERT INTO `personas` (`id`, `nombre`, `tipo_documento`, `num_documento`, `dire
 
 CREATE TABLE `roles` (
   `id` int(10) UNSIGNED NOT NULL,
-  `nombre` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `id_modulo` int(11) NOT NULL,
   `lectura` tinyint(1) NOT NULL,
   `escritura` tinyint(1) NOT NULL,
@@ -277,7 +277,6 @@ ALTER TABLE `personas`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `roles_nombre_unique` (`nombre`),
   ADD KEY `id_modulo` (`id_modulo`),
   ADD KEY `usu_crea` (`usu_crea`);
 
