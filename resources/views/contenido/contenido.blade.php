@@ -1,16 +1,23 @@
-    @extends('principal')
+@extends('principal')
     @section('contenido')
-
+<?php
+	$menu_usuario2 = Session::get('menu_usu');
+?>
     @if(Auth::check())
-            @if (Auth::user()->idrol == 1)
+		
             <template v-if="menu==0">
                 <h1>Escritorio</h1>
             </template>
-
-            <template v-if="menu==1">
-                <categoria :ruta="ruta"></categoria>
-            </template>
-
+			@foreach ($menu_usuario2 as $menu_usu)
+				@if(count($menu_usu['hijos'])>0)
+					@foreach ($menu_usu['hijos'] as $menu_hijo)
+						<template v-if="menu=={{$menu_hijo['menu']}}">
+							<{{$menu_hijo['template_menu']}} :ruta="ruta"></{{$menu_hijo['template_menu']}}>
+						</template>
+					@endforeach
+				@endif
+			@endforeach
+			
             <template v-if="menu==7">
                 <user :ruta="ruta"></user>
             </template>
@@ -22,20 +29,15 @@
             <template v-if="menu==9">
                 <modulo :ruta="ruta"></modulo>
             </template>
+            
+            <template v-if="menu==11">
+                <h1>Ayuda</h1>
+            </template>
 
             <template v-if="menu==12">
                 <h1>Acerca de</h1>
-            </template>
-            <template v-if="menu==17">
-                <terceros :ruta="ruta"></terceros>
-            </template>
+            </template>      
 
-            <template v-if="menu==36">
-                <configuraciones :ruta="ruta"></configuraciones>
-            </template>
-            @else
-
-            @endif
 
     @endif
        
