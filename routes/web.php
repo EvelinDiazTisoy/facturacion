@@ -88,11 +88,11 @@ Route::group(['middleware'=>['auth']],function(){
         // Route::get('/categoria/selectCategoria', 'CategoriaController@selectCategoria');
 
         Route::get('/rol', 'RolController@index');
-        Route::get('/rol/selectRol', 'RolController@selectRol');
         Route::post('rol/registrar', 'RolController@store');
         Route::put('rol/actualizar', 'RolController@update');
         Route::put('/rol/desactivar', 'RolController@desactivar');
         Route::put('/rol/activar', 'RolController@activar');
+        Route::get('/rol/permisos', 'RolController@listarPermisos');
         
         Route::get('/modulo', 'ModuloController@index');
         Route::post('/modulo/registrar', 'ModuloController@store');

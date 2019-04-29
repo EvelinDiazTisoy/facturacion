@@ -98,7 +98,7 @@
                                             <input type="text" v-model="nombre" class="form-control" placeholder="Nombre del rol">
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="container-fluid form-group row">
                                         <table class="table table-bordered table-striped table-sm col-md-11">
                                             <thead>
                                                 <tr>
@@ -111,20 +111,13 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="modulo in arrayModulos" :key="modulo.id">
-                                                    <td v-if="modulo.tipo==1" v-text="modulo.nombre" style="background: #c2cfd6;"></td>
-                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.lectura"></td>
-                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.escritura"></td>
-                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.edicion"></td>
-                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.anular"></td>
-                                                    <td  v-if="modulo.tipo==1" style="background: #c2cfd6;"><input type="checkbox" v-model="modulo.imprimir"></td>
-                                                    
-                                                    <td v-if="modulo.tipo==2" v-text="modulo.nombre" style="padding-left: 1em; background: #ffffff;"></td>
-                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.lectura"></td>
-                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.escritura"></td>
-                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.edicion"></td>
-                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.anular"></td>
-                                                    <td  v-if="modulo.tipo==2" style="background: #ffffff;"><input type="checkbox" v-model="modulo.imprimir"></td>
+                                                <tr v-for="permisos in arrayPermisos" :key="permisos.id">
+                                                    <td v-text="permisos.nombre"></td>
+                                                    <td><input type="checkbox" v-model="permisos.lectura" value=""></td>
+                                                    <td><input type="checkbox" v-model="permisos.escritura" value=""></td>
+                                                    <td><input type="checkbox" v-model="permisos.edicion" value=""></td>
+                                                    <td><input type="checkbox" v-model="permisos.anular" value=""></td>
+                                                    <td><input type="checkbox" v-model="permisos.imprimir" value=""></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -169,6 +162,7 @@
                 arrayRol : [],
                 arrayModulos: [],
                 arrayNombresRoles:[],
+                arrayPermisos : [],
                 errorRol : [],
                 errorMostrarMsjRol : [],
                 modal : 0,
@@ -219,6 +213,7 @@
         methods : {
             listarRol (page,buscar,criterio){
                 let me=this;
+                
                 var url= this.ruta+'/rol?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
@@ -237,27 +232,18 @@
                     var respuesta= response.data;
                     me.arrayModulos = respuesta.modulos;
                     // me.pagination= respuesta.pagination;
-                    
-                    if(me.tipoAccion==2)
-                    {
-                        for(var p=0; p<me.arrayRol.length; p++)
-                        {
-                            if(me.arrayRol[p]['nombre'] == me.nombre)
-                            {
-                                for(var m=0; m<me.arrayModulos.length; m++)
-                                {
-                                    if(me.arrayModulos[m]['id']==me.arrayRol[p]['id_modulo'])
-                                    {
-                                        me.arrayModulos[m].lectura = me.arrayRol[p]['lectura'];
-                                        me.arrayModulos[m].escritura = me.arrayRol[p]['escritura'];
-                                        me.arrayModulos[m].edicion = me.arrayRol[p]['edicion'];
-                                        me.arrayModulos[m].anular = me.arrayRol[p]['anular'];
-                                        me.arrayModulos[m].imprimir = me.arrayRol[p]['imprimir'];
-                                    }
-                                }
-                            }
-                        }
-                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            listarPermisos(rol_id){
+                let me=this;
+                
+                var url= this.ruta+'/rol/permisos?id_rol='+rol_id;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayPermisos = respuesta.permisos;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -285,7 +271,7 @@
                     'edicion': this.edicion,
                     'anular': this.anular,
                     'imprimir': this.imprimir,
-                    'modulos' : this.arrayModulos
+                    'modulos' : this.arrayPermisos
                 }).then(function (response) {
                     me.cerrarModal();
                     me.listarRol(1,'','nombre');
@@ -303,13 +289,7 @@
                 axios.put(this.ruta +'/rol/actualizar',{
                     'nombre': this.nombre,
                     'nombreAnterior': this.validarNombre,
-                    'id_modulo': this.id_modulo,
-                    'lectura': this.lectura,
-                    'escritura': this.escritura,
-                    'edicion': this.edicion,
-                    'anular': this.anular,
-                    'imprimir': this.imprimir,
-                    'modulos' : this.arrayModulos,
+                    'modulos' : this.arrayPermisos,
                     'id': this.rol_id
                 }).then(function (response) {
                     me.cerrarModal();
@@ -429,13 +409,13 @@
                 this.errorRol = 0;
                 this.errorMostrarMsjRol = [];
                 this.arrayModulos = [];
+                this.arrayPermisos = [];
             },
             abrirModal(modelo, accion, data = []){
                 let me = this;
                 switch(modelo){
                     case "roles":
                     {
-                        this.listarModulos();
                         switch(accion){
                             case 'registrar':
                             {
@@ -454,15 +434,16 @@
                             case 'actualizar':
                             {
                                 //console.log(data);
+                                this.rol_id = data['id'];
                                 this.modal=1;
                                 this.tituloModal='Actualizar Cliente';
                                 this.tipoAccion=2;
                                 this.nombre = data['nombre'];
                                 this.validarNombre = data['nombre'];
-                                this.rol_id = data['id'];
                                 break;
                             }
                         }
+                        this.listarPermisos(this.rol_id);
                     }
                 }
             }
