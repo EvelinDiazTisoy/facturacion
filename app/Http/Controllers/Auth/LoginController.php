@@ -23,7 +23,7 @@ class LoginController extends Controller
         $this->validateLogin($request);        
 
         if (Auth::attempt(['usuario' => $request->usuario,'password' => $request->password,'condicion'=>1])){
-            $hijos[0] = ["modulo"=>"hijo11","icono"=>"icon-home","menu"=>"7", "lectura"=>1, "escritura"=>1, "editar"=>1, "anular"=>1, "imprimir"=>1,
+            $hijos[0] = ["modulo"=>"hijo11","icono"=>"icon-home","menu"=>"17", "lectura"=>1, "escritura"=>1, "editar"=>1, "anular"=>1, "imprimir"=>1,
 				"hijos" =>array(),"template_menu"=>"user"];
 			$hijos[1] = ["modulo"=>"hijo12","icono"=>"icon-home","menu"=>"2", "lectura"=>1, "escritura"=>1, "editar"=>1, "anular"=>1, "imprimir"=>1,
 				"hijos" =>array(),"template_menu"=>"component1"];
@@ -38,7 +38,8 @@ class LoginController extends Controller
 			$menu_usu[1] = ["modulo"=>"modulo2","icono"=>"icon-list","menu"=>"", "lectura"=>1, "escritura"=>1, "editar"=>1, "anular"=>1, "imprimir"=>1,
 				"hijos" =>$hijos1,"template_menu"=>""];
 			
-			$request->session()->put('menu_usu', $menu_usu);
+            $request->session()->put('menu_usu', $menu_usu);
+            $request->session()->put('empresa_id', '1');
             return redirect()->route('main');
         }
 

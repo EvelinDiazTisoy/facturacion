@@ -31,7 +31,6 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>Opciones</th>
                                     <th>Nombre</th>
                                     <th>Tipo Documento</th>
                                     <th>Número</th>
@@ -40,11 +39,23 @@
                                     <th>Email</th>
                                     <th>Usuario</th>
                                     <th>Role</th>
+                                    <th>Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="persona in arrayPersona" :key="persona.id">
+                                    <td v-text="persona.nombre"></td>
+                                    <td v-text="persona.tipo_documento"></td>
+                                    <td v-text="persona.num_documento"></td>
+                                    <td v-text="persona.direccion"></td>
+                                    <td v-text="persona.telefono"></td>
+                                    <td v-text="persona.email"></td>
+                                    <td v-text="persona.usuario"></td>
+                                    <td v-text="persona.role"></td>
                                     <td>
+                                        <button type="button" @click="abrirModal('persona','permisos', [persona.id, persona.nombre])" class="btn btn-primary btn-sm">
+                                          <i class="icon-list"></i>
+                                        </button> &nbsp;
                                         <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
@@ -59,14 +70,6 @@
                                             </button>
                                         </template>
                                     </td>
-                                    <td v-text="persona.nombre"></td>
-                                    <td v-text="persona.tipo_documento"></td>
-                                    <td v-text="persona.num_documento"></td>
-                                    <td v-text="persona.direccion"></td>
-                                    <td v-text="persona.telefono"></td>
-                                    <td v-text="persona.email"></td>
-                                    <td v-text="persona.usuario"></td>
-                                    <td v-text="persona.role"></td>
                                 </tr>                                
                             </tbody>
                         </table>
@@ -182,13 +185,92 @@
                 <!-- /.modal-dialog -->
             </div>
             <!--Fin del modal-->
+            <!--Inicio modal permisos-->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalPermisos}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModal"></h4>
+                            <button type="button" class="close" @click="cerrarModalPermisos()" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                    <div class="form-group row">
+                                        <h5 class="col-md-4">Marcar permisos como</h5>
+                                        <select class="col-md-4 custom-select custom-select-sm" @change="marcarPermisosRol" v-model="idrol">
+                                            <option value="0" selected disabled>Seleccione un rol</option>
+                                            <option v-for="rol in arrayRol" :value="rol.id" v-text="rol.nombre"></option>
+                                        </select>
+                                    </div>
+                                <!-- Inicio tabla permisos -->
+                                <!--<div class="card">
+                                    <div class="card-header">
+                                    <!--</div>-->
+                                    <!--<div class="card-body">-->
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Módulo</th>
+                                                    <th>Crear</th>
+                                                    <th>Leer</th>
+                                                    <th>Actualizar</th>
+                                                    <th>Anular</th>
+                                                    <th>Imprimir</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr :class="moduloPermisos.padre == null ? 'table-info' : 'table-light'" v-for="(moduloPermisos, key) in arrModulosPermisos" :key="moduloPermisos.id_modulos_empresas">
+                                                    <td v-text="moduloPermisos.nombre"></td>
+                                                    <td>
+                                                        <input v-if="moduloPermisos.padre == null" v-model="moduloPermisos.crear" @click="alternarMarcaHijos(key, 'crear')" type="checkbox">
+                                                        <input v-else v-model="moduloPermisos.crear" @click="marcarPadre(key, 'crear')" type="checkbox">
+                                                    </td>
+                                                    <td>
+                                                        <input v-if="moduloPermisos.padre == null" v-model="moduloPermisos.leer" @click="alternarMarcaHijos(key, 'leer')" type="checkbox">
+                                                        <input v-else v-model="moduloPermisos.leer" @click="marcarPadre(key, 'leer')" type="checkbox">
+                                                    </td>
+                                                    <td>
+                                                        <input v-if="moduloPermisos.padre == null" v-model="moduloPermisos.actualizar" @click="alternarMarcaHijos(key, 'actualizar')" type="checkbox">
+                                                        <input v-else v-model="moduloPermisos.actualizar" @click="marcarPadre(key, 'actualizar')" type="checkbox">
+                                                    </td>
+                                                    <td>
+                                                        <input v-if="moduloPermisos.padre == null" v-model="moduloPermisos.anular" @click="alternarMarcaHijos(key, 'anular')" type="checkbox">
+                                                        <input v-else v-model="moduloPermisos.anular" @click="marcarPadre(key, 'anular')" type="checkbox">
+                                                    </td>
+                                                    <td>
+                                                        <input v-if="moduloPermisos.padre == null" v-model="moduloPermisos.imprimir" @click="alternarMarcaHijos(key, 'imprimir')" type="checkbox">
+                                                        <input v-else v-model="moduloPermisos.imprimir" @click="marcarPadre(key, 'imprimir')" type="checkbox">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--Fin tabla permisos-->
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModalPermisos()">Cerrar</button>
+                            <!-- DEBE MODIFICARSE------------------------------------------------------------------------------------------>
+                            <button type="button" class="btn btn-primary" @click="guardarPermisos()">Guardar</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!--Fin modal permisos-->
+                        
         </main>
 </template>
 
 <script>
     export default {
         props : ['ruta'],
-        data (){
+        data ()
+        {
             return {
                 persona_id: 0,
                 nombre : '',
@@ -202,7 +284,11 @@
                 idrol: '',
                 arrayPersona : [],
                 arrayRol : [],
+                arrRolesPermisos : [],
+                arrModulosPermisos : [], // Carga la tabla permisos
+                cargarSelectorRoles : true,
                 modal : 0,
+                modalPermisos : 0, // Para abrir y cerrar el modal permisos
                 tituloModal : '',
                 tipoAccion : 0,
                 errorPersona : 0,
@@ -220,12 +306,15 @@
                 buscar : ''
             }
         },
-        computed:{
-            isActived: function(){
+        computed :
+        {
+            isActived: function ()
+            {
                 return this.pagination.current_page;
             },
             //Calcula los elementos de la paginación
-            pagesNumber: function() {
+            pagesNumber: function ()
+            {
                 if(!this.pagination.to) {
                     return [];
                 }
@@ -246,11 +335,12 @@
                     from++;
                 }
                 return pagesArray;             
-
             }
         },
-        methods : {
-            listarPersona (page,buscar,criterio){
+        methods :
+        {
+            listarPersona (page,buscar,criterio)
+            {
                 let me=this;
                 var url= this.ruta +'/user?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
@@ -262,7 +352,83 @@
                     console.log(error);
                 });
             },
-            selectRol(){
+            
+            // Obtiene los permisos del usuario por módulo
+            listarPermisos (usuario_id)
+            {
+                let me = this;
+                var url = `${this.ruta}/listar_permisos`;
+                axios.post(url, {'empresa_id':1, 'usuario_id':usuario_id, 'cargarSelector':me.cargarSelectorRoles}).then(function (response) {
+                    if (me.cargarSelectorRoles) {
+                        me.arrayRol = response.data.roles;
+                        me.arrRolesPermisos = response.data.rolesPermisos;
+                        me.cargarSelectorRoles = false;
+                    }
+                    me.arrModulosPermisos = response.data.permisos;
+                    me.arrModulosPermisos.forEach((moduloPermisos) => {
+                            moduloPermisos.usuarios_id = usuario_id;
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            guardarPermisos ()
+            {
+                let me = this;
+                var url = `${this.ruta}/permisos`;
+                
+                axios.post(url, me.arrModulosPermisos).then(function (response) {
+                    me.cerrarModalPermisos();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            marcarPermisosRol ()
+            {
+                var idPadre = 0;
+
+                this.arrRolesPermisos.forEach((rolPermisos) => {
+                    if(rolPermisos.roles_id == this.idrol) {
+                        this.arrModulosPermisos.forEach((moduloPermisos, indice) => {
+                            if (moduloPermisos.modulos_id == rolPermisos.modulos_id) {
+                                if (moduloPermisos.padre != idPadre && moduloPermisos.padre != null) {
+                                    idPadre = moduloPermisos.padre;
+                                    if (rolPermisos.escritura == 1) {this.marcarPadre(indice, 'crear');}
+                                    if (rolPermisos.lectura == 1) {this.marcarPadre(indice, 'leer');}
+                                    if (rolPermisos.edicion == 1) {this.marcarPadre(indice, 'actualizar');}
+                                    if (rolPermisos.anular == 1) {this.marcarPadre(indice, 'anular');}
+                                    if (rolPermisos.imprimir == 1) {this.marcarPadre(indice, 'imprimir');}
+                                }
+                                moduloPermisos.crear = rolPermisos.escritura;
+                                moduloPermisos.leer = rolPermisos.lectura;
+                                moduloPermisos.actualizar = rolPermisos.edicion;
+                                moduloPermisos.anular = rolPermisos.anular;
+                                moduloPermisos.imprimir = rolPermisos.imprimir;
+                            }
+                        }, this);
+                    }
+                }, this);
+            },
+            alternarMarcaHijos (claveModulo, accion)
+            {
+                var marcaHijos = this.arrModulosPermisos[claveModulo][accion] = !this.arrModulosPermisos[claveModulo][accion];
+                for (var i = claveModulo + 1; (i < (this.arrModulosPermisos.length)) ? (this.arrModulosPermisos[i].padre != null) ? true : false : false; i++) {
+                    this.arrModulosPermisos[i][accion] = marcaHijos;
+                }
+            },
+            marcarPadre (claveModulo, accion)
+            {
+                for (var i = claveModulo - 1; i >= 0; i--) {
+                    if (this.arrModulosPermisos[i].padre == null) {
+                        this.arrModulosPermisos[i][accion] = true;
+                        break;
+                    }
+                }
+            },
+            selectRol ()
+            {
                 let me=this;
                 var url= this.ruta +'/rol/selectRol';
                 axios.get(url).then(function (response) {
@@ -275,14 +441,16 @@
                 });
             },
 
-            cambiarPagina(page,buscar,criterio){
+            cambiarPagina (page,buscar,criterio)
+            {
                 let me = this;
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
                 me.listarPersona(page,buscar,criterio);
             },
-            registrarPersona(){
+            registrarPersona ()
+            {
                 if (this.validarPersona()){
                     return;
                 }
@@ -307,7 +475,8 @@
                     console.log(error);
                 });
             },
-            actualizarPersona(){
+            actualizarPersona ()
+            {
                if (this.validarPersona()){
                     return;
                 }
@@ -332,7 +501,8 @@
                     console.log(error);
                 }); 
             },
-            validarPersona(){
+            validarPersona ()
+            {
                 this.errorPersona=0;
                 this.errorMostrarMsjPersona =[];
 
@@ -344,7 +514,8 @@
 
                 return this.errorPersona;
             },
-            cerrarModal(){
+            cerrarModal ()
+            {
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
@@ -358,7 +529,14 @@
                 this.idrol=0;
                 this.errorPersona=0;
             },
-            abrirModal(modelo, accion, data = []){
+            cerrarModalPermisos ()
+            {
+                this.modalPermisos = 0;
+                this.tituloModal = '';
+                this.arrModulosPermisos = [];
+            },
+            abrirModal (modelo, accion, data = [])
+            {
                 this.selectRol();
                 switch(modelo){
                     case "persona":
@@ -398,11 +576,20 @@
                                 this.idrol=data['idrol'];
                                 break;
                             }
+                            case 'permisos':
+                            {
+                                this.modalPermisos = 1;
+                                this.tituloModal = 'Permisos ' + data[1];
+                                this.persona_id = data[0];
+                                this.listarPermisos(data[0]);
+                                break;
+                            }
                         }
                     }
                 }
             },
-            desactivarUsuario(id){
+            desactivarUsuario (id)
+            {
                swal({
                 title: 'Esta seguro de desactivar este usuario?',
                 type: 'warning',
@@ -441,7 +628,8 @@
                 }
                 }) 
             },
-            activarUsuario(id){
+            activarUsuario (id)
+            {
                swal({
                 title: 'Esta seguro de activar este usuario?',
                 type: 'warning',

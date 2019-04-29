@@ -93,6 +93,7 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/rol/desactivar', 'RolController@desactivar');
         Route::put('/rol/activar', 'RolController@activar');
         Route::get('/rol/permisos', 'RolController@listarPermisos');
+        Route::get('/rol/selectRol', 'RolController@selectRol');
         
         Route::get('/modulo', 'ModuloController@index');
         Route::post('/modulo/registrar', 'ModuloController@store');
@@ -114,6 +115,9 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/user/actualizar', 'UserController@update');
         Route::put('/user/desactivar', 'UserController@desactivar');
         Route::put('/user/activar', 'UserController@activar');
+
+        Route::post('/listar_permisos', 'PermisosController@listarPermisos');
+        Route::post('/permisos', 'PermisosController@insertar');
     });
 
 });

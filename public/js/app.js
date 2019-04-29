@@ -34591,6 +34591,87 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['ruta'],
@@ -34608,7 +34689,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             idrol: '',
             arrayPersona: [],
             arrayRol: [],
+            arrRolesPermisos: [],
+            arrModulosPermisos: [], // Carga la tabla permisos
+            cargarSelectorRoles: true,
             modal: 0,
+            modalPermisos: 0, // Para abrir y cerrar el modal permisos
             tituloModal: '',
             tipoAccion: 0,
             errorPersona: 0,
@@ -34666,6 +34751,87 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }).catch(function (error) {
                 console.log(error);
             });
+        },
+
+
+        // Obtiene los permisos del usuario por módulo
+        listarPermisos: function listarPermisos(usuario_id) {
+            var me = this;
+            var url = this.ruta + '/listar_permisos';
+            axios.post(url, { 'empresa_id': 1, 'usuario_id': usuario_id, 'cargarSelector': me.cargarSelectorRoles }).then(function (response) {
+                if (me.cargarSelectorRoles) {
+                    me.arrayRol = response.data.roles;
+                    me.arrRolesPermisos = response.data.rolesPermisos;
+                    me.cargarSelectorRoles = false;
+                }
+                me.arrModulosPermisos = response.data.permisos;
+                me.arrModulosPermisos.forEach(function (moduloPermisos) {
+                    moduloPermisos.usuarios_id = usuario_id;
+                });
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        guardarPermisos: function guardarPermisos() {
+            var me = this;
+            var url = this.ruta + '/permisos';
+
+            axios.post(url, me.arrModulosPermisos).then(function (response) {
+                me.cerrarModalPermisos();
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        marcarPermisosRol: function marcarPermisosRol() {
+            var _this = this;
+
+            var idPadre = 0;
+
+            this.arrRolesPermisos.forEach(function (rolPermisos) {
+                if (rolPermisos.roles_id == _this.idrol) {
+                    _this.arrModulosPermisos.forEach(function (moduloPermisos, indice) {
+                        if (moduloPermisos.modulos_id == rolPermisos.modulos_id) {
+                            if (moduloPermisos.padre != idPadre && moduloPermisos.padre != null) {
+                                idPadre = moduloPermisos.padre;
+                                if (rolPermisos.escritura == 1) {
+                                    _this.marcarPadre(indice, 'crear');
+                                }
+                                if (rolPermisos.lectura == 1) {
+                                    _this.marcarPadre(indice, 'leer');
+                                }
+                                if (rolPermisos.edicion == 1) {
+                                    _this.marcarPadre(indice, 'actualizar');
+                                }
+                                if (rolPermisos.anular == 1) {
+                                    _this.marcarPadre(indice, 'anular');
+                                }
+                                if (rolPermisos.imprimir == 1) {
+                                    _this.marcarPadre(indice, 'imprimir');
+                                }
+                            }
+                            moduloPermisos.crear = rolPermisos.escritura;
+                            moduloPermisos.leer = rolPermisos.lectura;
+                            moduloPermisos.actualizar = rolPermisos.edicion;
+                            moduloPermisos.anular = rolPermisos.anular;
+                            moduloPermisos.imprimir = rolPermisos.imprimir;
+                        }
+                    }, _this);
+                }
+            }, this);
+        },
+        alternarMarcaHijos: function alternarMarcaHijos(claveModulo, accion) {
+            var marcaHijos = this.arrModulosPermisos[claveModulo][accion] = !this.arrModulosPermisos[claveModulo][accion];
+            for (var i = claveModulo + 1; i < this.arrModulosPermisos.length ? this.arrModulosPermisos[i].padre != null ? true : false : false; i++) {
+                this.arrModulosPermisos[i][accion] = marcaHijos;
+            }
+        },
+        marcarPadre: function marcarPadre(claveModulo, accion) {
+            for (var i = claveModulo - 1; i >= 0; i--) {
+                if (this.arrModulosPermisos[i].padre == null) {
+                    this.arrModulosPermisos[i][accion] = true;
+                    break;
+                }
+            }
         },
         selectRol: function selectRol() {
             var me = this;
@@ -34761,6 +34927,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.idrol = 0;
             this.errorPersona = 0;
         },
+        cerrarModalPermisos: function cerrarModalPermisos() {
+            this.modalPermisos = 0;
+            this.tituloModal = '';
+            this.arrModulosPermisos = [];
+        },
         abrirModal: function abrirModal(modelo, accion) {
             var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
 
@@ -34803,12 +34974,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                     this.idrol = data['idrol'];
                                     break;
                                 }
+                            case 'permisos':
+                                {
+                                    this.modalPermisos = 1;
+                                    this.tituloModal = 'Permisos ' + data[1];
+                                    this.persona_id = data[0];
+                                    this.listarPermisos(data[0]);
+                                    break;
+                                }
                         }
                     }
             }
         },
         desactivarUsuario: function desactivarUsuario(id) {
-            var _this = this;
+            var _this2 = this;
 
             swal({
                 title: 'Esta seguro de desactivar este usuario?',
@@ -34824,9 +35003,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 reverseButtons: true
             }).then(function (result) {
                 if (result.value) {
-                    var me = _this;
+                    var me = _this2;
 
-                    axios.put(_this.ruta + '/user/desactivar', {
+                    axios.put(_this2.ruta + '/user/desactivar', {
                         'id': id
                     }).then(function (response) {
                         me.listarPersona(1, '', 'nombre');
@@ -34840,7 +35019,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         activarUsuario: function activarUsuario(id) {
-            var _this2 = this;
+            var _this3 = this;
 
             swal({
                 title: 'Esta seguro de activar este usuario?',
@@ -34856,9 +35035,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 reverseButtons: true
             }).then(function (result) {
                 if (result.value) {
-                    var me = _this2;
+                    var me = _this3;
 
-                    axios.put(_this2.ruta + '/user/activar', {
+                    axios.put(_this3.ruta + '/user/activar', {
                         'id': id
                     }).then(function (response) {
                         me.listarPersona(1, '', 'nombre');
@@ -35020,9 +35199,58 @@ var render = function() {
                 "tbody",
                 _vm._l(_vm.arrayPersona, function(persona) {
                   return _c("tr", { key: persona.id }, [
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.nombre) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.tipo_documento) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.num_documento) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.direccion) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.telefono) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.email) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.usuario) }
+                    }),
+                    _vm._v(" "),
+                    _c("td", {
+                      domProps: { textContent: _vm._s(persona.role) }
+                    }),
+                    _vm._v(" "),
                     _c(
                       "td",
                       [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary btn-sm",
+                            attrs: { type: "button" },
+                            on: {
+                              click: function($event) {
+                                _vm.abrirModal("persona", "permisos", [
+                                  persona.id,
+                                  persona.nombre
+                                ])
+                              }
+                            }
+                          },
+                          [_c("i", { staticClass: "icon-list" })]
+                        ),
+                        _vm._v("  \n                                "),
                         _c(
                           "button",
                           {
@@ -35070,39 +35298,7 @@ var render = function() {
                             ]
                       ],
                       2
-                    ),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.nombre) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.tipo_documento) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.num_documento) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.direccion) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.telefono) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.email) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.usuario) }
-                    }),
-                    _vm._v(" "),
-                    _c("td", {
-                      domProps: { textContent: _vm._s(persona.role) }
-                    })
+                    )
                   ])
                 })
               )
@@ -35709,6 +35905,722 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        class: { mostrar: _vm.modalPermisos },
+        staticStyle: { display: "none" },
+        attrs: {
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "myModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-primary modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _c("div", { staticClass: "modal-header" }, [
+                _c("h4", {
+                  staticClass: "modal-title",
+                  domProps: { textContent: _vm._s(_vm.tituloModal) }
+                }),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "close",
+                    attrs: { type: "button", "aria-label": "Close" },
+                    on: {
+                      click: function($event) {
+                        _vm.cerrarModalPermisos()
+                      }
+                    }
+                  },
+                  [
+                    _c("span", { attrs: { "aria-hidden": "true" } }, [
+                      _vm._v("×")
+                    ])
+                  ]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "container-fluid" }, [
+                  _c("div", { staticClass: "form-group row" }, [
+                    _c("h5", { staticClass: "col-md-4" }, [
+                      _vm._v("Marcar permisos como")
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.idrol,
+                            expression: "idrol"
+                          }
+                        ],
+                        staticClass: "col-md-4 custom-select custom-select-sm",
+                        on: {
+                          change: [
+                            function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.idrol = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            },
+                            _vm.marcarPermisosRol
+                          ]
+                        }
+                      },
+                      [
+                        _c(
+                          "option",
+                          { attrs: { value: "0", selected: "", disabled: "" } },
+                          [_vm._v("Seleccione un rol")]
+                        ),
+                        _vm._v(" "),
+                        _vm._l(_vm.arrayRol, function(rol) {
+                          return _c("option", {
+                            domProps: {
+                              value: rol.id,
+                              textContent: _vm._s(rol.nombre)
+                            }
+                          })
+                        })
+                      ],
+                      2
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "table",
+                    { staticClass: "table table-bordered table-sm" },
+                    [
+                      _vm._m(2),
+                      _vm._v(" "),
+                      _c(
+                        "tbody",
+                        _vm._l(_vm.arrModulosPermisos, function(
+                          moduloPermisos,
+                          key
+                        ) {
+                          return _c(
+                            "tr",
+                            {
+                              key: moduloPermisos.id_modulos_empresas,
+                              class:
+                                moduloPermisos.padre == null
+                                  ? "table-info"
+                                  : "table-light"
+                            },
+                            [
+                              _c("td", {
+                                domProps: {
+                                  textContent: _vm._s(moduloPermisos.nombre)
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("td", [
+                                moduloPermisos.padre == null
+                                  ? _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.crear,
+                                          expression: "moduloPermisos.crear"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.crear
+                                        )
+                                          ? _vm._i(moduloPermisos.crear, null) >
+                                            -1
+                                          : moduloPermisos.crear
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.alternarMarcaHijos(key, "crear")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.crear,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.crear = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.crear = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "crear",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                                  : _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.crear,
+                                          expression: "moduloPermisos.crear"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.crear
+                                        )
+                                          ? _vm._i(moduloPermisos.crear, null) >
+                                            -1
+                                          : moduloPermisos.crear
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.marcarPadre(key, "crear")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.crear,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.crear = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.crear = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "crear",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                moduloPermisos.padre == null
+                                  ? _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.leer,
+                                          expression: "moduloPermisos.leer"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.leer
+                                        )
+                                          ? _vm._i(moduloPermisos.leer, null) >
+                                            -1
+                                          : moduloPermisos.leer
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.alternarMarcaHijos(key, "leer")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.leer,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.leer = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.leer = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "leer",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                                  : _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.leer,
+                                          expression: "moduloPermisos.leer"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.leer
+                                        )
+                                          ? _vm._i(moduloPermisos.leer, null) >
+                                            -1
+                                          : moduloPermisos.leer
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.marcarPadre(key, "leer")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.leer,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.leer = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.leer = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "leer",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                moduloPermisos.padre == null
+                                  ? _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.actualizar,
+                                          expression:
+                                            "moduloPermisos.actualizar"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.actualizar
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.actualizar,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.actualizar
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.alternarMarcaHijos(
+                                            key,
+                                            "actualizar"
+                                          )
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.actualizar,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.actualizar = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.actualizar = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "actualizar",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                                  : _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.actualizar,
+                                          expression:
+                                            "moduloPermisos.actualizar"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.actualizar
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.actualizar,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.actualizar
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.marcarPadre(key, "actualizar")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.actualizar,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.actualizar = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.actualizar = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "actualizar",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                moduloPermisos.padre == null
+                                  ? _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.anular,
+                                          expression: "moduloPermisos.anular"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.anular
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.anular,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.anular
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.alternarMarcaHijos(key, "anular")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.anular,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.anular = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.anular = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "anular",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                                  : _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.anular,
+                                          expression: "moduloPermisos.anular"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.anular
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.anular,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.anular
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.marcarPadre(key, "anular")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.anular,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.anular = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.anular = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "anular",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                moduloPermisos.padre == null
+                                  ? _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.imprimir,
+                                          expression: "moduloPermisos.imprimir"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.imprimir
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.imprimir,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.imprimir
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.alternarMarcaHijos(
+                                            key,
+                                            "imprimir"
+                                          )
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.imprimir,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.imprimir = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.imprimir = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "imprimir",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                                  : _c("input", {
+                                      directives: [
+                                        {
+                                          name: "model",
+                                          rawName: "v-model",
+                                          value: moduloPermisos.imprimir,
+                                          expression: "moduloPermisos.imprimir"
+                                        }
+                                      ],
+                                      attrs: { type: "checkbox" },
+                                      domProps: {
+                                        checked: Array.isArray(
+                                          moduloPermisos.imprimir
+                                        )
+                                          ? _vm._i(
+                                              moduloPermisos.imprimir,
+                                              null
+                                            ) > -1
+                                          : moduloPermisos.imprimir
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          _vm.marcarPadre(key, "imprimir")
+                                        },
+                                        change: function($event) {
+                                          var $$a = moduloPermisos.imprimir,
+                                            $$el = $event.target,
+                                            $$c = $$el.checked ? true : false
+                                          if (Array.isArray($$a)) {
+                                            var $$v = null,
+                                              $$i = _vm._i($$a, $$v)
+                                            if ($$el.checked) {
+                                              $$i < 0 &&
+                                                (moduloPermisos.imprimir = $$a.concat(
+                                                  [$$v]
+                                                ))
+                                            } else {
+                                              $$i > -1 &&
+                                                (moduloPermisos.imprimir = $$a
+                                                  .slice(0, $$i)
+                                                  .concat($$a.slice($$i + 1)))
+                                            }
+                                          } else {
+                                            _vm.$set(
+                                              moduloPermisos,
+                                              "imprimir",
+                                              $$c
+                                            )
+                                          }
+                                        }
+                                      }
+                                    })
+                              ])
+                            ]
+                          )
+                        })
+                      )
+                    ]
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.cerrarModalPermisos()
+                      }
+                    }
+                  },
+                  [_vm._v("Cerrar")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.guardarPermisos()
+                      }
+                    }
+                  },
+                  [_vm._v("Guardar")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -35729,8 +36641,6 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Opciones")]),
-        _vm._v(" "),
         _c("th", [_vm._v("Nombre")]),
         _vm._v(" "),
         _c("th", [_vm._v("Tipo Documento")]),
@@ -35745,7 +36655,29 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Usuario")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Role")])
+        _c("th", [_vm._v("Role")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Opciones")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Módulo")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Crear")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Leer")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Actualizar")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Anular")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Imprimir")])
       ])
     ])
   }
