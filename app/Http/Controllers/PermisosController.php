@@ -12,20 +12,34 @@ use Illuminate\Support\Facades\Auth;
 
 class PermisosController extends Controller
 {
-    public function listarPermisos(Request $request)
+    private static function obtenerModulos($tipo, $empresas_id)
     {
-        // SE OBTIENEN LOS MODULOS ADQUIRIDOS POR LA EMPRESA
-        $modulosEmpresa = DB::table('modulos_empresas')
+        return DB::table('modulos_empresas')
         ->join('modulos', 'modulos_empresas.modulos_id', '=', 'modulos.id')
         ->where([
-            ['modulos_empresas.empresas_id', '=', $request->empresa_id],
+            ['modulos_empresas.empresas_id', '=', $empresas_id],
+            ['modulos.tipo', '=', $tipo],
             ['modulos_empresas.estado', '=', 1]
         ])
         ->select('modulos_empresas.modulos_id',
-        'modulos_empresas.id AS id_modulos_empresas',
+        'modulos_empresas.id',
         'modulos.nombre',
-        'modulos.menu',
-        'modulos.padre')->orderBy('modulos.menu')->get();
+        'modulos.padre')->orderBy('modulos.nombre')->get();
+    }
+    public function listarPermisos(Request $request)
+    {
+        $modulosPadre = self::obtenerModulos(1, $request->empresa_id);
+        $modulosHijo = self::obtenerModulos(2, $request->empresa_id);
+
+        $modulosEmpresa = [];
+        foreach ($modulosPadre as $padre) {
+            $modulosEmpresa[] = $padre;
+            foreach ($modulosHijo as $hijo) {
+                if ($hijo->padre == $padre->modulos_id) {
+                    $modulosEmpresa[] = $hijo;                
+                }
+            }
+        }
 
         $permisos = DB::table('modulos_empresas_usuarios')
         ->join('users', 'modulos_empresas_usuarios.usu_crea', '=', 'users.id')
@@ -56,7 +70,7 @@ class PermisosController extends Controller
                 $clavePadre = $claveModEmp;
             }
             foreach ($permisos as $claveP => $permiso) {
-                if ($modulo->id_modulos_empresas == $permiso->modulos_empresas_id) {
+                if ($permiso->modulos_empresas_id == $modulo->id) {
                     $modulo->id_modulos_empresas_usuarios = $permiso->id;
                     $modulo->crear = $permiso->crear;
                     $modulo->leer = $permiso->leer;
@@ -73,14 +87,14 @@ class PermisosController extends Controller
             }
         }
 
-        // REORDENA LOS MODULOS DE MENOR A MAYOR
-        //$arrModulosEmpresa = json_decode(json_encode($modulosEmpresa), true);
-        $arrModulosPermisos = $modulosEmpresa->toArray();
+        # REORDENA LOS MODULOS DE MENOR A MAYOR
+        # $arrModulosEmpresa = json_decode(json_encode($modulosEmpresa), true);
+        /*$arrModulosPermisos = $modulosEmpresa->toArray();
         usort($arrModulosPermisos, function ($a, $b) {
             return $a->menu - $b->menu;
-        });
+        });*/
 
-        $respuesta = ['permisos' => $arrModulosPermisos];
+        $respuesta = ['permisos' => $modulosEmpresa];
 
         if ($request->cargarSelector) {
             $respuesta['roles'] = Rol::where('estado', '=', '1')->select('id','nombre')->get();
@@ -88,17 +102,16 @@ class PermisosController extends Controller
             $respuesta['rolesPermisos']  = DB::table('roles_permisos')
             ->join('modulos', 'roles_permisos.id_modulo', '=', 'modulos.id')
             ->whereIn('id_rol', $respuesta['roles']->pluck('id'))
-            ->whereIn('id_modulo', $modulosEmpresa->pluck('id_modulo'))
+            ->whereIn('id_modulo', $modulosHijo->pluck('modulos_id'))
             ->select(
                 'roles_permisos.id_rol',
                 'roles_permisos.id_modulo',
-                'modulos.menu',
                 'modulos.padre',
                 'roles_permisos.escritura',
                 'roles_permisos.lectura',
                 'roles_permisos.edicion',
                 'roles_permisos.anular',
-                'roles_permisos.imprimir')->orderBy('modulos.menu')->get();
+                'roles_permisos.imprimir')->orderBy('modulos.nombre')->get();
         }
 
         return $respuesta;
@@ -127,7 +140,7 @@ class PermisosController extends Controller
                     # ...SOLO SI LOS HAY, TAMBIEN SE REGISTRA EL MODULO PADRE...
                     if ($insertarPadre) {
                         $arrNuevosPermisos[] = [
-                            'modulos_empresas_id' => $permiso['id_modulos_empresas'],
+                            'modulos_empresas_id' => $permiso['id'],
                             'usuarios_id' => $permiso['usuarios_id'],
                             'crear' => 0,
                             'leer' => 0,
@@ -147,7 +160,7 @@ class PermisosController extends Controller
                 # VERIFICA SI EL HIJO TIENE AL MENOS UN PERMISO MARCADO
                 if ($permiso['crear'] == 1 || $permiso['leer'] == 1 || $permiso['actualizar'] == 1 || $permiso['anular'] == 1 || $permiso['imprimir'] == 1) {
                     $arrNuevosPermisos[] = [
-                        'modulos_empresas_id' => $permiso['id_modulos_empresas'],
+                        'modulos_empresas_id' => $permiso['id'],
                         'usuarios_id' => $permiso['usuarios_id'],
                         'crear' => $permiso['crear'],
                         'leer' => $permiso['leer'],
