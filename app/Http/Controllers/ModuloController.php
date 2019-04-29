@@ -64,6 +64,8 @@ class ModuloController extends Controller
         $modulo->save();
     }
     public function update(Request $request){
+        $tipo = $request->tipo;
+
         $usu_crea = Auth::user()->id;
         $modulo = Modulo::findOrFail($request->id);
         $modulo->nombre = $request->nombre;
@@ -72,25 +74,76 @@ class ModuloController extends Controller
         $modulo->usu_crea = $usu_crea;
         $modulo->componente = $request->componente;
         $modulo->menu = $request->menu;
+        // $id = $request->id;
+        if($request->tipo=='1'){
+        $modulo->padre = null;
         $modulo->tipo = $request->tipo;
-        $tipo = $request->tipo;
-        if($tipo==1){
-            $modulo->padre = null;  
-        }else{
-            $modulo->padre = $request->padre;   
         }
+
+        if($request->tipo=='2'){
+            $modulo->padre = $request->padre;
+            $modulo->tipo = $request->tipo;
+        }
+        
         $modulo->icono = $request->icono;
         $modulo->template = $request->template;
         $modulo->save();
     }
+
+    public function cambiarHijos(Request $request){
+
+        
+        $tipo = $request->tipo;
+        if($tipo=='2'){
+            $buscarHijos= Modulo::where('padre','=',$request->id)->get();
+            if($buscarHijos)
+            {
+                foreach($buscarHijos as $bh)
+                {
+                    $cambiarPadres = Modulo::findOrFail($bh['id']);
+                 
+                    $cambiarPadres->padre = null;
+                    $cambiarPadres->tipo = '1';
+                    $cambiarPadres->save();
+                }
+            } 
+        }
+    }
+    
     public function selectPadre(Request $request)
     {
-        // if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
         $modulos = Modulo::where('estado', '=', '1')->where('tipo','=','1')
         ->select('id','nombre')
         ->orderBy('nombre', 'asc')->get();
 
         return ['modulos' => $modulos];
+    }
+    public function desactivarHijos(Request $request)
+    {
+        $buscarHijos= Modulo::where('padre','=',$request->id)->get();
+        if($buscarHijos)
+        {
+            foreach($buscarHijos as $bh)
+            {
+                $desactivar = Modulo::findOrFail($bh['id']);
+                $desactivar->estado = '0';
+                $desactivar->save();
+            }
+        }
+    }
+    public function activarHijos(Request $request)
+    {
+        $buscarHijos= Modulo::where('padre','=',$request->id)->get();
+        if($buscarHijos)
+        {
+            foreach($buscarHijos as $bh)
+            {
+                $activar = Modulo::findOrFail($bh['id']);
+                $activar->estado = '1';
+                $activar->save();
+            }
+        }
     }
     public function desactivar(Request $request)
     {

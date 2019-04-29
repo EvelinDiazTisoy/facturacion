@@ -37923,6 +37923,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['ruta'],
@@ -37931,7 +37933,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             modulo_id: '',
             nombre: '',
             descripcion: '',
-            num_documento: '',
             componente: '',
             menu: '',
             tipo: '',
@@ -37945,6 +37946,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             tipoAccion: 0,
             errorModulo: 0,
             errorMostrarMsjModulo: [],
+            arrayHijos: [],
             offset: 3,
             criterio: 'nombre',
             buscar: ''
@@ -38020,8 +38022,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 'padre': this.padre,
                 'id': this.modulo_id
             }).then(function (response) {
+                // console.log(me.modulo_id);
+                // Aqui tienen que ir con me en lugar de this
+                me.cambiarHijos(me.modulo_id, me.tipo);
                 me.cerrarModal();
                 me.listarModulo('', 'nombre');
+            }).catch(function (error) {
+                console.log(error);
+            });
+        },
+        cambiarHijos: function cambiarHijos(id, tipo) {
+            var me = this;
+            // console.log('hijos');
+            // console.log('id: '+id);
+            // console.log('tipo: '+tipo);
+            axios.put(me.ruta + '/modulo/cambiarHijos', {
+                'id': id,
+                'tipo': tipo
             }).catch(function (error) {
                 console.log(error);
             });
@@ -38115,10 +38132,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }).then(function (result) {
                 if (result.value) {
                     var me = _this;
-
-                    axios.put(_this.ruta + '/modulo/desactivar', {
+                    // console.log('hijos');
+                    // console.log('id: '+id);
+                    axios.put(me.ruta + '/modulo/desactivar', {
                         'id': id
                     }).then(function (response) {
+                        me.desactivarHijos(id);
                         me.listarModulo('', 'nombre');
                         swal('Desactivado!', 'El modulo ha sido desactivado con éxito.', 'success');
                     }).catch(function (error) {
@@ -38127,6 +38146,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 } else if (
                 // Read more about handling dismissals
                 result.dismiss === swal.DismissReason.cancel) {}
+            });
+        },
+        desactivarHijos: function desactivarHijos(id) {
+            var me = this;
+            //  console.log('hijos');
+            //  console.log('id: '+id);
+            axios.put(me.ruta + '/modulo/desactivarHijos', {
+                'id': id
+            }).catch(function (error) {
+                console.log(error);
             });
         },
         activarModulo: function activarModulo(id) {
@@ -38151,6 +38180,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     axios.put(_this2.ruta + '/modulo/activar', {
                         'id': id
                     }).then(function (response) {
+                        me.activarHijos(id);
                         me.listarModulo('', 'nombre');
                         swal('Activado!', 'El modulo ha sido activado con éxito.', 'success');
                     }).catch(function (error) {
@@ -38159,6 +38189,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 } else if (
                 // Read more about handling dismissals
                 result.dismiss === swal.DismissReason.cancel) {}
+            });
+        },
+        activarHijos: function activarHijos(id) {
+            var me = this;
+            console.log('hijos');
+            console.log('id: ' + id);
+            axios.put(me.ruta + '/modulo/activarHijos', {
+                'id': id
+            }).catch(function (error) {
+                console.log(error);
             });
         }
     },
@@ -38179,6 +38219,7 @@ var render = function() {
     _vm._m(0),
     _vm._v(" "),
     _c("div", { staticClass: "container-fluid" }, [
+      _vm._v("<\n        "),
       _c("div", { staticClass: "card" }, [
         _c("div", { staticClass: "card-header" }, [
           _c("i", { staticClass: "fa fa-align-justify" }),

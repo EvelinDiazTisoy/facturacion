@@ -96,10 +96,13 @@ Route::group(['middleware'=>['auth']],function(){
         
         Route::get('/modulo', 'ModuloController@index');
         Route::post('/modulo/registrar', 'ModuloController@store');
+        Route::put('/modulo/cambiarHijos', 'ModuloController@cambiarHijos');
         Route::get('/modulo/selectPadre', 'ModuloController@selectPadre');
         Route::put('/modulo/actualizar', 'ModuloController@update');
         Route::put('/modulo/desactivar', 'ModuloController@desactivar');
+        Route::put('/modulo/desactivarHijos', 'ModuloController@desactivarHijos');
         Route::put('/modulo/activar', 'ModuloController@activar');
+        Route::put('/modulo/activarHijos', 'ModuloController@activarHijos');
 
         Route::get('/cliente', 'ClienteController@index');
         Route::post('/cliente/registrar', 'ClienteController@store');

@@ -5,7 +5,7 @@
                 <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
             </ol>
             <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
+                <!-- Ejemplo de tabla Listado --><
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Modulos
@@ -99,12 +99,14 @@
                                           <i class="icon-pencil"></i>
                                         </button>
                                         <template v-if="modulo.estado">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarModulo(modulo.id)">
+                                            <button type="button" class="btn btn-danger btn-sm"  @click="desactivarModulo(modulo.id)">
+                                                
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
                                         <template v-else>
                                             <button type="button" class="btn btn-info btn-sm" @click="activarModulo(modulo.id)">
+                                                
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -215,7 +217,6 @@
                 modulo_id: '',
                 nombre : '',
                 descripcion: '',
-                num_documento : '',
                 componente : '',
                 menu : '',
                 tipo : '',
@@ -229,6 +230,7 @@
                 tipoAccion : 0,
                 errorModulo : 0,
                 errorMostrarMsjModulo : [],
+                arrayHijos: [],
                 offset : 3,
                 criterio : 'nombre',
                 buscar : ''
@@ -305,12 +307,27 @@
                     'padre':this.padre,
                     'id': this.modulo_id
                 }).then(function (response) {
+                    // console.log(me.modulo_id);
+                    // Aqui tienen que ir con me en lugar de this
+                    me.cambiarHijos(me.modulo_id,me.tipo);
                     me.cerrarModal();
                     me.listarModulo('','nombre');
                 }).catch(function (error) {
                     console.log(error);
                 }); 
-            },            
+            },
+            cambiarHijos(id,tipo){
+                let me = this;
+                // console.log('hijos');
+                // console.log('id: '+id);
+                // console.log('tipo: '+tipo);
+                axios.put(me.ruta +'/modulo/cambiarHijos',{
+                    'id':id,
+                    'tipo':tipo,
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },         
             validarModulo(){
                 this.errorModulo=0;
                 this.errorMostrarMsjModulo =[];
@@ -397,10 +414,12 @@
                 }).then((result) => {
                 if (result.value) {
                     let me = this;
-
-                    axios.put(this.ruta +'/modulo/desactivar',{
+                    // console.log('hijos');
+                    // console.log('id: '+id);
+                    axios.put(me.ruta +'/modulo/desactivar',{
                         'id': id
                     }).then(function (response) {
+                        me.desactivarHijos(id);
                         me.listarModulo('','nombre');
                         swal(
                         'Desactivado!',
@@ -419,6 +438,16 @@
                     
                 }
                 }) 
+            },
+            desactivarHijos(id){
+                let me = this;
+                //  console.log('hijos');
+                //  console.log('id: '+id);
+                axios.put(me.ruta +'/modulo/desactivarHijos',{
+                    'id': id,
+                }).catch(function (error) {
+                    console.log(error);
+                });
             },
             activarModulo(id){
                swal({
@@ -440,6 +469,7 @@
                     axios.put(this.ruta +'/modulo/activar',{
                         'id': id
                     }).then(function (response) {
+                        me.activarHijos(id);
                         me.listarModulo('','nombre');
                         swal(
                         'Activado!',
@@ -459,9 +489,20 @@
                 }
                 }) 
             },
+            activarHijos(id){
+                let me = this;
+                console.log('hijos');
+                console.log('id: '+id);
+                axios.put(me.ruta +'/modulo/activarHijos',{
+                    'id': id,
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
         },
         mounted() {
             this.listarModulo(this.buscar,this.criterio);
+           
         }
     }
 </script>
