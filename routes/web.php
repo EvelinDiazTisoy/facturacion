@@ -117,6 +117,7 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/user/activar', 'UserController@activar');
 
         Route::post('/listar_permisos', 'PermisosController@listarPermisos');
+        Route::get('/listar_permisos2', 'PermisosController@listarPermisos2');
         Route::post('/permisos', 'PermisosController@insertar');
     });
 

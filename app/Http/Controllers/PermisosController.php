@@ -24,12 +24,14 @@ class PermisosController extends Controller
         ->select('modulos_empresas.modulos_id',
         'modulos_empresas.id',
         'modulos.nombre',
+        'modulos.tipo',
         'modulos.padre')->orderBy('modulos.nombre')->get();
     }
     public function listarPermisos(Request $request)
     {
-        $modulosPadre = self::obtenerModulos(1, $request->empresa_id);
-        $modulosHijo = self::obtenerModulos(2, $request->empresa_id);
+        $empresa_id = Auth::user()->empresas_id;
+        $modulosPadre = self::obtenerModulos(1, $empresa_id);
+        $modulosHijo = self::obtenerModulos(2, $empresa_id);
 
         $modulosEmpresa = [];
         foreach ($modulosPadre as $padre) {
@@ -96,7 +98,7 @@ class PermisosController extends Controller
 
         $respuesta = ['permisos' => $modulosEmpresa];
 
-        if ($request->cargarSelector) {
+        if ($request->cargarSelector == 1) {
             $respuesta['roles'] = Rol::where('estado', '=', '1')->select('id','nombre')->get();
 
             $respuesta['rolesPermisos']  = DB::table('roles_permisos')
@@ -115,6 +117,33 @@ class PermisosController extends Controller
         }
 
         return $respuesta;
+    }
+
+    public function listarPermisos2(Request $request)
+    {
+        $empresas_id = $request->session()->get('id_empresa');
+        $id_usuario = Auth::user()->id;
+        $resultado=array();
+        //$modulosPadre = self::obtenerModulos(1, $empresas_id);
+        $cons="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND tipo=1 ";
+        $respuesta = DB::select($cons);
+        foreach($respuesta as $res){
+            
+            $hijos = array();
+            
+            $cons2="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND padre =  ".$res->id;
+            $respuesta2 = DB::select($cons2);
+
+            foreach($respuesta2 as $res2){
+                $hijos[] = ["modulo"=>$res2->nombre,"icono"=>$res2->nombre,"menu"=>$res2->menu, "lectura"=>$res2->leer, "escritura"=>$res2->crear, "editar"=>$res2->actualizar, "anular"=>$res2->anular, "imprimir"=>$res2->imprimir,"hijos" =>array(),"template_menu"=>$res2->template];
+            }
+            
+            $resultado[] = ["modulo"=>$res->nombre,"icono"=>$res->nombre,"menu"=>$res->menu, "lectura"=>$res->leer, "escritura"=>$res->crear, "editar"=>$res->actualizar, "anular"=>$res->anular, "imprimir"=>$res->imprimir,"hijos" =>$hijos,"template_menu"=>$res->template];
+        }
+        return [
+            $resultado,
+            // $request->session()->get('menu_usu'),
+        ];
     }
 
     public function insertar(Request $request)

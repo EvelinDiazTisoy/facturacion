@@ -7,6 +7,7 @@ use App\Rol;
 use App\RolPermisos;
 use App\Modulo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RolController extends Controller
 {
@@ -44,6 +45,7 @@ class RolController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
+        $id_empresa = $request->session()->get('id_empresa');
 
         $roles = new Rol();
         $roles->nombre = $request->nombre;
@@ -57,6 +59,7 @@ class RolController extends Controller
             $permisos = new RolPermisos();
             $permisos->id_rol = $roles->id;
             $permisos->id_modulo = $mod['id'];
+            $permisos->id_empresa = $id_empresa;
             $ban = 0;
 
             if(isset($mod['lectura']) && $mod['lectura']==true)
@@ -104,6 +107,7 @@ class RolController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
+        $id_empresa = $request->session()->get('id_empresa');
 
         $roles = Rol::findOrFail($request->id);
         $roles->nombre = $request->nombre;
@@ -118,6 +122,7 @@ class RolController extends Controller
             $permisos = new RolPermisos();
             $permisos->id_rol = $roles->id;
             $permisos->id_modulo = $mod['id'];
+            $permisos->id_empresa = $id_empresa;
             $ban = 0;
 
             if(isset($mod['lectura']) && $mod['lectura']==true)

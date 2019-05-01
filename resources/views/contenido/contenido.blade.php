@@ -1,13 +1,14 @@
 @extends('principal')
     @section('contenido')
 <?php
-	$menu_usuario2 = Session::get('menu_usu');
+    $menu_usuario2 = Session::get('menu_usu');
 ?>
     @if(Auth::check())
 		
             <template v-if="menu==0">
                 <h1>Escritorio</h1>
             </template>
+            
 			@foreach ($menu_usuario2 as $menu_usu)
 				@if(count($menu_usu['hijos'])>0)
 					@foreach ($menu_usu['hijos'] as $menu_hijo)

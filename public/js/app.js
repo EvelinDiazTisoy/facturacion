@@ -34689,6 +34689,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             idrol: '',
             arrayPersona: [],
             arrayRol: [],
+            arrRolesEmpresa: [],
             arrRolesPermisos: [],
             arrModulosPermisos: [], // Carga la tabla permisos
             cargarSelectorRoles: true,
@@ -34758,9 +34759,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         listarPermisos: function listarPermisos(usuario_id) {
             var me = this;
             var url = this.ruta + '/listar_permisos';
-            axios.post(url, { 'empresa_id': 1, 'usuario_id': usuario_id, 'cargarSelector': me.cargarSelectorRoles }).then(function (response) {
+            axios.post(url, { 'usuario_id': usuario_id, 'cargarSelector': me.cargarSelectorRoles }).then(function (response) {
                 if (me.cargarSelectorRoles) {
-                    me.arrayRol = response.data.roles;
+                    me.arrRolesEmpresa = response.data.roles;
                     me.arrRolesPermisos = response.data.rolesPermisos;
                     me.cargarSelectorRoles = false;
                 }
@@ -34788,9 +34789,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var idPadre = 0;
 
             this.arrRolesPermisos.forEach(function (rolPermisos) {
-                if (rolPermisos.roles_id == _this.idrol) {
+                if (rolPermisos.id_rol == _this.idrol) {
                     _this.arrModulosPermisos.forEach(function (moduloPermisos, indice) {
-                        if (moduloPermisos.modulos_id == rolPermisos.modulos_id) {
+                        if (moduloPermisos.modulos_id == rolPermisos.id_modulo) {
                             if (moduloPermisos.padre != idPadre && moduloPermisos.padre != null) {
                                 idPadre = moduloPermisos.padre;
                                 if (rolPermisos.escritura == 1) {
@@ -34931,6 +34932,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.modalPermisos = 0;
             this.tituloModal = '';
             this.arrModulosPermisos = [];
+            this.idrol = '';
         },
         abrirModal: function abrirModal(modelo, accion) {
             var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
@@ -35993,13 +35995,11 @@ var render = function() {
                         }
                       },
                       [
-                        _c(
-                          "option",
-                          { attrs: { value: "0", selected: "", disabled: "" } },
-                          [_vm._v("Seleccione un rol")]
-                        ),
+                        _c("option", { attrs: { value: "", disabled: "" } }, [
+                          _vm._v("Seleccione un rol")
+                        ]),
                         _vm._v(" "),
-                        _vm._l(_vm.arrayRol, function(rol) {
+                        _vm._l(_vm.arrRolesEmpresa, function(rol) {
                           return _c("option", {
                             domProps: {
                               value: rol.id,

@@ -200,8 +200,8 @@
                                     <div class="form-group row">
                                         <h5 class="col-md-4">Marcar permisos como</h5>
                                         <select class="col-md-4 custom-select custom-select-sm" @change="marcarPermisosRol" v-model="idrol">
-                                            <option value="0" selected disabled>Seleccione un rol</option>
-                                            <option v-for="rol in arrayRol" :value="rol.id" v-text="rol.nombre"></option>
+                                            <option value="" disabled>Seleccione un rol</option>
+                                            <option v-for="rol in arrRolesEmpresa" :value="rol.id" v-text="rol.nombre"></option>
                                         </select>
                                     </div>
                                 <!-- Inicio tabla permisos -->
@@ -284,6 +284,7 @@
                 idrol: '',
                 arrayPersona : [],
                 arrayRol : [],
+                arrRolesEmpresa: [],
                 arrRolesPermisos : [],
                 arrModulosPermisos : [], // Carga la tabla permisos
                 cargarSelectorRoles : true,
@@ -358,9 +359,9 @@
             {
                 let me = this;
                 var url = `${this.ruta}/listar_permisos`;
-                axios.post(url, {'empresa_id':1, 'usuario_id':usuario_id, 'cargarSelector':me.cargarSelectorRoles}).then(function (response) {
+                axios.post(url, {'usuario_id':usuario_id, 'cargarSelector':me.cargarSelectorRoles}).then(function (response) {
                     if (me.cargarSelectorRoles) {
-                        me.arrayRol = response.data.roles;
+                        me.arrRolesEmpresa = response.data.roles;
                         me.arrRolesPermisos = response.data.rolesPermisos;
                         me.cargarSelectorRoles = false;
                     }
@@ -390,9 +391,9 @@
                 var idPadre = 0;
 
                 this.arrRolesPermisos.forEach((rolPermisos) => {
-                    if(rolPermisos.roles_id == this.idrol) {
+                    if(rolPermisos.id_rol == this.idrol) {
                         this.arrModulosPermisos.forEach((moduloPermisos, indice) => {
-                            if (moduloPermisos.modulos_id == rolPermisos.modulos_id) {
+                            if (moduloPermisos.modulos_id == rolPermisos.id_modulo) {
                                 if (moduloPermisos.padre != idPadre && moduloPermisos.padre != null) {
                                     idPadre = moduloPermisos.padre;
                                     if (rolPermisos.escritura == 1) {this.marcarPadre(indice, 'crear');}
@@ -534,6 +535,7 @@
                 this.modalPermisos = 0;
                 this.tituloModal = '';
                 this.arrModulosPermisos = [];
+                this.idrol = '';
             },
             abrirModal (modelo, accion, data = [])
             {
