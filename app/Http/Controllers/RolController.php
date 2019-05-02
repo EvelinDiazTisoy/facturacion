@@ -25,7 +25,7 @@ class RolController extends Controller
             $roles = Rol::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->get();
         }
         
-        $roles2 = Rol::select('id','nombre','estado')->where('estado','=','1')->groupBy('nombre')->orderBy('id','desc')->paginate(6);
+        $roles2 = Rol::select('id','nombre','estado')->groupBy('nombre')->orderBy('id','desc')->paginate(6);
 
         return [
             'pagination' => [
@@ -36,6 +36,9 @@ class RolController extends Controller
                 'from'         => $roles2->firstItem(),
                 'to'           => $roles2->lastItem(),
             ],
+            // 'page' => $request->page,
+            // 'buscar' => $buscar,
+            // 'criterio' => $criterio,
             'roles' => $roles,
             'roles2' => $roles2
         ];
@@ -49,6 +52,7 @@ class RolController extends Controller
 
         $roles = new Rol();
         $roles->nombre = $request->nombre;
+        $roles->id_empresa = $id_empresa;
         $roles->usu_crea = $id_usuario;
         $roles->save();
 
@@ -111,6 +115,7 @@ class RolController extends Controller
 
         $roles = Rol::findOrFail($request->id);
         $roles->nombre = $request->nombre;
+        $roles->id_empresa = $id_empresa;
         $roles->save();
         
         $borrarPermisos = RolPermisos::where('id_rol','=',$request->id)->delete();
@@ -176,12 +181,21 @@ class RolController extends Controller
         $permi = array();
         $permisos = array();
 
-        $modulos = Modulo::join('users','modulos.usu_crea','=','users.id')->select('modulos.id','modulos.nombre','modulos.descripcion','modulos.componente','modulos.menu','modulos.tipo','modulos.icono','modulos.template','modulos.padre','modulos.estado')->where('tipo','=','1')->orderBy('nombre', 'asc')->get();
+        $modulos = Modulo::join('users','modulos.usu_crea','=','users.id')
+        ->select('modulos.id','modulos.nombre','modulos.descripcion','modulos.componente','modulos.menu','modulos.tipo','modulos.icono','modulos.template','modulos.padre','modulos.estado')
+        ->where('tipo','=','1')
+        ->where('estado','=','1')
+        ->orderBy('nombre', 'asc')
+        ->get();
 
         foreach($modulos as $mod)
         {
             $total[] = $mod;
-            $modulos2= Modulo::where('tipo','=','2')->where('padre','=',$mod['id'])->orderBy('nombre','asc')->get();
+            $modulos2= Modulo::where('tipo','=','2')
+            ->where('padre','=',$mod['id'])
+            ->where('estado','=','1')
+            ->orderBy('nombre','asc')
+            ->get();
             foreach($modulos2 as $mod2)
             {
                 $total[] = $mod2;
@@ -196,6 +210,7 @@ class RolController extends Controller
                     'id' => $t['id'],
                     'nombre' => $t['nombre'],
                     'id_rol' => $id_rol,
+                    'tipo' => $t['tipo'],
                 );
 
                 $permisos = RolPermisos::where('id_rol','=',$id_rol)
@@ -212,7 +227,6 @@ class RolController extends Controller
                             'edicion' => $pe['edicion'],
                             'anular' => $pe['anular'],
                             'imprimir' => $pe['imprimir'],
-                            'si' => 'si',
                         );
                     }
                 }
@@ -253,21 +267,17 @@ class RolController extends Controller
 
     public function desactivar(Request $request)
     {
-        // if (!$request->ajax()) return redirect('/');
-        // $roles = Rol::where('nombre','like',$request->nombre)->get();
-        // foreach($roles as $r)
-        // {
-        //     $roles[r]['estado'] = 0;
-        // }
-        // $roles->estado = '0';
-        // $roles->save();
+        if (!$request->ajax()) return redirect('/');
+        $roles = Rol::findOrFail($request->id);
+        $roles->estado = '0';
+        $roles->save();
     }
 
     public function activar(Request $request)
     {
-        // if (!$request->ajax()) return redirect('/');
-        // $roles = Rol::where('nombre','like',$request->nombre)->all();
-        // $roles->estado = '1';
-        // $roles->save();
+        if (!$request->ajax()) return redirect('/');
+        $roles = Rol::findOrFail($request->id);
+        $roles->estado = '1';
+        $roles->save();
     }
 }

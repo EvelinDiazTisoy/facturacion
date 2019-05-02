@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.4
+-- version 4.8.5
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-04-2019 a las 00:45:23
--- Versión del servidor: 10.1.30-MariaDB
--- Versión de PHP: 7.2.1
+-- Tiempo de generación: 02-05-2019 a las 19:31:20
+-- Versión del servidor: 10.1.38-MariaDB
+-- Versión de PHP: 7.3.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -77,8 +77,10 @@ CREATE TABLE `modulos` (
   `usu_crea` int(10) UNSIGNED NOT NULL,
   `componente` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `menu` int(11) DEFAULT NULL,
-  `tipo` tinyint(1) NOT NULL DEFAULT '1',
-  `padre` int(11) DEFAULT NULL,
+  `tipo` int(11) NOT NULL,
+  `icono` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `template` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `padre` int(10) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -87,9 +89,66 @@ CREATE TABLE `modulos` (
 -- Volcado de datos para la tabla `modulos`
 --
 
-INSERT INTO `modulos` (`id`, `nombre`, `descripcion`, `estado`, `usu_crea`, `componente`, `menu`, `tipo`, `padre`, `created_at`, `updated_at`) VALUES
-(1, 'Modulo 1', 'Modulo 1', 1, 1, 'Modulo1.vue', 1, 1, NULL, NULL, NULL),
-(2, 'Modulo 1.1', 'Modulo 1.1', 1, 1, 'Modulo1_1.vue', 2, 2, 1, NULL, NULL);
+INSERT INTO `modulos` (`id`, `nombre`, `descripcion`, `estado`, `usu_crea`, `componente`, `menu`, `tipo`, `icono`, `template`, `padre`, `created_at`, `updated_at`) VALUES
+(1, 'Acceso', NULL, 1, 1, 'Acceso.vue', 1, 1, 'icon-people', 'n/a', NULL, NULL, NULL),
+(2, 'Usuarios', NULL, 1, 1, 'User.vue', 2, 2, 'icon-user', 'user', 1, NULL, NULL),
+(3, 'Roles', NULL, 1, 1, 'Rol.vue', 3, 2, 'icon-user-following', 'rol', 1, NULL, NULL),
+(4, 'Modulos', NULL, 1, 1, 'Modulo.vue', 4, 2, 'icon-user-following', 'modulo', 1, NULL, NULL),
+(7, 'Terceros', NULL, 1, 1, 'Terceros.vue', 5, 1, 'icon-pencil', 'terceros', NULL, '2019-05-02 22:07:57', '2019-05-02 22:07:57');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `modulos_empresas`
+--
+
+CREATE TABLE `modulos_empresas` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `modulos_id` int(10) UNSIGNED DEFAULT NULL,
+  `empresas_id` int(10) UNSIGNED DEFAULT NULL,
+  `estado` tinyint(1) DEFAULT NULL,
+  `usu_crea` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `modulos_empresas`
+--
+
+INSERT INTO `modulos_empresas` (`id`, `modulos_id`, `empresas_id`, `estado`, `usu_crea`, `created_at`) VALUES
+(1, 1, 1, 1, 1, NULL),
+(2, 2, 1, 1, 1, NULL),
+(3, 3, 1, 1, 1, NULL),
+(4, 4, 1, 1, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `modulos_empresas_usuarios`
+--
+
+CREATE TABLE `modulos_empresas_usuarios` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `modulos_empresas_id` int(10) UNSIGNED DEFAULT NULL,
+  `usuarios_id` int(10) UNSIGNED DEFAULT NULL,
+  `crear` tinyint(1) DEFAULT '0',
+  `leer` tinyint(1) DEFAULT '0',
+  `actualizar` tinyint(1) DEFAULT '0',
+  `anular` tinyint(1) DEFAULT '0',
+  `imprimir` tinyint(1) DEFAULT '0',
+  `usu_crea` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `modulos_empresas_usuarios`
+--
+
+INSERT INTO `modulos_empresas_usuarios` (`id`, `modulos_empresas_id`, `usuarios_id`, `crear`, `leer`, `actualizar`, `anular`, `imprimir`, `usu_crea`, `created_at`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1, 1, '2019-05-02 11:28:40'),
+(2, 2, 1, 1, 1, 1, 1, 1, 1, '2019-05-02 11:28:40'),
+(3, 3, 1, 1, 1, 1, 1, 1, 1, '2019-05-02 11:28:40'),
+(4, 4, 1, 1, 1, 1, 1, 1, 1, '2019-05-02 11:28:40');
 
 -- --------------------------------------------------------
 
@@ -182,14 +241,9 @@ INSERT INTO `personas` (`id`, `nombre`, `tipo_documento`, `num_documento`, `dire
 
 CREATE TABLE `roles` (
   `id` int(10) UNSIGNED NOT NULL,
-  `nombre` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_modulo` int(11) NOT NULL,
-  `lectura` tinyint(1) NOT NULL,
-  `escritura` tinyint(1) NOT NULL,
-  `edicion` tinyint(1) NOT NULL,
-  `anular` tinyint(1) NOT NULL,
-  `imprimir` tinyint(1) NOT NULL,
-  `usu_crea` int(11) NOT NULL,
+  `nombre` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `usu_crea` int(10) UNSIGNED NOT NULL,
   `estado` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
@@ -199,13 +253,36 @@ CREATE TABLE `roles` (
 -- Volcado de datos para la tabla `roles`
 --
 
-INSERT INTO `roles` (`id`, `nombre`, `id_modulo`, `lectura`, `escritura`, `edicion`, `anular`, `imprimir`, `usu_crea`, `estado`, `created_at`, `updated_at`) VALUES
-(1, 'Administrador', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(2, 'Vendedor', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(3, 'Almacenero', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(4, 'Contador', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(5, 'Aux Contable', 0, 0, 0, 0, 0, 0, 0, 1, NULL, NULL),
-(6, 'ajfoasj', 2, 0, 0, 0, 0, 0, 1, 1, '2019-04-18 00:53:14', '2019-04-18 00:53:14');
+INSERT INTO `roles` (`id`, `nombre`, `id_empresa`, `usu_crea`, `estado`, `created_at`, `updated_at`) VALUES
+(1, 'Administrador', 1, 0, 1, NULL, NULL),
+(2, 'Vendedor', 1, 0, 1, NULL, NULL),
+(3, 'Almacenero', 1, 0, 1, NULL, NULL),
+(4, 'Contador', 1, 0, 1, NULL, NULL),
+(5, 'Aux Contable', 1, 0, 1, NULL, NULL),
+(83, 'Rol 1', 1, 1, 1, '2019-04-25 20:39:50', '2019-05-02 18:32:22'),
+(84, 'Rol 2', 1, 9, 1, '2019-05-02 18:15:26', '2019-05-02 19:44:10');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `roles_permisos`
+--
+
+CREATE TABLE `roles_permisos` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `id_rol` int(11) NOT NULL,
+  `id_modulo` int(11) NOT NULL,
+  `id_empresa` int(11) NOT NULL,
+  `lectura` tinyint(1) NOT NULL DEFAULT '0',
+  `escritura` tinyint(1) NOT NULL DEFAULT '0',
+  `edicion` tinyint(1) NOT NULL DEFAULT '0',
+  `anular` tinyint(1) NOT NULL DEFAULT '0',
+  `imprimir` tinyint(1) NOT NULL DEFAULT '0',
+  `usu_crea` int(10) UNSIGNED NOT NULL,
+  `estado` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -219,16 +296,19 @@ CREATE TABLE `users` (
   `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `condicion` tinyint(1) NOT NULL DEFAULT '1',
   `idrol` int(10) UNSIGNED NOT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `empresas_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `users`
 --
 
-INSERT INTO `users` (`id`, `usuario`, `password`, `condicion`, `idrol`, `remember_token`) VALUES
-(1, 'cristhiam', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'NuJfvvrzGOhDaRRpJvSn6OBpQgFyqgyKlZa3H9KKSKHWuaQWJddPlNlz6Fiu'),
-(9, 'fabian', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'wo8sErJvqxHw6lqjANBc726TFZ77DUE4FjoCr8shrQh3weAFc5OU99HVPQJH');
+INSERT INTO `users` (`id`, `usuario`, `password`, `condicion`, `idrol`, `remember_token`, `empresas_id`) VALUES
+(1, 'cristhiam', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'Luavv2EqZt5otwxL9SAEBMb004qKj7djjMat3MTfGNGM6H2DIkHpoy9w2TXg', 1),
+(9, 'fabian', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'qJq0vLgVI61dqqs3Ukq4SfMxXDRrLLY59wWU8KIUZFTUlGnmBHGsoIsKdxQl', 1),
+(8, 'ismael', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'wo8sErJvqxHw6lqjANBc726TFZ77DUE4FjoCr8shrQh3weAFc5OU99HVPQJH', 1),
+(2, 'jessica', '$2a$04$sFjAmm8DXjqbVqFSljmMmOj2EMwEFJpodtSBx61eCq5c4CM4pCI8a', 1, 1, 'M7JgIZYa1SfrgoD3GAQy53NSngaceRtHydF3OSnE2I6TB5MlGfJBsDc7f63e', 1);
 
 --
 -- Índices para tablas volcadas
@@ -251,7 +331,27 @@ ALTER TABLE `migrations`
 --
 ALTER TABLE `modulos`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `modulos_usu_crea_foreign` (`usu_crea`);
+  ADD UNIQUE KEY `menu` (`menu`),
+  ADD KEY `modulos_usu_crea_foreign` (`usu_crea`),
+  ADD KEY `padre` (`padre`);
+
+--
+-- Indices de la tabla `modulos_empresas`
+--
+ALTER TABLE `modulos_empresas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usu_crea` (`usu_crea`),
+  ADD KEY `empresas_id` (`empresas_id`),
+  ADD KEY `modulos_id` (`modulos_id`);
+
+--
+-- Indices de la tabla `modulos_empresas_usuarios`
+--
+ALTER TABLE `modulos_empresas_usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `modulos_empresas_id` (`modulos_empresas_id`),
+  ADD KEY `usuario_id` (`usuarios_id`),
+  ADD KEY `usu_crea` (`usu_crea`);
 
 --
 -- Indices de la tabla `notifications`
@@ -277,9 +377,17 @@ ALTER TABLE `personas`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `roles_nombre_unique` (`nombre`),
-  ADD KEY `id_modulo` (`id_modulo`),
   ADD KEY `usu_crea` (`usu_crea`);
+
+--
+-- Indices de la tabla `roles_permisos`
+--
+ALTER TABLE `roles_permisos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_modulo` (`id_modulo`),
+  ADD KEY `usu_crea` (`usu_crea`),
+  ADD KEY `id_modulo_2` (`id_modulo`),
+  ADD KEY `id_rol` (`id_rol`);
 
 --
 -- Indices de la tabla `users`
@@ -287,7 +395,8 @@ ALTER TABLE `roles`
 ALTER TABLE `users`
   ADD UNIQUE KEY `users_usuario_unique` (`usuario`),
   ADD KEY `users_id_foreign` (`id`),
-  ADD KEY `users_idrol_foreign` (`idrol`);
+  ADD KEY `users_idrol_foreign` (`idrol`),
+  ADD KEY `empresas_id` (`empresas_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -309,7 +418,19 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `modulos`
 --
 ALTER TABLE `modulos`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `modulos_empresas`
+--
+ALTER TABLE `modulos_empresas`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `modulos_empresas_usuarios`
+--
+ALTER TABLE `modulos_empresas_usuarios`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `personas`
@@ -321,7 +442,13 @@ ALTER TABLE `personas`
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+
+--
+-- AUTO_INCREMENT de la tabla `roles_permisos`
+--
+ALTER TABLE `roles_permisos`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
@@ -334,9 +461,28 @@ ALTER TABLE `modulos`
   ADD CONSTRAINT `modulos_usu_crea_foreign` FOREIGN KEY (`usu_crea`) REFERENCES `users` (`id`);
 
 --
+-- Filtros para la tabla `modulos_empresas`
+--
+ALTER TABLE `modulos_empresas`
+  ADD CONSTRAINT `modulos_empresas_ibfk_1` FOREIGN KEY (`usu_crea`) REFERENCES `users` (`id`);
+
+--
+-- Filtros para la tabla `modulos_empresas_usuarios`
+--
+ALTER TABLE `modulos_empresas_usuarios`
+  ADD CONSTRAINT `modulos_empresas_usuarios_ibfk_1` FOREIGN KEY (`usu_crea`) REFERENCES `users` (`id`);
+
+--
+-- Filtros para la tabla `roles_permisos`
+--
+ALTER TABLE `roles_permisos`
+  ADD CONSTRAINT `roles_permisos_ibfk_1` FOREIGN KEY (`usu_crea`) REFERENCES `users` (`id`);
+
+--
 -- Filtros para la tabla `users`
 --
 ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`empresas_id`) REFERENCES `empresas` (`id`),
   ADD CONSTRAINT `users_id_foreign` FOREIGN KEY (`id`) REFERENCES `personas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `users_idrol_foreign` FOREIGN KEY (`idrol`) REFERENCES `roles` (`id`);
 COMMIT;

@@ -102,66 +102,76 @@
                         </div>
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre(*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
+                                <div class="row">
+                                    <div class="form-group col-md-12 float-left">
+                                        <label class="col-md-1 form-control-label" for="text-input">Nombre(*)</label>
+                                        <div class="col-md-11 float-right">
+                                            <input type="text" v-model="nombre" class="form-control float-right" style="width: 96%;" placeholder="Nombre de la persona">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Tipo documento</label>
-                                    <div class="col-md-9">
-                                        <select v-model="tipo_documento" class="form-control">
-                                            <option value="DNI">DNI</option>
-                                            <option value="RUC">RUC</option>
-                                            <option value="CEDULA">CEDULA</option>
-                                            <option value="PASS">PASS</option>
-                                        </select>                                        
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="text-input">Tipo documento</label>
+                                        <div class="col-md-9 float-right">
+                                            <select v-model="tipo_documento" class="form-control">
+                                                <option value="DNI">DNI</option>
+                                                <option value="RUC">RUC</option>
+                                                <option value="CEDULA">CEDULA</option>
+                                                <option value="PASS">PASS</option>
+                                            </select>                                        
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Número documento</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="email" v-model="num_documento" class="form-control" placeholder="Número de documento">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Número documento</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="num_documento" class="form-control" placeholder="Número de documento">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Dirección</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="email" v-model="direccion" class="form-control" placeholder="Dirección">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Teléfono</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="email" v-model="telefono" class="form-control" placeholder="Teléfono">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="direccion" class="form-control" placeholder="Dirección">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Email</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Role</label>
+                                        <div class="col-md-9 float-right">
+                                            <select v-model="idrol" class="form-control">
+                                                <option value="0" disabled>Seleccione</option>
+                                                <option v-for="role in arrayRol" :key="role.id" :value="role.id" v-text="role.nombre"></option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="telefono" class="form-control" placeholder="Teléfono">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Usuario</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Email</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Role</label>
-                                    <div class="col-md-9">
-                                        <select v-model="idrol" class="form-control">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option v-for="role in arrayRol" :key="role.id" :value="role.id" v-text="role.nombre"></option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Usuario</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">password</label>
-                                    <div class="col-md-9">
-                                        <input type="password" v-model="password" class="form-control" placeholder="password del usuario">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">password</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="password" v-model="password" class="form-control" placeholder="password del usuario">
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-show="errorPersona" class="form-group row div-error">

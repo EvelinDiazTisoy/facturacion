@@ -19,7 +19,7 @@
 				@endif
 			@endforeach
 			
-            <template v-if="menu==7">
+            <!-- <template v-if="menu==7">
                 <user :ruta="ruta"></user>
             </template>
 
@@ -37,7 +37,7 @@
 
             <template v-if="menu==12">
                 <h1>Acerca de</h1>
-            </template>      
+            </template>       -->
 
 
     @endif

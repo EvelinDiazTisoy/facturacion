@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Modulo;
+use App\RolPermisos;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ModuloController extends Controller
@@ -151,6 +153,17 @@ class ModuloController extends Controller
         $modulo = Modulo::findOrFail($request->id);
         $modulo->estado = '0';
         $modulo->save();
+
+        $roles = RolPermisos::where('id_modulo','=',$request->id)->get();
+        foreach($roles as $r)
+        {
+            $roles2 = RolPermisos::findOrFail($r['id']);
+            $roles2->estado = '0';
+            $roles2->save();
+        }
+
+        $cons="UPDATE `modulos_empresas` SET `estado` = '0' WHERE `modulos_id` = $request->id";
+        $modulos_empresas = DB::update($cons);
     }
 
     public function activar(Request $request)
@@ -159,5 +172,16 @@ class ModuloController extends Controller
         $modulo = Modulo::findOrFail($request->id);
         $modulo->estado = '1';
         $modulo->save();
+
+        $roles = RolPermisos::where('id_modulo','=',$request->id)->get();
+        foreach($roles as $r)
+        {
+            $roles2 = RolPermisos::findOrFail($r['id']);
+            $roles2->estado = '1';
+            $roles2->save();
+        }
+
+        $cons="UPDATE `modulos_empresas` SET `estado` = '1' WHERE `modulos_id` = $request->id";
+        $modulos_empresas = DB::update($cons);
     }
 }

@@ -34,7 +34,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="rol in arrayNombresRoles" :key="rol.nombre">
+                                <tr v-for="rol in arrayRol" :key="rol.nombre">
                                     <td v-text="rol.nombre"></td>
                                     <td>
                                         <div v-if="rol.estado">
@@ -45,17 +45,21 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <button type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm">
+                                        <button  v-if="rol.estado" type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+
+                                        <button  v-else type="button" class="btn btn-secondary btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button>
 
                                         <template v-if="rol.estado">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.nombre)">
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.id)">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarRol(rol.nombre)">
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarRol(rol.id)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -112,12 +116,23 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="permisos in arrayPermisos" :key="permisos.id">
-                                                    <td v-text="permisos.nombre"></td>
-                                                    <td><input type="checkbox" v-model="permisos.lectura" value=""></td>
-                                                    <td><input type="checkbox" v-model="permisos.escritura" value=""></td>
-                                                    <td><input type="checkbox" v-model="permisos.edicion" value=""></td>
-                                                    <td><input type="checkbox" v-model="permisos.anular" value=""></td>
-                                                    <td><input type="checkbox" v-model="permisos.imprimir" value=""></td>
+                                                    <td v-if="permisos.tipo==1" v-text="permisos.nombre" style="background: #dae3e8;"></td>
+                                                    <td v-else v-text="permisos.nombre" style="background: #ffffff; padding-left: 1em;"></td>
+
+                                                    <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.lectura" value=""></td>
+                                                    <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.lectura" value=""></td>
+
+                                                    <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.escritura" value=""></td>
+                                                    <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.escritura" value=""></td>
+
+                                                    <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.edicion" value=""></td>
+                                                    <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.edicion" value=""></td>
+
+                                                    <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.anular" value=""></td>
+                                                    <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.anular" value=""></td>
+
+                                                    <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.imprimir" value=""></td>
+                                                    <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.imprimir" value=""></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -304,19 +319,33 @@
                 me.errorMostrarMsjRol =[];
 
                 if (!me.nombre) me.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
-                console.log(me.tipoAccion);
-                for(var r=0; r<me.arrayNombresRoles.length; r++)
+                
+                for(var r=0; r<me.arrayRol.length; r++)
                 {
-                    if(me.tipoAccion==1 && me.arrayNombresRoles[r]['nombre']==me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+                    if(me.tipoAccion==1 && me.arrayRol[r]['nombre']==me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
 
-                    if(me.tipoAccion==2 && me.validarNombre!=me.nombre && me.nombre==me.arrayNombresRoles[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+                    if(me.tipoAccion==2 && me.validarNombre!=me.nombre && me.nombre==me.arrayRol[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
                 }
+
+                var ban = 0;
+                if(me.arrayPermisos.length!=0)
+                {
+                    for(var p=0; p<me.arrayPermisos.length; p++)
+                    {
+                        if((!me.arrayPermisos[p]['lectura'] || me.arrayPermisos[p]['lectura']!=true) && (!me.arrayPermisos[p]['escritura'] || me.arrayPermisos[p]['escritura']!=true) && (!me.arrayPermisos[p]['edicion'] || me.arrayPermisos[p]['edicion']!=true) && (!me.arrayPermisos[p]['anular'] || me.arrayPermisos[p]['anular']!=true) && (!me.arrayPermisos[p]['imprimir'] || me.arrayPermisos[p]['imprimir']!=true))
+                        {
+                            ban = 1;
+                        }
+                    }
+                }
+
+                if (ban) me.errorMostrarMsjRol.push("Debe asignar por lo menos un permiso.");
 
                 if (me.errorMostrarMsjRol.length) me.errorRol = 1;
 
                 return me.errorRol;
             },
-            desactivarRol(nombre){
+            desactivarRol(id){
                swal({
                 title: 'Esta seguro de desactivar este rol?',
                 type: 'warning',
@@ -334,7 +363,7 @@
                     let me = this;
 
                     axios.put(this.ruta +'/rol/desactivar',{
-                        'nombre': nombre
+                        'id': id
                     }).then(function (response) {
                         me.listarRol(1,'','nombre');
                         swal(
@@ -355,7 +384,7 @@
                 }
                 }) 
             },
-            activarRol(nombre){
+            activarRol(id){
                swal({
                 title: 'Esta seguro de activar este rol?',
                 type: 'warning',
@@ -373,9 +402,9 @@
                     let me = this;
 
                     axios.put(this.ruta +'/rol/activar',{
-                        'nombre': nombre
+                        'id': id
                     }).then(function (response) {
-                        me.listarModulo('','nombre');
+                        me.listarRol(1,'','nombre');
                         swal(
                         'Activado!',
                         'El rol ha sido activado con éxito.',

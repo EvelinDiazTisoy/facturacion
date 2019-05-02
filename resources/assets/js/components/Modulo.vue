@@ -1,11 +1,11 @@
 <template>
-            <main class="main">
+        <main class="main">
             <!-- Breadcrumb -->
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
             </ol>
             <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado --><
+                <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Modulos
@@ -61,9 +61,14 @@
                                         
                                     </td>
                                     <td v-if="modulo.tipo==1" style="background: #dae3e8;">
-                                        <button type="button" @click="abrirModal('modulo','actualizar',modulo)" class="btn btn-warning btn-sm">
+
+                                        <button v-if="modulo.estado == 1" type="button" @click="abrirModal('modulo','actualizar',modulo)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+
                                         <template v-if="modulo.estado">
                                             <button type="button" class="btn btn-danger btn-sm" @click="desactivarModulo(modulo.id)">
                                                 <i class="icon-trash"></i>
@@ -130,59 +135,71 @@
                         </div>
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre del modulo">                                        
+                                <div class="row">
+                                    <div class="form-group col-md-12">
+                                        <label class="col-md-1 form-control-label float-left" for="text-input">Nombre (*)</label>
+                                        <div class="col-md-11 float-right">
+                                            <input type="text" v-model="nombre" style="width: 96%;" class="form-control float-right" placeholder="Nombre del modulo">                                        
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Descripcion</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="descripcion" class="form-control" placeholder="Descripcion del modulo">                                        
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="text-input">Descripcion</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="descripcion" class="form-control" placeholder="Descripcion del modulo">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Componente</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="componente" class="form-control" placeholder="Componente">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Componente</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="componente" class="form-control" placeholder="Componente">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Menú</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="menu" class="form-control" placeholder="Menú">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Icono</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="icono" class="form-control" placeholder="Icono">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Menú</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="menu" class="form-control" placeholder="Menú">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Template</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="text" v-model="template" class="form-control" placeholder="Template">
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Tipo</label>
+                                        <div class="col-md-9 float-right">
+                                            <select v-model="tipo" class="form-control">
+                                                <option value="0" disabled="disabled">--Seleccione--</option>
+                                                <option value="1">Padre</option>
+                                                <option value="2">Hijo</option>
+                                            </select>                                    
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Icono</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="icono" class="form-control" placeholder="Icono">
+                                <div class="row" v-if="tipo==2">
+                                    <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left" for="email-input">Padre</label>
+                                        <div class="col-md-9 float-right">
+                                            <select v-model="padre" class="form-control">
+                                                <option value="0" disabled>Seleccione</option>
+                                                <option v-for="padre in arrayPadre" :key="padre.id" :value="padre.id" v-text="padre.nombre"></option>
+                                            </select>                                   
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Template</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="template" class="form-control" placeholder="Template">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Tipo</label>
-                                    <div class="col-md-9">
-                                        <select v-model="tipo" class="form-control">
-                                            <option value="0" disabled="disabled">--Seleccione--</option>
-                                            <option value="1">Padre</option>
-                                            <option value="2">Hijo</option>
-                                        </select>                                    
-                                    </div>
-                                </div>
-                                <div class="form-group row" v-if="tipo==2">
-                                    <label class="col-md-3 form-control-label" for="email-input">Padre</label>
-                                    <div class="col-md-9">
-                                        <select v-model="padre" class="form-control">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option v-for="padre in arrayPadre" :key="padre.id" :value="padre.id" v-text="padre.nombre"></option>
-                                        </select>                                   
+                                    <div class="form-group col-md-6">
                                     </div>
                                 </div>
                                 <div v-show="errorModulo" class="form-group row div-error">
@@ -219,6 +236,7 @@
                 descripcion: '',
                 componente : '',
                 menu : '',
+                validarMenu : '',
                 tipo : '',
                 icono : '',
                 template : '',
@@ -329,6 +347,8 @@
                 });
             },         
             validarModulo(){
+                let me = this;
+
                 this.errorModulo=0;
                 this.errorMostrarMsjModulo =[];
 
@@ -338,6 +358,15 @@
                 if (!this.tipo) this.errorMostrarMsjModulo.push("Se debe seleccionar el tipo de modulo");
                 if (!this.icono) this.errorMostrarMsjModulo.push("Se debe seleccionar el icono  del modulo");
                 if (!this.template) this.errorMostrarMsjModulo.push("Se debe seleccionar el template del modulo");
+
+                console.log('tipo_accion: '+me.tipoAccion);
+                for(var r=0; r<me.arrayModulo.length; r++)
+                {
+                    if(me.tipoAccion==1 && me.arrayModulo[r]['menu']==me.menu) me.errorMostrarMsjModulo.push("El numero del menu ya se encuentra registrado");
+
+                    if(me.tipoAccion==2 && me.validarMenu!=me.menu && me.menu==me.arrayModulo[r]['menu']) me.errorMostrarMsjModulo.push("El numero del menu ya se encuentra registrado");
+                }
+                
                 if (this.errorMostrarMsjModulo.length) this.errorModulo = 1;
 
                 return this.errorModulo;
@@ -388,6 +417,7 @@
                                 this.descripcion = data['descripcion'];
                                 this.componente = data['componente'];
                                 this.menu = data['menu'];
+                                this.validarMenu = data['menu'];
                                 this.tipo = data['tipo'];
                                 this.icono = data['icono'];
                                 this.template = data['template'];

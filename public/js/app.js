@@ -33230,6 +33230,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['ruta'],
@@ -33385,18 +33400,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             me.errorMostrarMsjRol = [];
 
             if (!me.nombre) me.errorMostrarMsjRol.push("El nombre de la Rol no puede estar vacío.");
-            console.log(me.tipoAccion);
-            for (var r = 0; r < me.arrayNombresRoles.length; r++) {
-                if (me.tipoAccion == 1 && me.arrayNombresRoles[r]['nombre'] == me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
 
-                if (me.tipoAccion == 2 && me.validarNombre != me.nombre && me.nombre == me.arrayNombresRoles[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+            for (var r = 0; r < me.arrayRol.length; r++) {
+                if (me.tipoAccion == 1 && me.arrayRol[r]['nombre'] == me.nombre) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
+
+                if (me.tipoAccion == 2 && me.validarNombre != me.nombre && me.nombre == me.arrayRol[r]['nombre']) me.errorMostrarMsjRol.push("El nombre del rol ya se encuentra registrado");
             }
+
+            var ban = 0;
+            if (me.arrayPermisos.length != 0) {
+                for (var p = 0; p < me.arrayPermisos.length; p++) {
+                    if ((!me.arrayPermisos[p]['lectura'] || me.arrayPermisos[p]['lectura'] != true) && (!me.arrayPermisos[p]['escritura'] || me.arrayPermisos[p]['escritura'] != true) && (!me.arrayPermisos[p]['edicion'] || me.arrayPermisos[p]['edicion'] != true) && (!me.arrayPermisos[p]['anular'] || me.arrayPermisos[p]['anular'] != true) && (!me.arrayPermisos[p]['imprimir'] || me.arrayPermisos[p]['imprimir'] != true)) {
+                        ban = 1;
+                    }
+                }
+            }
+
+            if (ban) me.errorMostrarMsjRol.push("Debe asignar por lo menos un permiso.");
 
             if (me.errorMostrarMsjRol.length) me.errorRol = 1;
 
             return me.errorRol;
         },
-        desactivarRol: function desactivarRol(nombre) {
+        desactivarRol: function desactivarRol(id) {
             var _this = this;
 
             swal({
@@ -33416,7 +33442,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     var me = _this;
 
                     axios.put(_this.ruta + '/rol/desactivar', {
-                        'nombre': nombre
+                        'id': id
                     }).then(function (response) {
                         me.listarRol(1, '', 'nombre');
                         swal('Desactivado!', 'El rol ha sido desactivado con éxito.', 'success');
@@ -33428,7 +33454,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 result.dismiss === swal.DismissReason.cancel) {}
             });
         },
-        activarRol: function activarRol(nombre) {
+        activarRol: function activarRol(id) {
             var _this2 = this;
 
             swal({
@@ -33448,9 +33474,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     var me = _this2;
 
                     axios.put(_this2.ruta + '/rol/activar', {
-                        'nombre': nombre
+                        'id': id
                     }).then(function (response) {
-                        me.listarModulo('', 'nombre');
+                        me.listarRol(1, '', 'nombre');
                         swal('Activado!', 'El rol ha sido activado con éxito.', 'success');
                     }).catch(function (error) {
                         console.log(error);
@@ -33650,7 +33676,7 @@ var render = function() {
               _vm._v(" "),
               _c(
                 "tbody",
-                _vm._l(_vm.arrayNombresRoles, function(rol) {
+                _vm._l(_vm.arrayRol, function(rol) {
                   return _c("tr", { key: rol.nombre }, [
                     _c("td", { domProps: { textContent: _vm._s(rol.nombre) } }),
                     _vm._v(" "),
@@ -33671,19 +33697,28 @@ var render = function() {
                     _c(
                       "td",
                       [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-warning btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.abrirModal("roles", "actualizar", rol)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "icon-pencil" })]
-                        ),
+                        rol.estado
+                          ? _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-warning btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function($event) {
+                                    _vm.abrirModal("roles", "actualizar", rol)
+                                  }
+                                }
+                              },
+                              [_c("i", { staticClass: "icon-pencil" })]
+                            )
+                          : _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-secondary btn-sm",
+                                attrs: { type: "button" }
+                              },
+                              [_c("i", { staticClass: "icon-pencil" })]
+                            ),
                         _vm._v(" "),
                         rol.estado
                           ? [
@@ -33694,7 +33729,7 @@ var render = function() {
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
-                                      _vm.desactivarRol(rol.nombre)
+                                      _vm.desactivarRol(rol.id)
                                     }
                                   }
                                 },
@@ -33709,7 +33744,7 @@ var render = function() {
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
-                                      _vm.activarRol(rol.nombre)
+                                      _vm.activarRol(rol.id)
                                     }
                                   }
                                 },
@@ -33920,245 +33955,698 @@ var render = function() {
                                 "tbody",
                                 _vm._l(_vm.arrayPermisos, function(permisos) {
                                   return _c("tr", { key: permisos.id }, [
-                                    _c("td", {
-                                      domProps: {
-                                        textContent: _vm._s(permisos.nombre)
-                                      }
-                                    }),
+                                    permisos.tipo == 1
+                                      ? _c("td", {
+                                          staticStyle: {
+                                            background: "#dae3e8"
+                                          },
+                                          domProps: {
+                                            textContent: _vm._s(permisos.nombre)
+                                          }
+                                        })
+                                      : _c("td", {
+                                          staticStyle: {
+                                            background: "#ffffff",
+                                            "padding-left": "1em"
+                                          },
+                                          domProps: {
+                                            textContent: _vm._s(permisos.nombre)
+                                          }
+                                        }),
                                     _vm._v(" "),
-                                    _c("td", [
-                                      _c("input", {
-                                        directives: [
+                                    permisos.tipo == 1
+                                      ? _c(
+                                          "td",
                                           {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: permisos.lectura,
-                                            expression: "permisos.lectura"
-                                          }
-                                        ],
-                                        attrs: { type: "checkbox", value: "" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            permisos.lectura
-                                          )
-                                            ? _vm._i(permisos.lectura, "") > -1
-                                            : permisos.lectura
-                                        },
-                                        on: {
-                                          change: function($event) {
-                                            var $$a = permisos.lectura,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = "",
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (permisos.lectura = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (permisos.lectura = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(permisos, "lectura", $$c)
+                                            staticStyle: {
+                                              background: "#dae3e8"
                                             }
-                                          }
-                                        }
-                                      })
-                                    ]),
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.lectura,
+                                                  expression: "permisos.lectura"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.lectura
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.lectura,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.lectura
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.lectura,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.lectura = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.lectura = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "lectura",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              background: "#ffffff"
+                                            }
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.lectura,
+                                                  expression: "permisos.lectura"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.lectura
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.lectura,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.lectura
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.lectura,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.lectura = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.lectura = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "lectura",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        ),
                                     _vm._v(" "),
-                                    _c("td", [
-                                      _c("input", {
-                                        directives: [
+                                    permisos.tipo == 1
+                                      ? _c(
+                                          "td",
                                           {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: permisos.escritura,
-                                            expression: "permisos.escritura"
-                                          }
-                                        ],
-                                        attrs: { type: "checkbox", value: "" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            permisos.escritura
-                                          )
-                                            ? _vm._i(permisos.escritura, "") >
-                                              -1
-                                            : permisos.escritura
-                                        },
-                                        on: {
-                                          change: function($event) {
-                                            var $$a = permisos.escritura,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = "",
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (permisos.escritura = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (permisos.escritura = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(
-                                                permisos,
-                                                "escritura",
-                                                $$c
-                                              )
+                                            staticStyle: {
+                                              background: "#dae3e8"
                                             }
-                                          }
-                                        }
-                                      })
-                                    ]),
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.escritura,
+                                                  expression:
+                                                    "permisos.escritura"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.escritura
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.escritura,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.escritura
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.escritura,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.escritura = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.escritura = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "escritura",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              background: "#ffffff"
+                                            }
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.escritura,
+                                                  expression:
+                                                    "permisos.escritura"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.escritura
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.escritura,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.escritura
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.escritura,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.escritura = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.escritura = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "escritura",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        ),
                                     _vm._v(" "),
-                                    _c("td", [
-                                      _c("input", {
-                                        directives: [
+                                    permisos.tipo == 1
+                                      ? _c(
+                                          "td",
                                           {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: permisos.edicion,
-                                            expression: "permisos.edicion"
-                                          }
-                                        ],
-                                        attrs: { type: "checkbox", value: "" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            permisos.edicion
-                                          )
-                                            ? _vm._i(permisos.edicion, "") > -1
-                                            : permisos.edicion
-                                        },
-                                        on: {
-                                          change: function($event) {
-                                            var $$a = permisos.edicion,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = "",
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (permisos.edicion = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (permisos.edicion = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(permisos, "edicion", $$c)
+                                            staticStyle: {
+                                              background: "#dae3e8"
                                             }
-                                          }
-                                        }
-                                      })
-                                    ]),
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.edicion,
+                                                  expression: "permisos.edicion"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.edicion
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.edicion,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.edicion
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.edicion,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.edicion = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.edicion = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "edicion",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              background: "#ffffff"
+                                            }
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.edicion,
+                                                  expression: "permisos.edicion"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.edicion
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.edicion,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.edicion
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.edicion,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.edicion = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.edicion = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "edicion",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        ),
                                     _vm._v(" "),
-                                    _c("td", [
-                                      _c("input", {
-                                        directives: [
+                                    permisos.tipo == 1
+                                      ? _c(
+                                          "td",
                                           {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: permisos.anular,
-                                            expression: "permisos.anular"
-                                          }
-                                        ],
-                                        attrs: { type: "checkbox", value: "" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            permisos.anular
-                                          )
-                                            ? _vm._i(permisos.anular, "") > -1
-                                            : permisos.anular
-                                        },
-                                        on: {
-                                          change: function($event) {
-                                            var $$a = permisos.anular,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = "",
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (permisos.anular = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (permisos.anular = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(permisos, "anular", $$c)
+                                            staticStyle: {
+                                              background: "#dae3e8"
                                             }
-                                          }
-                                        }
-                                      })
-                                    ]),
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.anular,
+                                                  expression: "permisos.anular"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.anular
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.anular,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.anular
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.anular,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.anular = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.anular = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "anular",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              background: "#ffffff"
+                                            }
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.anular,
+                                                  expression: "permisos.anular"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.anular
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.anular,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.anular
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.anular,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.anular = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.anular = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "anular",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        ),
                                     _vm._v(" "),
-                                    _c("td", [
-                                      _c("input", {
-                                        directives: [
+                                    permisos.tipo == 1
+                                      ? _c(
+                                          "td",
                                           {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: permisos.imprimir,
-                                            expression: "permisos.imprimir"
-                                          }
-                                        ],
-                                        attrs: { type: "checkbox", value: "" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            permisos.imprimir
-                                          )
-                                            ? _vm._i(permisos.imprimir, "") > -1
-                                            : permisos.imprimir
-                                        },
-                                        on: {
-                                          change: function($event) {
-                                            var $$a = permisos.imprimir,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = "",
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (permisos.imprimir = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (permisos.imprimir = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.$set(
-                                                permisos,
-                                                "imprimir",
-                                                $$c
-                                              )
+                                            staticStyle: {
+                                              background: "#dae3e8"
                                             }
-                                          }
-                                        }
-                                      })
-                                    ])
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.imprimir,
+                                                  expression:
+                                                    "permisos.imprimir"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.imprimir
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.imprimir,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.imprimir
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.imprimir,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.imprimir = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.imprimir = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "imprimir",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
+                                      : _c(
+                                          "td",
+                                          {
+                                            staticStyle: {
+                                              background: "#ffffff"
+                                            }
+                                          },
+                                          [
+                                            _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: permisos.imprimir,
+                                                  expression:
+                                                    "permisos.imprimir"
+                                                }
+                                              ],
+                                              attrs: {
+                                                type: "checkbox",
+                                                value: ""
+                                              },
+                                              domProps: {
+                                                checked: Array.isArray(
+                                                  permisos.imprimir
+                                                )
+                                                  ? _vm._i(
+                                                      permisos.imprimir,
+                                                      ""
+                                                    ) > -1
+                                                  : permisos.imprimir
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = permisos.imprimir,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = "",
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        (permisos.imprimir = $$a.concat(
+                                                          [$$v]
+                                                        ))
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        (permisos.imprimir = $$a
+                                                          .slice(0, $$i)
+                                                          .concat(
+                                                            $$a.slice($$i + 1)
+                                                          ))
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      permisos,
+                                                      "imprimir",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          ]
+                                        )
                                   ])
                                 })
                               )
@@ -34404,6 +34892,16 @@ exports.push([module.i, "\n.modal-content{\n    width: 100% !important;\n    pos
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -35448,381 +35946,406 @@ var render = function() {
                     }
                   },
                   [
-                    _c("div", { staticClass: "form-group row" }, [
+                    _c("div", { staticClass: "row" }, [
                       _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "text-input" }
-                        },
-                        [_vm._v("Nombre(*)")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
+                        "div",
+                        { staticClass: "form-group col-md-12 float-left" },
+                        [
+                          _c(
+                            "label",
                             {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.nombre,
-                              expression: "nombre"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: "Nombre de la persona"
-                          },
-                          domProps: { value: _vm.nombre },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.nombre = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "text-input" }
-                        },
-                        [_vm._v("Tipo documento")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c(
-                          "select",
-                          {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.tipo_documento,
-                                expression: "tipo_documento"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.tipo_documento = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              }
-                            }
-                          },
-                          [
-                            _c("option", { attrs: { value: "DNI" } }, [
-                              _vm._v("DNI")
-                            ]),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "RUC" } }, [
-                              _vm._v("RUC")
-                            ]),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "CEDULA" } }, [
-                              _vm._v("CEDULA")
-                            ]),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "PASS" } }, [
-                              _vm._v("PASS")
-                            ])
-                          ]
-                        )
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Número documento")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.num_documento,
-                              expression: "num_documento"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "email",
-                            placeholder: "Número de documento"
-                          },
-                          domProps: { value: _vm.num_documento },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.num_documento = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Dirección")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.direccion,
-                              expression: "direccion"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "email", placeholder: "Dirección" },
-                          domProps: { value: _vm.direccion },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.direccion = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Teléfono")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.telefono,
-                              expression: "telefono"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "email", placeholder: "Teléfono" },
-                          domProps: { value: _vm.telefono },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.telefono = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Email")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.email,
-                              expression: "email"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "email", placeholder: "Email" },
-                          domProps: { value: _vm.email },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.email = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Role")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c(
-                          "select",
-                          {
-                            directives: [
-                              {
-                                name: "model",
-                                rawName: "v-model",
-                                value: _vm.idrol,
-                                expression: "idrol"
-                              }
-                            ],
-                            staticClass: "form-control",
-                            on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.idrol = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              }
-                            }
-                          },
-                          [
-                            _c(
-                              "option",
-                              { attrs: { value: "0", disabled: "" } },
-                              [_vm._v("Seleccione")]
-                            ),
-                            _vm._v(" "),
-                            _vm._l(_vm.arrayRol, function(role) {
-                              return _c("option", {
-                                key: role.id,
-                                domProps: {
-                                  value: role.id,
-                                  textContent: _vm._s(role.nombre)
+                              staticClass: "col-md-1 form-control-label",
+                              attrs: { for: "text-input" }
+                            },
+                            [_vm._v("Nombre(*)")]
+                          ),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "col-md-11 float-right" }, [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.nombre,
+                                  expression: "nombre"
                                 }
-                              })
+                              ],
+                              staticClass: "form-control float-right",
+                              staticStyle: { width: "96%" },
+                              attrs: {
+                                type: "text",
+                                placeholder: "Nombre de la persona"
+                              },
+                              domProps: { value: _vm.nombre },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.nombre = $event.target.value
+                                }
+                              }
                             })
-                          ],
-                          2
-                        )
+                          ])
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "text-input" }
+                          },
+                          [_vm._v("Tipo documento")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.tipo_documento,
+                                  expression: "tipo_documento"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.tipo_documento = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c("option", { attrs: { value: "DNI" } }, [
+                                _vm._v("DNI")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "RUC" } }, [
+                                _vm._v("RUC")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "CEDULA" } }, [
+                                _vm._v("CEDULA")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "PASS" } }, [
+                                _vm._v("PASS")
+                              ])
+                            ]
+                          )
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Número documento")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.num_documento,
+                                expression: "num_documento"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "email",
+                              placeholder: "Número de documento"
+                            },
+                            domProps: { value: _vm.num_documento },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.num_documento = $event.target.value
+                              }
+                            }
+                          })
+                        ])
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Usuario")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.usuario,
-                              expression: "usuario"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: "Nombre del usuario"
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
                           },
-                          domProps: { value: _vm.usuario },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                          [_vm._v("Dirección")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.direccion,
+                                expression: "direccion"
                               }
-                              _vm.usuario = $event.target.value
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "email", placeholder: "Dirección" },
+                            domProps: { value: _vm.direccion },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.direccion = $event.target.value
+                              }
                             }
-                          }
-                        })
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Teléfono")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.telefono,
+                                expression: "telefono"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "email", placeholder: "Teléfono" },
+                            domProps: { value: _vm.telefono },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.telefono = $event.target.value
+                              }
+                            }
+                          })
+                        ])
                       ])
                     ]),
                     _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("password")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.password,
-                              expression: "password"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "password",
-                            placeholder: "password del usuario"
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
                           },
-                          domProps: { value: _vm.password },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                          [_vm._v("Email")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.email,
+                                expression: "email"
                               }
-                              _vm.password = $event.target.value
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "email", placeholder: "Email" },
+                            domProps: { value: _vm.email },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.email = $event.target.value
+                              }
                             }
-                          }
-                        })
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Role")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.idrol,
+                                  expression: "idrol"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.idrol = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "0", disabled: "" } },
+                                [_vm._v("Seleccione")]
+                              ),
+                              _vm._v(" "),
+                              _vm._l(_vm.arrayRol, function(role) {
+                                return _c("option", {
+                                  key: role.id,
+                                  domProps: {
+                                    value: role.id,
+                                    textContent: _vm._s(role.nombre)
+                                  }
+                                })
+                              })
+                            ],
+                            2
+                          )
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Usuario")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.usuario,
+                                expression: "usuario"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              placeholder: "Nombre del usuario"
+                            },
+                            domProps: { value: _vm.usuario },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.usuario = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("password")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.password,
+                                expression: "password"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: {
+                              type: "password",
+                              placeholder: "password del usuario"
+                            },
+                            domProps: { value: _vm.password },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.password = $event.target.value
+                              }
+                            }
+                          })
+                        ])
                       ])
                     ]),
                     _vm._v(" "),
@@ -38857,6 +39380,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['ruta'],
@@ -38867,6 +39407,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             descripcion: '',
             componente: '',
             menu: '',
+            validarMenu: '',
             tipo: '',
             icono: '',
             template: '',
@@ -38976,6 +39517,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         validarModulo: function validarModulo() {
+            var me = this;
+
             this.errorModulo = 0;
             this.errorMostrarMsjModulo = [];
 
@@ -38985,6 +39528,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if (!this.tipo) this.errorMostrarMsjModulo.push("Se debe seleccionar el tipo de modulo");
             if (!this.icono) this.errorMostrarMsjModulo.push("Se debe seleccionar el icono  del modulo");
             if (!this.template) this.errorMostrarMsjModulo.push("Se debe seleccionar el template del modulo");
+
+            console.log('tipo_accion: ' + me.tipoAccion);
+            for (var r = 0; r < me.arrayModulo.length; r++) {
+                if (me.tipoAccion == 1 && me.arrayModulo[r]['menu'] == me.menu) me.errorMostrarMsjModulo.push("El numero del menu ya se encuentra registrado");
+
+                if (me.tipoAccion == 2 && me.validarMenu != me.menu && me.menu == me.arrayModulo[r]['menu']) me.errorMostrarMsjModulo.push("El numero del menu ya se encuentra registrado");
+            }
+
             if (this.errorMostrarMsjModulo.length) this.errorModulo = 1;
 
             return this.errorModulo;
@@ -39036,6 +39587,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                                     this.descripcion = data['descripcion'];
                                     this.componente = data['componente'];
                                     this.menu = data['menu'];
+                                    this.validarMenu = data['menu'];
                                     this.tipo = data['tipo'];
                                     this.icono = data['icono'];
                                     this.template = data['template'];
@@ -39151,7 +39703,6 @@ var render = function() {
     _vm._m(0),
     _vm._v(" "),
     _c("div", { staticClass: "container-fluid" }, [
-      _vm._v("<\n        "),
       _c("div", { staticClass: "card" }, [
         _c("div", { staticClass: "card-header" }, [
           _c("i", { staticClass: "fa fa-align-justify" }),
@@ -39352,23 +39903,32 @@ var render = function() {
                           "td",
                           { staticStyle: { background: "#dae3e8" } },
                           [
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-warning btn-sm",
-                                attrs: { type: "button" },
-                                on: {
-                                  click: function($event) {
-                                    _vm.abrirModal(
-                                      "modulo",
-                                      "actualizar",
-                                      modulo
-                                    )
-                                  }
-                                }
-                              },
-                              [_c("i", { staticClass: "icon-pencil" })]
-                            ),
+                            modulo.estado == 1
+                              ? _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-warning btn-sm",
+                                    attrs: { type: "button" },
+                                    on: {
+                                      click: function($event) {
+                                        _vm.abrirModal(
+                                          "modulo",
+                                          "actualizar",
+                                          modulo
+                                        )
+                                      }
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "icon-pencil" })]
+                                )
+                              : _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-secondary btn-sm",
+                                    attrs: { type: "button" }
+                                  },
+                                  [_c("i", { staticClass: "icon-pencil" })]
+                                ),
                             _vm._v(" "),
                             modulo.estado
                               ? [
@@ -39608,341 +40168,365 @@ var render = function() {
                     }
                   },
                   [
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "text-input" }
-                        },
-                        [_vm._v("Nombre (*)")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.nombre,
-                              expression: "nombre"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: "Nombre del modulo"
-                          },
-                          domProps: { value: _vm.nombre },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.nombre = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "text-input" }
-                        },
-                        [_vm._v("Descripcion")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.descripcion,
-                              expression: "descripcion"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "text",
-                            placeholder: "Descripcion del modulo"
-                          },
-                          domProps: { value: _vm.descripcion },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.descripcion = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Componente")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.componente,
-                              expression: "componente"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", placeholder: "Componente" },
-                          domProps: { value: _vm.componente },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.componente = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Menú")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.menu,
-                              expression: "menu"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", placeholder: "Menú" },
-                          domProps: { value: _vm.menu },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.menu = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Icono")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.icono,
-                              expression: "icono"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", placeholder: "Icono" },
-                          domProps: { value: _vm.icono },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.icono = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Template")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.template,
-                              expression: "template"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text", placeholder: "Template" },
-                          domProps: { value: _vm.template },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.template = $event.target.value
-                            }
-                          }
-                        })
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "form-group row" }, [
-                      _c(
-                        "label",
-                        {
-                          staticClass: "col-md-3 form-control-label",
-                          attrs: { for: "email-input" }
-                        },
-                        [_vm._v("Tipo")]
-                      ),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-md-9" }, [
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-12" }, [
                         _c(
-                          "select",
+                          "label",
                           {
+                            staticClass:
+                              "col-md-1 form-control-label float-left",
+                            attrs: { for: "text-input" }
+                          },
+                          [_vm._v("Nombre (*)")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-11 float-right" }, [
+                          _c("input", {
                             directives: [
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.tipo,
-                                expression: "tipo"
+                                value: _vm.nombre,
+                                expression: "nombre"
+                              }
+                            ],
+                            staticClass: "form-control float-right",
+                            staticStyle: { width: "96%" },
+                            attrs: {
+                              type: "text",
+                              placeholder: "Nombre del modulo"
+                            },
+                            domProps: { value: _vm.nombre },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.nombre = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "text-input" }
+                          },
+                          [_vm._v("Descripcion")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.descripcion,
+                                expression: "descripcion"
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: {
+                              type: "text",
+                              placeholder: "Descripcion del modulo"
+                            },
+                            domProps: { value: _vm.descripcion },
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.tipo = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.descripcion = $event.target.value
                               }
                             }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
                           },
-                          [
-                            _c(
-                              "option",
-                              { attrs: { value: "0", disabled: "disabled" } },
-                              [_vm._v("--Seleccione--")]
-                            ),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "1" } }, [
-                              _vm._v("Padre")
-                            ]),
-                            _vm._v(" "),
-                            _c("option", { attrs: { value: "2" } }, [
-                              _vm._v("Hijo")
-                            ])
-                          ]
-                        )
+                          [_vm._v("Componente")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.componente,
+                                expression: "componente"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", placeholder: "Componente" },
+                            domProps: { value: _vm.componente },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.componente = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Menú")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.menu,
+                                expression: "menu"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", placeholder: "Menú" },
+                            domProps: { value: _vm.menu },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.menu = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Icono")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.icono,
+                                expression: "icono"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", placeholder: "Icono" },
+                            domProps: { value: _vm.icono },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.icono = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Template")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.template,
+                                expression: "template"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", placeholder: "Template" },
+                            domProps: { value: _vm.template },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.template = $event.target.value
+                              }
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-md-6" }, [
+                        _c(
+                          "label",
+                          {
+                            staticClass:
+                              "col-md-3 form-control-label float-left",
+                            attrs: { for: "email-input" }
+                          },
+                          [_vm._v("Tipo")]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-9 float-right" }, [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.tipo,
+                                  expression: "tipo"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.tipo = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                }
+                              }
+                            },
+                            [
+                              _c(
+                                "option",
+                                { attrs: { value: "0", disabled: "disabled" } },
+                                [_vm._v("--Seleccione--")]
+                              ),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "1" } }, [
+                                _vm._v("Padre")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "2" } }, [
+                                _vm._v("Hijo")
+                              ])
+                            ]
+                          )
+                        ])
                       ])
                     ]),
                     _vm._v(" "),
                     _vm.tipo == 2
-                      ? _c("div", { staticClass: "form-group row" }, [
-                          _c(
-                            "label",
-                            {
-                              staticClass: "col-md-3 form-control-label",
-                              attrs: { for: "email-input" }
-                            },
-                            [_vm._v("Padre")]
-                          ),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "col-md-9" }, [
+                      ? _c("div", { staticClass: "row" }, [
+                          _c("div", { staticClass: "form-group col-md-6" }, [
                             _c(
-                              "select",
+                              "label",
                               {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.padre,
-                                    expression: "padre"
-                                  }
-                                ],
-                                staticClass: "form-control",
-                                on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.padre = $event.target.multiple
-                                      ? $$selectedVal
-                                      : $$selectedVal[0]
-                                  }
-                                }
+                                staticClass:
+                                  "col-md-3 form-control-label float-left",
+                                attrs: { for: "email-input" }
                               },
-                              [
-                                _c(
-                                  "option",
-                                  { attrs: { value: "0", disabled: "" } },
-                                  [_vm._v("Seleccione")]
-                                ),
-                                _vm._v(" "),
-                                _vm._l(_vm.arrayPadre, function(padre) {
-                                  return _c("option", {
-                                    key: padre.id,
-                                    domProps: {
-                                      value: padre.id,
-                                      textContent: _vm._s(padre.nombre)
+                              [_vm._v("Padre")]
+                            ),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col-md-9 float-right" }, [
+                              _c(
+                                "select",
+                                {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.padre,
+                                      expression: "padre"
                                     }
+                                  ],
+                                  staticClass: "form-control",
+                                  on: {
+                                    change: function($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call($event.target.options, function(
+                                          o
+                                        ) {
+                                          return o.selected
+                                        })
+                                        .map(function(o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.padre = $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    }
+                                  }
+                                },
+                                [
+                                  _c(
+                                    "option",
+                                    { attrs: { value: "0", disabled: "" } },
+                                    [_vm._v("Seleccione")]
+                                  ),
+                                  _vm._v(" "),
+                                  _vm._l(_vm.arrayPadre, function(padre) {
+                                    return _c("option", {
+                                      key: padre.id,
+                                      domProps: {
+                                        value: padre.id,
+                                        textContent: _vm._s(padre.nombre)
+                                      }
+                                    })
                                   })
-                                })
-                              ],
-                              2
-                            )
-                          ])
+                                ],
+                                2
+                              )
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "form-group col-md-6" })
                         ])
                       : _vm._e(),
                     _vm._v(" "),
