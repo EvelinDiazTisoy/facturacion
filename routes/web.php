@@ -116,9 +116,40 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/user/desactivar', 'UserController@desactivar');
         Route::put('/user/activar', 'UserController@activar');
 
+        Route::post('/permisos', 'PermisosController@insertar');
         Route::post('/listar_permisos', 'PermisosController@listarPermisos');
         Route::get('/listar_permisos2', 'PermisosController@listarPermisos2');
-        Route::post('/permisos', 'PermisosController@insertar');
+        Route::get('/permisos/listarPermisosLogueado', 'PermisosController@listarPermisosLogueado');
+
+        // Rutas del plan de cuentas y de formatos
+        Route::get('/planCuentas', 'PlanCuentas@index');        
+        Route::post('/planCuentas/registrar', 'PlanCuentas@store');        
+        Route::put('/planCuentas/actualizar', 'PlanCuentas@update');
+        Route::get('/planCuentas/selectCuenta', 'PlanCuentas@selectCuenta');
+        Route::get('/planCuentas/selectCuenta2', 'PlanCuentas@selectCuenta2');
+        Route::get('/planCuentas/selectCuentaInfo', 'PlanCuentas@selectCuentaInfo');
+        Route::put('/planCuentas/desactivar', 'PlanCuentas@desactivar');
+        Route::put('/planCuentas/activar', 'PlanCuentas@activar');
+
+        Route::get('/conf_formatos', 'Conf_formatosController@index');
+        Route::post('/conf_formatos/registrar', 'Conf_formatosController@store');
+        Route::put('/conf_formatos/actualizar', 'Conf_formatosController@update');
+        Route::get('/conf_formatos/get_tipos_formatos', 'Conf_formatosController@get_tipos_formatos');
+        Route::get('/conf_formatos/get_filt_tipo', 'Conf_formatosController@get_filt_tipo');
+
+        Route::get('/formatos','FormatoController@index');
+        Route::post('/formatos/registrar','FormatoController@store');
+        Route::get('/formatos/numero_next','FormatoController@numero_next');
+        Route::put('/formatos/desactivar', 'FormatoController@desactivar');
+        Route::put('/formatos/cerrar', 'FormatoController@cerrar');
+        Route::get('/formatos/obtenerCabecera', 'FormatoController@obtenerCabecera');
+        Route::get('/formatos/obtenerDetalles', 'FormatoController@obtenerDetalles');
+        Route::get('/formatos/pdf/{id}','FormatoController@pdf')->name('formato_pdf');
+        Route::put('/formatos/actualizar', 'FormatoController@update');
+
+        Route::get('/cuentas/saldo', 'CuentasController@saldo');
+        Route::get('/cuentas/get_fuentes', 'CuentasController@get_fuentes');
+        Route::get('/cuentas/get_x_afectar', 'CuentasController@get_x_afectar');
     });
 
 });

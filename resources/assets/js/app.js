@@ -19,11 +19,27 @@ Vue.component('rol', require('./components/Rol.vue'));
 Vue.component('user', require('./components/User.vue'));
 Vue.component('terceros', require('./components/Terceros.vue'));
 Vue.component('modulo', require('./components/Modulo.vue'));
+Vue.component('plancuentas', require('./components/PlanCuentas.vue'));
+Vue.component('conformatos', require('./components/ConFormatos.vue'));
+Vue.component('formatos', require('./components/Formatos.vue'));
+Vue.component('registroconta', require('./components/RegistroConta.vue'));
 
 const app = new Vue({
     el: '#app', 
     data :{
         menu : 0,
-        ruta : 'http://localhost/laravel_estudio/sistema2/public'
+        ruta : 'http://localhost/laravel_estudio/sistema2/public',
+        permisosUser : []
+    },
+
+    mounted() {
+        let me = this;
+        var url= this.ruta +'/permisos/listarPermisosLogueado';
+        axios.get(url).then(function (response) {
+            me.permisosUser = response.data.permisosLogueado;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
 });

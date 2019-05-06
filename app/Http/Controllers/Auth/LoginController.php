@@ -40,7 +40,8 @@ class LoginController extends Controller
                 "hijos" =>$hijos1,"template_menu"=>""];*/
             
 			
-            $request->session()->put('id_empresa', 1);
+            $request->session()->put('id_empresa', Auth::user()->empresas_id);
+            // $request->session()->put('id_empresa', 1);
 
             $empresas_id = $request->session()->get('id_empresa');
             $id_usuario = Auth::user()->id;
@@ -56,10 +57,10 @@ class LoginController extends Controller
                 $respuesta2 = DB::select($cons2);
 
                 foreach($respuesta2 as $res2){
-                    $hijos[] = ["modulo"=>$res2->nombre,"icono"=>$res2->nombre,"menu"=>$res2->menu, "lectura"=>$res2->leer, "escritura"=>$res2->crear, "editar"=>$res2->actualizar, "anular"=>$res2->anular, "imprimir"=>$res2->imprimir,"hijos" =>array(),"template_menu"=>$res2->template];
+                    $hijos[] = ["modulo"=>$res2->nombre,"icono"=>$res2->icono,"menu"=>$res2->menu, "lectura"=>$res2->leer, "escritura"=>$res2->crear, "editar"=>$res2->actualizar, "anular"=>$res2->anular, "imprimir"=>$res2->imprimir,"hijos" =>array(),"template_menu"=>$res2->template];
                 }
                 
-                $resultado[] = ["modulo"=>$res->nombre,"icono"=>$res->nombre,"menu"=>$res->menu, "lectura"=>$res->leer, "escritura"=>$res->crear, "editar"=>$res->actualizar, "anular"=>$res->anular, "imprimir"=>$res->imprimir,"hijos" =>$hijos,"template_menu"=>$res->template];
+                $resultado[] = ["modulo"=>$res->nombre,"icono"=>$res->icono,"menu"=>$res->menu, "lectura"=>$res->leer, "escritura"=>$res->crear, "editar"=>$res->actualizar, "anular"=>$res->anular, "imprimir"=>$res->imprimir,"hijos" =>$hijos,"template_menu"=>$res->template];
             }
 
             $request->session()->put('menu_usu', $resultado);

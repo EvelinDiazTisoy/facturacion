@@ -8,10 +8,39 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Session;
 
 class PermisosController extends Controller
 {
+    public function listarPermisosLogueado()
+    {   
+        $permisos = DB::table('modulos_empresas_usuarios')
+        ->join('modulos_empresas', 'modulos_empresas_usuarios.modulos_empresas_id', '=', 'modulos_empresas.id')
+        ->join('modulos', 'modulos_empresas.modulos_id', '=', 'modulos.id')
+        ->where('modulos_empresas_usuarios.usuarios_id', '=', Auth::user()->id)
+        ->select(
+            'modulos.template',
+            'modulos_empresas_usuarios.crear',
+            'modulos_empresas_usuarios.leer',
+            'modulos_empresas_usuarios.actualizar',
+            'modulos_empresas_usuarios.anular',
+            'modulos_empresas_usuarios.imprimir'
+        )->get();
+
+        $permisosLogueado = array();
+        foreach ($permisos as $permiso) {
+            $permisosLogueado [$permiso->template] = array(
+                'crear' => $permiso->crear,
+                'leer' => $permiso->leer,
+                'actualizar' => $permiso->actualizar,
+                'anular' => $permiso->anular,
+                'imprimir' => $permiso->imprimir
+            );
+        }
+
+        return ['permisosLogueado' => $permisosLogueado];
+    }
+    
     private static function obtenerModulos($tipo, $empresas_id)
     {
         return DB::table('modulos_empresas')
@@ -29,6 +58,8 @@ class PermisosController extends Controller
     }
     public function listarPermisos(Request $request)
     {
+        // if (!$request->ajax()) return redirect('/');
+
         $empresa_id = Auth::user()->empresas_id;
         $modulosPadre = self::obtenerModulos(1, $empresa_id);
         $modulosHijo = self::obtenerModulos(2, $empresa_id);
