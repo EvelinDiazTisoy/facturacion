@@ -9,7 +9,11 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Plan Cuentas
-                        <button type="button" @click="abrirModal('planCuentas','registrar')" class="btn btn-secondary">
+                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('planCuentas','registrar')" class="btn btn-primary" title="Nuevo">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>
+
+                        <button v-else type="button" class="btn btn-secondary" title="Nuevo">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -17,12 +21,20 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="codigo">Codigo</option>
                                       <option value="nombre">Nombre</option>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarPlanCuentas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarPlanCuentas(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+
+                                    <select v-else disabled class="form-control col-md-3" v-model="criterio" title="Tipo">
+                                      <option value="codigo">Codigo</option>
+                                      <option value="nombre">Nombre</option>
+                                    </select>
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarPlanCuentas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+                                    <input v-else type="text" disabled v-model="buscar" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+
+                                    <button v-if="permisosUser.leer" type="submit" @click="listarPlanCuentas(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="button" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -35,7 +47,7 @@
                                     <th>Editar</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="permisosUser.leer">
                                 <tr v-for="cuenta in arrayPlanCuentas" :key="cuenta.id">
                                     
                                     <td v-text="cuenta.codigo"></td>
@@ -50,11 +62,18 @@
                                         
                                     </td>
                                     <td>
-                                        <button type="button" @click="abrirModal('planCuentas','actualizar',cuenta)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('planCuentas','actualizar',cuenta)" class="btn btn-warning btn-sm" title="Editar">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                        
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;                                        
                                     </td>
-                                </tr>                                
+                                </tr>
+                            </tbody>
+                            <tbody v-else>
+                                <tr colspan="4"><span>Nada para mostrar</span></tr>
                             </tbody>
                         </table>
                         <nav>
@@ -178,7 +197,7 @@
 
 <script>
     export default {
-        props : ['ruta'],
+        props : ['ruta', 'permisosUser'],
         data (){
             return {
                 cuenta_id: 0,

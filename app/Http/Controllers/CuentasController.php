@@ -37,7 +37,7 @@ class CuentasController extends Controller
     public function get_x_afectar(Request $request){
         $id_tercero = $request->id_tercero;
         $cons="select *,cuentas.cuenta as id_cuenta, cuentas.id as id_afectado from cuentas,formatos,conf_formatos where cuentas.tercero=$id_tercero and cuentas.condicion=1 and formatos.id=cuentas.id_formato and conf_formatos.id = formatos.formato and num_cuenta like '2%' and saldo_cuent is not null and saldo_cuent>0 "; 
-        //echo $cons; exit;
+        // echo $cons; exit;
         $afectados = DB::select($cons);  
         
         return ['afectados'=>$afectados];

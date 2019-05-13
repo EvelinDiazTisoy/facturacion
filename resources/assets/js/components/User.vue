@@ -391,6 +391,7 @@
                 
                 axios.post(url, me.arrModulosPermisos).then(function (response) {
                     me.cerrarModalPermisos();
+                    me.recargarPermisos();
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -546,6 +547,19 @@
                 this.tituloModal = '';
                 this.arrModulosPermisos = [];
                 this.idrol = '';
+            },
+            recargarPermisos()
+            {
+                let me=this;
+                var url= this.ruta +'/permisos/recargarPermisos';
+                axios.get(url).then(function (response) {
+                    //console.log(response);
+                    // var respuesta= response.data;
+                    // me.arrayRol = respuesta.roles;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             },
             abrirModal (modelo, accion, data = [])
             {

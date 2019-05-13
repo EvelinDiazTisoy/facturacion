@@ -23,6 +23,9 @@ Vue.component('plancuentas', require('./components/PlanCuentas.vue'));
 Vue.component('conformatos', require('./components/ConFormatos.vue'));
 Vue.component('formatos', require('./components/Formatos.vue'));
 Vue.component('registroconta', require('./components/RegistroConta.vue'));
+Vue.component('configgenerales', require('./components/ConfigGenerales.vue'));
+Vue.component('auxiliares_conta', require('./components/AuxiliaresConta.vue'));
+Vue.component('retenciones', require('./components/Retenciones.vue'));
 
 const app = new Vue({
     el: '#app', 

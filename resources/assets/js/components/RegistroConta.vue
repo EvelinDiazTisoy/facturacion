@@ -10,16 +10,21 @@
             <div class="card">
                 <div class="card-header">
                     <i style="float: left;" class="fa fa-align-justify"></i> 
-                        <span style="float: left;">Plan Cuentas </span>
+                        <span style="float: left;">Registros Contables</span>
                     
-                    <button style="float: left;" type="button" @click="mostrarDetalle()" class="btn btn-secondary" >
+                    <button v-if="permisosUser.crear" style="float: left;" type="button" @click="mostrarDetalle()" class="btn btn-primary" title="Nuevo">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
+                    <button v-else style="float: left;" type="button" class="btn btn-secondary" title="Nuevo">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+
                     <label style="float: left;" for="text-input">Tipo Formato</label>
-                    <select style="float: left;" class="form-control col-md-3" v-model="tipo_formato_new" id="tipo_formato_new"
-                    @change="cambiar_tipo_f()">
-                        
+                    <select v-if="permisosUser.crear" style="float: left;" class="form-control col-md-3" v-model="tipo_formato_new" id="tipo_formato_new"
+                    @change="cambiar_tipo_f()" title="Tipo formato">
                         <option v-for="TipoFormato in arrayTiposFormatos" :key="TipoFormato.id" :value="TipoFormato.id" v-text="TipoFormato.nombre_formato"></option>
+                    </select> 
+                    <select v-else disabled style="float: left;" class="form-control col-md-3" v-model="tipo_formato_new" id="tipo_formato_new" title="Tipo formato">
                     </select> 
                     
                 </div>
@@ -30,22 +35,24 @@
                         <div class="form-group row">
                             <div class="col-md-1">
                                 
-                                    <label>Año</label>
-                                    <select class="form-control" v-model="anio" style="max-width:120px; min-width: 80px !important;" >
-                                        <option value="2015">2015</option>
-                                        <option value="2016">2016</option>
-                                        <option value="2017">2017</option>
-                                        <option value="2018">2018</option>
-                                        <option value="2019">2019</option>
-                                        <option value="2020">2020</option>
-                                        <option value="2021">2021</option>
-                                        <option value="2022">2022</option>
-                                    </select>
+                                <label>Año</label>
+                                <select v-if="permisosUser.leer" class="form-control" v-model="anio" style="max-width:120px; min-width: 80px !important;" >
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
+                                </select>
+                                <select v-else disabled class="form-control" v-model="anio" style="max-width:120px; min-width: 80px !important;" >
+                                </select>
                                 
                             </div>
                             <div class="col-md-2">
                                 <label>Mes</label>
-                                <select class="form-control" v-model="mes" style="max-width:120px">
+                                <select v-if="permisosUser.leer" class="form-control" v-model="mes" style="max-width:120px">
                                     <option value="01">Enero</option>
                                     <option value="02">Febrero</option>
                                     <option value="03">Marzo</option>
@@ -59,29 +66,39 @@
                                     <option value="11">Noviembre</option>
                                     <option value="12">Diciembre</option>
                                 </select>
+                                <select v-else disabled class="form-control" v-model="mes" style="max-width:120px">
+                                </select>
                             </div>
                             <div class="col-md-3">                                
                                 <label for="text-input">Tipo Formato</label>
-                                <select class="form-control" v-model="tipo_formato_busq">
+                                <select v-if="permisosUser.leer" class="form-control" v-model="tipo_formato_busq">
                                     <option value="0" >Seleccione</option>
                                     <option v-for="TipoFormato in arrayTiposFormatos" :key="TipoFormato.id" :value="TipoFormato.id" v-text="TipoFormato.nombre_formato"></option>
-                                </select>      
+                                </select>
+                                <select v-else disabled class="form-control" v-model="tipo_formato_busq">
+                                </select>
                             </div>
                             <div class="col-md-2">
                                 <label>Criterio</label>
-                                <select class="form-control " v-model="criterio">
+                                <select v-if="permisosUser.leer" class="form-control " v-model="criterio">
                                     <option value="tercero">Documento Tercero</option>
                                     <option value="nom_tercero">Nombre Tercero</option>
                                     <option value="numero">Numero</option>
                                     <option value="dia">Dia</option>
                                 </select>
+                                <select v-else disabled class="form-control " v-model="criterio">
+                                </select>
                             </div>
                             <div class="col-md-2">
                                 <label>Valor</label>
-                                <input type="text" v-model="valor" class="form-control" placeholder="Valor a buscar">
+                                <input v-if="permisosUser.leer" type="text" v-model="valor" class="form-control" placeholder="Valor a buscar">
+                                <input v-else disabled type="text" v-model="valor" class="form-control" placeholder="Valor a buscar">
                             </div>
                             <div class="col-md-2">                                  
-                                <button type="submit" class="btn btn-primary" @click="listarRegistros(1)" >
+                                <button v-if="permisosUser.leer" type="submit" class="btn btn-primary" @click="listarRegistros(1)" title="Buscar">
+                                    <i class="fa fa-search"></i> Buscar
+                                </button>
+                                <button v-else type="button" class="btn btn-secondary" title="Buscar">
                                     <i class="fa fa-search"></i> Buscar
                                 </button>
                             </div>
@@ -103,7 +120,7 @@
                                         
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody v-if="permisosUser.leer">
                                     <tr v-for="registro in arrayRegistros" :key="registro.id">
                                         <td v-text="registro.fecha"></td>
                                         <td v-text="registro.nombre_formato"></td>
@@ -136,27 +153,48 @@
                                         </td>
                                         <td style="width:178px !important">
                                             
-                                            <button type="button" style=" margin-right: -8px;" @click="verFormato(registro.id)" class="btn btn-success btn-sm" title='Ver formato'>
+                                            <button v-if="permisosUser.leer" type="button" style=" margin-right: -8px;" @click="verFormato(registro.id)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                <i class="icon-eye"></i>
+                                            </button>
+                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Ver formato'>
                                                 <i class="icon-eye"></i>
                                             </button> &nbsp;
-                                            <button v-if="registro.condicion ==1 " type="button" style=" margin-right: -8px;" @click="editarFormato(registro.id)" class="btn btn-success btn-sm" title='Ver formato'>
+
+                                            <button v-if="registro.condicion ==1 && permisosUser.actualizar" type="button" style=" margin-right: -8px;" @click="editarFormato(registro.id)" class="btn btn-success btn-sm" title='Editar formato'>
+                                                <i class="icon-pencil"></i>
+                                            </button>
+                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Editar formato'>
                                                 <i class="icon-pencil"></i>
                                             </button> &nbsp;
-                                             <button type="button" @click="pdfFormato(registro.id)" class="btn btn-info btn-sm">
-                                                <i class="icon-doc"></i>
-                                             </button>
+
+                                            <button v-if="permisosUser.imprimir" type="button" @click="pdfFormato(registro.id)" class="btn btn-info btn-sm" title="PDF">
+                                            <i class="icon-doc"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="PDF">
+                                            <i class="icon-doc"></i>
+                                            </button>
+
                                             <template v-if="registro.condicion ==1 && registro.cerrado==0">
-                                                <button type="button" @click="cerrarFormato(registro.id)" class="btn btn-warning  btn-sm" title='Ver formato'>
+                                                <button v-if="permisosUser.actualizar" type="button" @click="cerrarFormato(registro.id)" class="btn btn-warning  btn-sm" title='Cerrar formato'>
+                                                    <i class="icon-lock"></i>
+                                                </button>
+                                                <button v-else type="button" class="btn btn-secondary btn-sm" title='Cerrar formato'>
                                                     <i class="icon-lock"></i>
                                                 </button>
                                             </template>
                                             <template v-if="registro.condicion == 1 && registro.cerrado==0">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="anularFormato(registro.id)">
+                                                <button v-if="permisosUser.anular" type="button" class="btn btn-danger btn-sm" @click="anularFormato(registro.id)" title="Anular Formato">
+                                                    <i class="icon-trash"></i>
+                                                </button>
+                                                <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular Formato">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
                                         </td>
                                     </tr>
+                                </tbody>
+                                <tbody v-else>
+                                    <tr><span>Nada para mostrar</span></tr>
                                 </tbody>
                             </table>
                         </div> 
@@ -188,7 +226,7 @@
                                 </div>
                             </div>
                             <div class="col-md-1">
-                                <label><b>Numero</b></label>
+                                <label><b>Numero</b> <span v-text="numero"></span></label>
                             </div>
                             <!--<div class="col-md-1">
                                 {{ numero }}
@@ -208,11 +246,11 @@
                                     </v-select>
                             </div>-->
                             <div class="form-group col-md-8">
-                                <label for="" class="float-left col-md-2">Tercero(*) </label>
+                                <label for="" class="float-left col-md-2"><b>Tercero*</b></label>
                                 <div class="form-inline float-right col-md-10">
                                     <input type="text" readonly style="max-width: 482px;" class="form-control col-md-10" name="cuenta_fin" v-model="tercero">
-                                    <button @click="abrirModalTerceros('tercero_filtro')" style="min-width: 30px;" class="btn btn-primary form-control">...</button>
-                                    <button @click="quitar(4)" style="min-width: 30px;" class="btn btn-danger form-control">
+                                    <button @click="abrirModalTerceros('tercero_filtro1')" style="min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                    <button @click="quitar(1)" style="min-width: 30px;" class="btn btn-danger form-control">
                                         <i class="icon-trash"></i>
                                     </button>
                                 </div>
@@ -297,7 +335,7 @@
                                     <input type="number" value="0" class="form-control" v-model="credito" id="credito" @focus="limpia_credito()" @blur="cero_credito()">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <!--<div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tercero</label>
                                     <div class="form-inline">                                        
@@ -313,6 +351,17 @@
                                         </v-select>
                                         
                                     </div>
+                                </div>
+                            </div>-->
+
+                            <div class="form-group col-md-4">
+                                <label for="" class="float-left col-md-4">Tercero </label>
+                                <div class="form-inline float-right col-md-12">
+                                    <input type="text" readonly style="max-width: 223px;" class="form-control col-md-10" name="cuenta_fin" v-model="tercero2">
+                                    <button @click="abrirModalTerceros('tercero_filtro2')" style="min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                    <button @click="quitar(2)" style="min-width: 30px;" class="btn btn-danger form-control">
+                                        <i class="icon-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                            
@@ -531,7 +580,7 @@
 <script>
 import vSelect from 'vue-select';
 export default {
-    props : ['ruta'],
+    props : ['ruta', 'permisosUser'],
     data (){
         return {
             registro_id: 0,
@@ -611,16 +660,22 @@ export default {
             suma_deuda: '',
             var_totalAfects:'',
 
-            // variables terceros
-            idTerceroFiltro : '',
-            terceroFiltro : '',
+            // variables modulo terceros 1
             tipoAccionModalTerceros : 0,
             arrayTerceros : [],
             titulomodalTerceros : '',
             modalTerceros : 0,
             tercero : '',
             tercero_id : '',
+            tercero_doc : '',
             terc_busq : '',
+
+            // variables modulo terceros 2
+            tipoAccionModalTerceros : 0,
+            arrayTerceros : [],
+            tercero2 : '',
+            tercero_id2 : '',
+            tercero_doc2 : '',
         }
     },
     components: {
@@ -879,15 +934,17 @@ export default {
                     
                  //   me.id_tercero_det=me.id_tercero;
                  //   me.tercero_det_aux = me.doc_tercero;
-                    if(me.id_tercero_det == '' ){
+                    if(me.tercero_id2==''){
                         me.arrayCliente_detalle = me.arrayCliente;
-                        me.id_tercero_det =  me.id_tercero;
-                        me.tercero_det_aux = me.doc_tercero;
-                        var mylist = document.getElementById("tercero_detalle_id");                           
-                        var listitems= mylist.getElementsByClassName("form-control");
+                        me.tercero2 = '';
+                        me.tercero_id2 = '';
+                        me.tercero2 = me.tercero;
+                        me.tercero_id2 = me.tercero_id;
+                        // var mylist = document.getElementById("tercero_detalle_id");                           
+                        // var listitems= mylist.getElementsByClassName("form-control");
                         //var aux1 = $('#tercero_detalle_id').children('input').attr("placeholder", "Type your answer here");
                         //listitems[0].attr("placeholder", "Type your answer here");
-                        var aux11 = $("#tercero_detalle_id").children().children().attr("placeholder", me.aux_nom_y_ced);
+                        // var aux11 = $("#tercero_detalle_id").children().children().attr("placeholder", me.aux_nom_y_ced);
                         //$("#tercero_detalle_id").first().append( "<span class='selected-tag'>Luis  Monsalve  - 3839<!----></span>");
                         //aux11.append( "<span class='selected-tag'>Luis  Monsalve  - 3839<!----></span>");
                         //console.log(aux11[0]);  
@@ -936,7 +993,7 @@ export default {
         },
         agregarCuenta(){
             let me=this;
-            if(me.id_tercero=='')
+            if(me.terero_id=='')
             {
                 swal({  type: 'error',  title: 'Error...',
                     text: 'Debe seleccionar un tercero para el documento!!!',
@@ -957,8 +1014,8 @@ export default {
                     num_cuenta: me.codigo,
                     debito: me.debito,
                     credito: me.credito,
-                    id_tercero: me.id_tercero_det,
-                    doc_tercero: me.tercero_det_aux,
+                    id_tercero: me.tercero_id,
+                    doc_tercero: me.tercero_doc,
                     nom_cuenta : me.cuenta,
                     documento : '',
                     doc_externo: '',
@@ -969,13 +1026,15 @@ export default {
                 me.id_cuenta = '';
                 me.cuenta = '';
                 me.codigo = '';
-                me.id_tercero_det = '';
-                me.tercero_det_aux = '';            
+                me.tercero_id2 = '';
+                me.tercero_doc2 = '';
+                me.tercero_id2 = '';
+                me.tercero2 = '';
                 me.diferencia = parseFloat(me.debito) - parseFloat(me.credito);
 
-                var mylist = document.getElementById("tercero_detalle_id");
-                var listitems= mylist.getElementsByClassName("form-control");
-                listitems[0].value = '';
+                // var mylist = document.getElementById("tercero_detalle_id");
+                // var listitems= mylist.getElementsByClassName("form-control");
+                // listitems[0].value = '';
             }
             
         },
@@ -1007,6 +1066,7 @@ export default {
         },
         mostrarDetalle(){
             let me=this;
+            me.getNumeroNext();
             if(me.tipo_formato_new == '')
             {
                swal({  type: 'error',  title: 'Error...',
@@ -1016,7 +1076,8 @@ export default {
             }
             else{
                 
-                 me.listado=0;
+                me.listado=0;
+                console.log('numero: '+me.numero);
                 $('#tipo_formato_new').attr('readonly', true);
                 $('#tipo_formato_new').attr('disabled', true);
                 
@@ -1028,6 +1089,8 @@ export default {
             this.arrayDetalle = null;
             this.arrayDetalle = [];
             this.detalle='';
+            this.numero = '';
+            this.tipo_formato_new = '';
             $('#tipo_formato_new').attr('readonly', false);
             $('#tipo_formato_new').attr('disabled', false);
         },
@@ -1037,9 +1100,10 @@ export default {
                 return;
             }
             let me = this;
+            
             this.getNumeroNext();
             axios.post(this.ruta +'/formatos/registrar',{
-                'id_tercero': this.id_tercero,
+                'id_tercero': this.tercero_id,
                 'formato': this.tipo_formato_new,
                 'fecha' : this.fecha,
                 'subtotal' : this.subtotal,
@@ -1101,6 +1165,13 @@ export default {
                 $('#tipo_formato_new').attr('disabled', false);
                 //window.open(this.ruta +'/formatos/pdf/'+ response.data.id + ',' + '_blank');
 
+                me.tercero = '';
+                me.tercero_doc = '';
+                me.tercero_id = '';
+                me.tercero2 = '';
+                me.tercero_doc2 = '';
+                me.tercero_id2 = '';
+
             }).catch(function (error) {
                 console.log(error);
             });  
@@ -1112,7 +1183,7 @@ export default {
             me.errorMostrarMsjFormato = [];
             var cuent;
 
-            if(me.id_tercero=='')   me.errorMostrarMsjFormato.push("Seleccione un Tercero");
+            if(me.tercero_id=='')   me.errorMostrarMsjFormato.push("Seleccione un Tercero");
             if(me.fecha == '')   me.errorMostrarMsjFormato.push("Seleccione una fecha");
             if(me.detalle == '')   me.errorMostrarMsjFormato.push("Digite el detalle");
             if(me.forma_pago == '' && me.tipo_f_nom !='Cuentas')   me.errorMostrarMsjFormato.push("Selecione la forma de pago");
@@ -1270,13 +1341,17 @@ export default {
             //Obtener los datos del ingreso
             var arrayFormatosT=[];
             var url= this.ruta +'/formatos/obtenerCabecera?id=' + id;
+
+            this.getNumeroNext();
             
             axios.get(url).then(function (response) {
                 var respuesta= response.data;
                 var AuxFormato = respuesta.formato;
                 //console.log(AuxFormato[0]['formato']);
                 me.fecha = AuxFormato[0]['fecha'];
-                me.id_tercero = AuxFormato[0]['id_persona'],
+                me.tercero_id = AuxFormato[0]['id_persona'],
+                me.tercero_doc = AuxFormato[0]['num_doc'],
+                me.tercero = AuxFormato[0]['nombre1']+' - '+AuxFormato[0]['apellido1'],
                 me.tipo_formato_new = AuxFormato[0]['formato'],                
                 me.subtotal = AuxFormato[0]['subtotal'],
                 me.total = AuxFormato[0]['total'],
@@ -1292,7 +1367,7 @@ export default {
                 me.numero = AuxFormato[0]['numero'],
                 me.doc_afecta_long = AuxFormato[0]['doc_afecta_long'],
                 me.cambiar_tipo_f();
-                me.selectCliente2(me.id_tercero);
+                // me.selectCliente2(me.id_tercero);
             })
             .catch(function (error) {
                 console.log(error);
@@ -1319,7 +1394,7 @@ export default {
             this.getNumeroNext();
             axios.put(this.ruta +'/formatos/actualizar',{
                 'id' : this.registro_id,
-                'id_tercero': this.id_tercero,
+                'id_tercero': this.tercero_id,
                 'formato': this.tipo_formato_new,
                 'fecha' : this.fecha,
                 'subtotal' : this.subtotal,
@@ -1380,6 +1455,14 @@ export default {
                 me.arrayDetalle= [];
                 me.arrayAfectados= [];
                 me.arrayAuxChecksAfecst = [];   me.arrayChecksAfecst = [];  me.arrayValsAfecst=[];  me.arrayAuxValsAfecst=[];
+
+                me.tercero = '';
+                me.tercero_doc = '';
+                me.tercero_id = '';
+                me.tercero2 = '';
+                me.tercero_doc2 = '';
+                me.tercero_id2 = '';
+
                 me.listarRegistros(1);
                 
 
@@ -1391,7 +1474,7 @@ export default {
             window.open(this.ruta +'/formatos/pdf/'+ id + ',' + '_blank');
         },    
         cargarCuentaB(cuenta){
-            let me=this;  
+            let me=this;
             me.codigo= cuenta['codigo'];
             me.id_cuenta= cuenta['id'];
             me.cuenta= cuenta['nombre'];
@@ -1406,15 +1489,17 @@ export default {
                 $( "#credito" ).val('');
             }
             me.tipo=cuenta['tipo'];
-            if(me.id_tercero_det == '' ){
+            if( me.tercero_id2 == ''){
                 me.arrayCliente_detalle = me.arrayCliente;
-                me.id_tercero_det =  me.id_tercero;
-                me.tercero_det_aux = me.num_documento
-                var mylist = document.getElementById("tercero_detalle_id");                           
-                var listitems= mylist.getElementsByClassName("form-control");
+                // me.id_tercero_det =  me.id_tercero;
+                // me.tercero_det_aux = me.num_documento
+                me.tercero2 = me.tercero;
+                me.tercero_id2 = me.tercero_id;
+                // var mylist = document.getElementById("tercero_detalle_id");                           
+                // var listitems= mylist.getElementsByClassName("form-control");
                 //var aux1 = $('#tercero_detalle_id').children('input').attr("placeholder", "Type your answer here");
                 //listitems[0].attr("placeholder", "Type your answer here");
-                var aux11 = $("#tercero_detalle_id").children().children().attr("placeholder", me.aux_nom_y_ced);
+                // var aux11 = $("#tercero_detalle_id").children().children().attr("placeholder", me.aux_nom_y_ced);
                 //$("#tercero_detalle_id").first().append( "<span class='selected-tag'>Luis  Monsalve  - 3839<!----></span>");
                 //aux11.append( "<span class='selected-tag'>Luis  Monsalve  - 3839<!----></span>");
                 //console.log(aux11[0]);  
@@ -1457,8 +1542,6 @@ export default {
             axios.get(url).then(function (response) {
                 var respuesta= response.data;
                 me.arrayCuentasBusq = respuesta.cuentas;
-
-                
             })
             .catch(function (error) {
                 console.log(error);
@@ -1509,8 +1592,12 @@ export default {
             me.arrayAuxChecksAfecst = me.arrayChecksAfecst;
             me.arrayAuxValsAfecst = me.arrayValsAfecst;
             var auxiliar = document;
-            var mylist = auxiliar.getElementById('selectCliente');
-            var listitems= mylist.getElementsByClassName("form-control");
+            // var mylist = auxiliar.getElementById('selectCliente');
+            // var listitems= mylist.getElementsByClassName("form-control");
+            // var listitems;
+            // me.arrayDetalle.forEach( function(datos){
+            //     listitems = datos;
+            // })
             var aux_ingresar_c="";
             var aux_saldo=0;
             listitems[0].readOnly = true;
@@ -1529,7 +1616,7 @@ export default {
 
         },
         get_x_afectar(){
-            //console.log("llega");
+            // console.log("llega");
             let me=this; 
             //if(me.arrayValsAfecst.length<=0){
                 me.arrayValsAfecst = [];
@@ -1538,14 +1625,15 @@ export default {
                 me.arrayAfectadosBusqData = [];
                 me.arrayAfectadosBusq = [];
 
-                var url= this.ruta +'/cuentas/get_x_afectar?id_tercero=' + me.id_tercero;
+                var url= this.ruta +'/cuentas/get_x_afectar?id_tercero=' + me.tercero_id;
+                
                 var resultado = [];
                 
                 axios.get(url).then(function (response) {
                     //arrayAfectadosBusq
                     var respuesta= response.data;
                     resultado = respuesta.afectados                
-                    //console.log(resultado);                                        
+                    // console.log(resultado);
                     resultado
                     me.arrayAfectadosBusq=resultado;
                                     
@@ -1585,7 +1673,7 @@ export default {
                     text: 'Debe seleccionar la fuente del pago para realizar la afectación!!!',
                 })
             else{
-                if(this.id_tercero==""){
+                if(this.tercero_id==""){
                      swal({  type: 'error',  title: 'Error...',
                         text: 'Debe seleccionar un tercero para realizar la afectación!!!',
                     })
@@ -1616,9 +1704,24 @@ export default {
         abrirModalTerceros(accion){
             let me=this;
             me.arrayTerceros=[];
-            me.modalTerceros = 1;
-            me.titulomodalTerceros = 'Seleccione un tercero';
-            me.tipoAccionModalTerceros = 1;
+            
+            switch(accion)
+            {
+                case 'tercero_filtro1':
+                {
+                    me.modalTerceros = 1;
+                    me.titulomodalTerceros = 'Seleccione un tercero filtro 1';
+                    me.tipoAccionModalTerceros = 1;
+                    break;
+                }
+                case 'tercero_filtro2':
+                {
+                    me.modalTerceros = 1;
+                    me.titulomodalTerceros = 'Seleccione un tercero filtro 2';
+                    me.tipoAccionModalTerceros = 2;
+                    break;
+                }
+            }
         },
         cerrarModalT(){
             let me=this;
@@ -1627,8 +1730,21 @@ export default {
             me.terc_busq = '';
         },
         cargarTercero(tercero){
-            this.tercero = tercero['num_documento'];
-            this.tercero_id = tercero['id'];
+            switch(this.tipoAccionModalTerceros)
+            {
+                case 1:{
+                    this.tercero = tercero['num_documento']+' - '+tercero['nombre1']+' '+tercero['apellido1'];
+                    this.tercero_id = tercero['id'];
+                    this.tercero_doc = tercero['num_documento'];
+                    break;
+                }
+                case 2:{
+                    this.tercero2 = tercero['num_documento']+' - '+tercero['nombre1']+' '+tercero['apellido1'];
+                    this.tercero_id2 = tercero['id'];
+                    this.tercero_doc2 = tercero['num_documento'];
+                    break;
+                }
+            }
             this.cerrarModalT();
         },
         buscarTercero(){
@@ -1652,8 +1768,19 @@ export default {
         },
         quitar(opc){
             //alert(opc);
-            this.tercero_id = '';
-            this.tercero = '';
+            switch(opc)
+            {
+                case 1:{
+                    this.tercero_id = '';
+                    this.tercero = '';
+                    break;
+                }
+                case 2:{
+                    this.tercero_id2 = '';
+                    this.tercero2 = '';
+                    break;
+                }
+            }
         }
     },
     mounted() {
@@ -1677,6 +1804,7 @@ export default {
         this.selectTipoFormato();
         this.selectFuentes();
         this.getNumeroNext();
+        console.log(this.permisosUser);
     },
 }
 </script>

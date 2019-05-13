@@ -23,20 +23,15 @@
             margin-left: -2%;
             margin-right: -4%;
         }
-        #logo img{
+        #logo2{
             float: left;
-            width: 200px;
-            height: 104px;
-            margin-right: 20px;
-            margin-left: 23px;
-        }
-
-        #imagen2{
-            float: left;
-            width: 200px;
             margin-top: 0%;
             margin-left: 0%;
             margin-right: 0%;
+        }
+
+        #imagen2{
+            width: 200px;
         }
         #imagen{
             width: 60px;
@@ -125,24 +120,24 @@
             <header>
                 <div id="logo">
                    <!-- <img src="img/logo2.png" alt="incanatoIT" id="imagen">  -->                   
-                   <img src="../..//logos/1_empresa/{{$f->logo_empresa}}" alt="incanatoIT" id="imagen2">
+                   <img src="../../img/logo2.png" alt="incanatoIT" id="imagen2">
                 </div>
                
                 <div id="datos">
                     <p id="encabezado">
                         <b><span style="font-weight: bolder;">EMPRESA DE COFRES FUNERARIOS</span></b><br>
                         <b><!--<span>EMCOFUNERAL LA PAZ S.A.S</span>--><span>{{ $f->nom_empresa }}</span></b><br> 
-                        NIT {{ $f->nit_empresa}} - Régimen Común
-                        <br>Cel: {{ $f->celular_empresa }}<br>
-                        <span style="font-size: 10px;margin-bottom: 3px;" >E-MAIL: {{ $f->correo_empresa }}</span><br>
+                        NIT 901022959-0 - Régimen Común
+                        <br>Cel: 3202479589 - 3115946736<br>
+                        <span style="font-size: 10px;margin-bottom: 3px;" >E-MAIL:emcofuneraleslapaz@hotmail.com</span><br>
                         <hr style="margin-top: -10px; margin-bottom: 3px; border-color: #0d520d;" size="2" noshade="noshade" >
-                        <span style="font-size: 8px;"><b>{{ $f->direccion_empresa}} - Tel: {{ $f-> telefono_empresa }} - Puerto Asís - Putumayo</b></span>
+                        <span style="font-size: 8px;"><b>Crr 29 No 12 -14 B/ Allende - Tel: 4229808 - Puerto Asís - Putumayo</b></span>
                         
                     </p>
                 </div>
                 <div id="logo2">                   
                         <!-- <img src="img/logo2.png" alt="incanatoIT" id="imagen">  -->                    
-                        <img src="../..//logos/1_empresa/{{$f->logo_empresa}}" alt="incanatoIT" id="imagen"></span>
+                        <img src="../..//img/logo-remanso.png" alt="incanatoIT" id="imagen">
                      </div>
                 <div id="fact">
                     <p style="margin-bottom: -10px;background-color: #b4f1b0;"><b>{{$f->nombre_formato}}</b><br><center></p>

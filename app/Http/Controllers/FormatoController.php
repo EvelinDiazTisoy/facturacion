@@ -255,7 +255,7 @@ class FormatoController extends Controller
                 $cuenta->usuario = \Auth::user()->id;
                 $cuenta->doc_afecta_long = $cue['doc_afecta_long'];
                 $cuenta->doc_externo = $cue['doc_externo'];
-                $cuenta->doc_externo = $cue['saldo_cuent'];
+                // $cuenta->saldo_cuent = $cue['saldo_cuent'];
                 if($t_f=='Cuentas'&&$cuenta->num_cuenta[0]=='2'){
                     $cuenta->saldo_cuent = $cue['credito'];
                 }
@@ -308,7 +308,7 @@ class FormatoController extends Controller
         $formatos = Formatos::join('personas','formatos.tercero','=','personas.id')
         ->join('users','formatos.usuario','=','users.id')
         ->join('conf_formatos','formatos.formato','=','conf_formatos.id')
-        ->select('formatos.id','conf_formatos.nombre_formato','formatos.numero','formatos.fecha','formatos.detalle', 'formatos.condicion','personas.nombre','personas.num_documento','personas.id as id_persona','users.usuario',
+        ->select('formatos.id','conf_formatos.nombre_formato','formatos.numero','formatos.fecha','formatos.detalle', 'formatos.condicion','personas.nombre','personas.num_documento','personas.id as id_persona','personas.nombre1','personas.apellido1','users.usuario',
         'conf_formatos.tipo','formatos.haberes','formatos.debes', 'subtotal','impuesto', 'vr_impuesto', 'total', 'cerrado','forma_pago','formatos.formato')
         ->where('formatos.id','=',$id)->orderBy('formatos.id', 'desc')->take(1)->get();
         
@@ -332,6 +332,33 @@ class FormatoController extends Controller
         $formato = Formatos::join('personas','formatos.tercero','=','personas.id')
         ->join('users','formatos.usuario','=','users.id')
         ->join('conf_formatos','formatos.formato','=','conf_formatos.id')
+        ->join('empresas', 'formatos.id_empresa','=','empresas.id')
+        ->select('formatos.id','conf_formatos.nombre_formato','formatos.numero','formatos.fecha','formatos.detalle', 'formatos.condicion','personas.nombre','personas.tipo_documento','email','personas.telefono','personas.direccion','personas.num_documento','personas.id as id_persona','users.usuario',
+        'conf_formatos.tipo','formatos.haberes','formatos.debes', 'subtotal','impuesto', 'vr_impuesto', 'total', 'cerrado'
+        ,'personas.nombre1','personas.nombre2','personas.apellido1','personas.apellido2',
+        'empresas.id as id_empresa','empresas.nombre as nom_empresa', 'empresas.nit as nit_empresa','empresas.celular as cel_empresa', 'empresas.correo as correo_empresa', 'empresas.direccion as direccion_empresa', 'empresas.telefono as telefono_empresa','empresas.logo as logo_empresa')
+        ->where('formatos.id','=',$id)->orderBy('formatos.id', 'desc')->take(1)->get();
+
+        $detalles = Cuentas::join('plan_cuentas','cuentas.cuenta','=','plan_cuentas.id')
+        ->leftJoin('personas','cuentas.tercero','=','personas.id')
+        ->select('cuentas.debe','cuentas.haber','personas.num_documento','plan_cuentas.nombre','plan_cuentas.codigo','cuentas.doc_afecta_long')
+        ->where('cuentas.id_formato','=',$id)
+        ->orderBy('cuentas.id', 'desc')->get();
+
+        $numformato=Formatos::select('numero')->where('id',$id)->get();
+        return view('pdf.formato')->with('formato', $formato)->with('detalles', $detalles);
+        //$pdf = \PDF::loadView('pdf.formato',['formato'=>$formato,'detalles'=>$detalles]);
+        //return $pdf->download('formato-'.$numformato[0]->numero.'.pdf');
+
+
+    }
+
+    /*public function Pdf(Request $request, $id)
+    {
+        
+        $formato = Formatos::join('personas','formatos.tercero','=','personas.id')
+        ->join('users','formatos.usuario','=','users.id')
+        ->join('conf_formatos','formatos.formato','=','conf_formatos.id')
         ->select('formatos.id','conf_formatos.nombre_formato','formatos.numero','formatos.fecha','formatos.detalle', 'formatos.condicion','personas.nombre','personas.tipo_documento','email','telefono','direccion','personas.num_documento','personas.id as id_persona','users.usuario',
         'conf_formatos.tipo','formatos.haberes','formatos.debes', 'subtotal','impuesto', 'vr_impuesto', 'total', 'cerrado'
         ,'personas.nombre1','personas.nombre2','personas.apellido1','personas.apellido2')
@@ -349,5 +376,5 @@ class FormatoController extends Controller
         //return $pdf->download('formato-'.$numformato[0]->numero.'.pdf');
 
 
-    }
+    }*/
 }

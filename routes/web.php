@@ -94,6 +94,14 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/rol/activar', 'RolController@activar');
         Route::get('/rol/permisos', 'RolController@listarPermisos');
         Route::get('/rol/selectRol', 'RolController@selectRol');
+
+        Route::get('/configgenerales', 'ConfigGeneralesController@index');
+        Route::post('configgenerales/registrar', 'ConfigGeneralesController@store');
+        Route::post('configgenerales/actualizar', 'ConfigGeneralesController@update');
+        Route::put('/configgenerales/desactivar', 'ConfigGeneralesController@desactivar');
+        Route::put('/configgenerales/activar', 'ConfigGeneralesController@activar');
+        Route::get('/configgenerales/permisos', 'ConfigGeneralesController@listarPermisos');
+        Route::get('/configgenerales/selectRol', 'ConfigGeneralesController@selectRol');
         
         Route::get('/modulo', 'ModuloController@index');
         Route::post('/modulo/registrar', 'ModuloController@store');
@@ -120,8 +128,19 @@ Route::group(['middleware'=>['auth']],function(){
         Route::post('/listar_permisos', 'PermisosController@listarPermisos');
         Route::get('/listar_permisos2', 'PermisosController@listarPermisos2');
         Route::get('/permisos/listarPermisosLogueado', 'PermisosController@listarPermisosLogueado');
+        Route::get('/permisos/recargarPermisos', 'PermisosController@recargarPermisos');
 
-        // Rutas del plan de cuentas y de formatos
+        // Rutas del plan de cuentas, informe auxiliares, retenciones y de formatos
+        Route::get('/info_auxiliares/selectInformes', 'InfAuxiliaresController@selectInformes');
+        Route::get('/info_auxiliares/aux_con_saldos', 'InfAuxiliaresController@AuxConSaldos');
+        Route::get('/info_auxiliares', 'InfAuxiliaresController@index');
+
+        Route::get('/retenciones', 'RetencionesController@index');        
+        Route::post('/retenciones/registrar', 'RetencionesController@store');        
+        Route::put('/retenciones/actualizar', 'RetencionesController@update');
+        Route::put('/retenciones/desactivar', 'RetencionesController@desactivar');
+        Route::put('/retenciones/activar', 'RetencionesController@activar');
+
         Route::get('/planCuentas', 'PlanCuentas@index');        
         Route::post('/planCuentas/registrar', 'PlanCuentas@store');        
         Route::put('/planCuentas/actualizar', 'PlanCuentas@update');

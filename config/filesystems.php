@@ -43,6 +43,10 @@ return [
 
     'disks' => [
 
+        'docLogos' => [
+            'driver' => 'local',
+            'root' => public_path('logos'),
+        ],
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),

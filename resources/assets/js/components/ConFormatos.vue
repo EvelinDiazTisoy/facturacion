@@ -9,7 +9,10 @@
             <div class="card">
                 <div class="card-header">
                     <i class="fa fa-align-justify"></i> Formatos
-                    <button type="button" @click="abrirModal('conf_formatos','registrar')" class="btn btn-secondary">
+                    <button v-if="permisosUser.crear" type="button" @click="abrirModal('conf_formatos','registrar')" class="btn btn-primary" title="Nuevo">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                    <button v-else type="button" class="btn btn-secondary" title="Nuevo">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
                 </div>
@@ -17,12 +20,20 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <select class="form-control col-md-3" v-model="criterio">
+                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                     <option value="nombre_formato">Nombre</option>
                                     <option value="tipo">Tipo Comprobante</option>
                                 </select>
-                                <input type="text" v-model="buscar" @keyup.enter="listarConf_formatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                <button type="submit" @click="listarConf_formatos(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                <select v-else disabled class="form-control col-md-3" v-model="criterio">
+                                    <option value="nombre_formato">Nombre</option>
+                                    <option value="tipo">Tipo Comprobante</option>
+                                </select>
+
+                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarConf_formatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+                                <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+
+                                <button v-if="permisosUser.leer" type="submit" @click="listarConf_formatos(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                <button v-else type="submit" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
                             </div>
                         </div>
                     </div>
@@ -35,7 +46,7 @@
                                 <th>Editar</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="permisosUser.leer">
                             <tr v-for="conf_for in arrayConf_formatos" :key="conf_for.id">
                                 <td v-text="conf_for.tipo"></td>           
                                 <td v-text="conf_for.nombre_formato"></td>                                
@@ -49,11 +60,17 @@
                                     
                                 </td>
                                 <td>
-                                    <button type="button" @click="abrirModal('conf_formatos','actualizar',conf_for)" class="btn btn-warning btn-sm">
+                                    <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('conf_formatos','actualizar',conf_for)" class="btn btn-warning btn-sm" title="Editar">
+                                        <i class="icon-pencil"></i>
+                                    </button>
+                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
                                         <i class="icon-pencil"></i>
                                     </button> &nbsp;                                        
                                 </td>
                             </tr>                                
+                        </tbody>
+                        <tbody v-else>
+                            <tr><span>Nada para mostrar</span></tr>
                         </tbody>
                     </table>
                     <nav>
@@ -154,7 +171,7 @@
 
 <script>
     export default {
-        props : ['ruta'],
+        props : ['ruta', 'permisosUser'],
         data (){
             return {
                 conf_formato_id: 0,
