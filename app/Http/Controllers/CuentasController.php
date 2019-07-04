@@ -33,6 +33,26 @@ class CuentasController extends Controller
         }
         return ['fuentes'=>$aux_f];
     }
+    public function get_fuentes2(Request $request){
+        $id_cuenta = $request->id_cuenta;
+        //echo "id_cuenta=$id_cuenta";   
+        $cons="SELECT id,nombre from plan_cuentas where  condicion=1 and tipo_cuenta = 'Cuenta compra' order by nombre";
+        $cons2="SELECT id,nombre from plan_cuentas where  condicion=1 and tipo_cuenta = 'Cuenta salida almacen' order by nombre";
+        
+        $fuentes = DB::select($cons);     
+        $fuentes2 = DB::select($cons2);
+        $aux_f = array();
+        foreach($fuentes as $a){
+            //print_r($a);
+            $aux_f[$a->id]=$a;
+        }
+        $aux_f2 = array();
+        foreach($fuentes2 as $a2){
+            //print_r($a);
+            $aux_f2[$a2->id]=$a2;
+        }
+        return ['fuentes'=>$aux_f,'fuentes2'=>$aux_f2];
+    }
 
     public function get_x_afectar(Request $request){
         $id_tercero = $request->id_tercero;

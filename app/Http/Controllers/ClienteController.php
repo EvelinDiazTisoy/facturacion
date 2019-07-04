@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Persona;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
@@ -14,12 +15,13 @@ class ClienteController extends Controller
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
+        $id_empresa = $request->session()->get('id_empresa');
         
         if ($buscar==''){
-            $personas = Persona::orderBy('id', 'desc')->paginate(20);
+            $personas = Persona::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(20);
         }
         else{
-            $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(20);
+            $personas = Persona::where($criterio, 'like', '%'. $buscar . '%')->where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(20);
         }
         
 
@@ -40,6 +42,7 @@ class ClienteController extends Controller
        // if (!$request->ajax()) return redirect('/');
 
         $filtro = $request->filtro;
+        $id_empresa = $request->session()->get('id_empresa');
         /*$clientes = Persona::Where('num_documento', 'like', '%'. $filtro . '%')
         ->orWhere('nombre', 'like', '%'. $filtro . '%')
         ->select('id','nombre','num_documento')
@@ -59,7 +62,7 @@ class ClienteController extends Controller
          $id = $request->id;
         
          $cons="select *,case tipo_persona when 'Juridica' then concat(nombre,' - ',num_documento) when 'Natural' then concat(nombre1,' ',nombre2,' ',apellido1,' ',apellido2,' - ',num_documento) when '' then concat(nombre,' - ',num_documento) end as nom_y_ced from personas 
-         where id = $id order by nombre asc";
+         where id = $id and where 'id_empresa'='$id_empresa' order by nombre asc";
          //echo $cons;
          $clientes = DB::select($cons);
          return ['clientes' => $clientes]; 
@@ -68,19 +71,25 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+        $id_usuario = Auth::user()->id;
+        $id_empresa = $request->session()->get('id_empresa');
+
         $persona = new Persona();
         if(!$request->nombre)  $persona->nombre = ''; else    $persona->nombre = $request->nombre;
         $persona->nombre = $request->nombre;
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
         $persona->direccion = $request->direccion;
-        $persona->telefono = $request->telefono;
+        $persona->telefono1 = $request->telefono1;
+        $persona->telefono2 = $request->telefono2;
+        $persona->celular = $request->celular;
         $persona->sexo = $request->sexo;
         $persona->regimen = $request->regimen;
         $persona->fec_nac = $request->fec_nac;
         $persona->reside = $request->reside;
         $persona->representante = $request->representante;
         $persona->email = $request->email;
+        $persona->email2 = $request->email2;
         $persona->tipo_persona = $request->tipo_persona;
         $persona->entidad = $request->entidad;       
         if(!$request->nombre1)  $persona->nombre1 = ''; else    $persona->nombre1 = $request->nombre1;
@@ -95,6 +104,30 @@ class ClienteController extends Controller
             $persona->digito_verif = "0";  
             $persona->num_verif = "";  
         } 
+
+        $persona->autoretenedor = $request->autoretenedor;
+        $persona->declarante = $request->declarante;
+        $persona->cliente = $request->cliente;
+        $persona->proveedor = $request->proveedor;
+        $persona->id_vendedor = $request->id_vendedor;
+        $persona->id_zona = $request->id_zona;
+        $persona->plazo_pago = $request->plazo_pago;
+        $persona->bloquear = $request->bloquear;
+        $persona->cupo_credito = $request->cupo_credito;
+        $persona->retenedor_fuente = $request->retenedor_fuente;
+        $persona->retenedor_iva = $request->retenedor_iva;
+        $persona->excluido_iva = $request->excluido_iva;
+        $persona->autoretefuente = $request->autoretefuente;
+        $persona->autoreteiva = $request->autoreteiva;
+        $persona->autoreteica = $request->autoreteica;
+        $persona->id_banco = $request->id_banco;
+        $persona->num_cuenta_banco = $request->num_cuenta_banco;
+        $persona->tipo_cuenta = $request->tipo_cuenta;
+        $persona->representante_cuenta = $request->representante_cuenta;
+        $persona->tipo_nacionalidad = $request->tipo_nacionalidad;
+        $persona->departamento = $request->departamento;
+        $persona->municipio = $request->municipio;
+        $persona->id_empresa = $id_empresa;
         
 
         $persona->save();
@@ -108,8 +141,11 @@ class ClienteController extends Controller
         $persona->tipo_documento = $request->tipo_documento;
         $persona->num_documento = $request->num_documento;
         $persona->direccion = $request->direccion;
-        $persona->telefono = $request->telefono;
+        $persona->telefono1 = $request->telefono1;
+        $persona->telefono2 = $request->telefono2;
+        $persona->celular = $request->celular;
         $persona->email = $request->email;
+        $persona->email2 = $request->email2;
         $persona->sexo = $request->sexo;
         $persona->regimen = $request->regimen;
         $persona->fec_nac = $request->fec_nac;
@@ -130,6 +166,29 @@ class ClienteController extends Controller
             $persona->digito_verif = "0";  
             $persona->num_verif = "";  
         } 
+
+        $persona->autoretenedor = $request->autoretenedor;
+        $persona->declarante = $request->declarante;
+        $persona->cliente = $request->cliente;
+        $persona->proveedor = $request->proveedor;
+        $persona->id_vendedor = $request->id_vendedor;
+        $persona->id_zona = $request->id_zona;
+        $persona->plazo_pago = $request->plazo_pago;
+        $persona->bloquear = $request->bloquear;
+        $persona->cupo_credito = $request->cupo_credito;
+        $persona->retenedor_fuente = $request->retenedor_fuente;
+        $persona->retenedor_iva = $request->retenedor_iva;
+        $persona->excluido_iva = $request->excluido_iva;
+        $persona->autoretefuente = $request->autoretefuente;
+        $persona->autoreteiva = $request->autoreteiva;
+        $persona->autoreteica = $request->autoreteica;
+        $persona->id_banco = $request->id_banco;
+        $persona->num_cuenta_banco = $request->num_cuenta_banco;
+        $persona->tipo_cuenta = $request->tipo_cuenta;
+        $persona->representante_cuenta = $request->representante_cuenta;
+        $persona->tipo_nacionalidad = $request->tipo_nacionalidad;
+        $persona->departamento = $request->departamento;
+        $persona->municipio = $request->municipio;
         
         $persona->save(); 
     }

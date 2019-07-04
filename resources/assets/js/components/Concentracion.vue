@@ -9,7 +9,10 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Concentracion
-                        <button type="button" @click="abrirModal('concentracion','registrar')" class="btn btn-secondary">
+                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('concentracion','registrar')" class="btn btn-primary">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>
+                        <button v-else type="button" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -17,30 +20,59 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarConcentracion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarConcentracion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <select v-else disabled class="form-control col-md-3" v-model="criterio">
+                                    </select>
+
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarConcentracion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
+
+                                    <button v-if="permisosUser.leer" type="submit" @click="listarConcentracion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th class="col-md-11">Nombre</th>
                                     <th>Opciones</th>
-                                    <th class="col-md-1">Nombre</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="permisosUser.leer">
                                 <tr v-for="concentracion in arrayConcentracion" :key="concentracion.id">
+                                    <td v-text="concentracion.nombre"></td>
                                     <td>
-                                        <button type="button" @click="abrirModal('concentracion','actualizar',concentracion)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && concentracion.estado" type="button" @click="abrirModal('concentracion','actualizar',concentracion)" class="btn btn-warning btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
+
+                                        <template v-if="permisosUser.anular">
+                                            <button v-if="concentracion.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarConcentracion(concentracion.id)">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarConcentracion(concentracion.id)">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
+                                        <template v-else>
+                                            <button v-if="concentracion.estado" type="button" class="btn btn-secondary btn-sm">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
                                     </td>
-                                    <td v-text="concentracion.nombre"></td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr><td colspan="2">No hay registros para mostrar</td></tr>
                             </tbody>
                         </table>
                         <nav>
@@ -105,7 +137,7 @@
 
 <script>
     export default {
-        props : ['ruta'],
+        props : ['ruta', 'permisosUser'],
         data (){
             return {
                 concentracion_id: 0,
@@ -220,6 +252,84 @@
                 if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
 
                 return this.errorConcentracion;
+            },
+            desactivarConcentracion(id){
+               swal({
+                title: 'Esta seguro de desactivar esta concentracion?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/concentracion/desactivar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.listarConcentracion(1,'','nombre');
+                        swal(
+                        'Desactivado!',
+                        'El registro ha sido desactivado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
+            },
+            activarConcentracion(id){
+               swal({
+                title: 'Esta seguro de activar esta concentracion?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/concentracion/activar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.listarConcentracion(1,'','nombre');
+                        swal(
+                        'Activado!',
+                        'El registro ha sido activado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
             },
             cerrarModal(){
                 this.modal=0;

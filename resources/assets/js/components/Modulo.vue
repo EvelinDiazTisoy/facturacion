@@ -25,19 +25,19 @@
                                 </div>
                             </div>
                         </div>
-                        <table class="table table-bordered table-striped table-sm">
+                        <table class="table table-bordered table-striped table-sm" style="overflow-y: auto;max-height: 23.7em !important;display: block;border: none;">
                             <thead>
                                 <tr>
-                                    <th>Nombre</th>
-                                    <th>Descripcion</th>
-                                    <th>Componente</th>
-                                    <th>Menu</th>
-                                    <th>Tipo</th>
-                                    <th>Icono</th>
-                                    <th>Template</th>
-                                    <th>Padre</th>
-                                    <th>Estado</th>
-                                    <th>Opciones</th>
+                                    <th class="col-md-2">Nombre</th>
+                                    <th class="col-md-2">Descripcion</th>
+                                    <th class="col-md-1">Componente</th>
+                                    <th class="col-md-1">Menu</th>
+                                    <th class="col-md-1">Tipo</th>
+                                    <th class="col-md-1">Icono</th>
+                                    <th class="col-md-1">Template</th>
+                                    <th class="col-md-1">Padre</th>
+                                    <th class="col-md-1">Estado</th>
+                                    <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>

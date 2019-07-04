@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Roles
-                        <button type="button" @click="abrirModal('roles','registrar')" class="btn btn-secondary">
+                        <button type="button" @click="abrirModal('roles','registrar')" class="btn btn-primary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -20,7 +20,9 @@
                                     <select class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>
                                     </select>
+
                                     <input type="text" v-model="buscar" @keyup.enter="listarRol(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+
                                     <button type="submit" @click="listarRol(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
@@ -29,8 +31,8 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Estado</th>
-                                    <th>Opciones</th>
+                                    <th class="col-md-1">Estado</th>
+                                    <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -53,13 +55,11 @@
                                           <i class="icon-pencil"></i>
                                         </button>
 
-                                        <template v-if="rol.estado">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.id)">
+                                        <template>
+                                            <button v-if="rol.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.id)">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                        </template>
-                                        <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarRol(rol.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarRol(rol.id)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -102,16 +102,16 @@
                                             <input type="text" v-model="nombre" class="form-control" placeholder="Nombre del rol">
                                         </div>
                                     </div>
-                                    <div class="container-fluid form-group row">
-                                        <table class="table table-bordered table-striped table-sm col-md-11">
+                                    <div class="row" style="padding: 0em 1em;">
+                                        <table class="table table-bordered table-striped table-sm" style="overflow-y: auto;max-height: 26em !important;display: block;border: none;">
                                             <thead>
                                                 <tr>
-                                                    <th>Modulo</th>
-                                                    <th>Ver</th>
-                                                    <th>Crear</th>
-                                                    <th>Editar</th>
-                                                    <th>Anular</th>
-                                                    <th>Imprimir</th>
+                                                    <th class="col-md-7">Modulo</th>
+                                                    <th class="col-md-1">Ver</th>
+                                                    <th class="col-md-1">Crear</th>
+                                                    <th class="col-md-1">Editar</th>
+                                                    <th class="col-md-1">Anular</th>
+                                                    <th class="col-md-1">Imprimir</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -134,6 +134,20 @@
                                                     <td v-if="permisos.tipo==1" style="background: #dae3e8;" ><input type="checkbox" v-model="permisos.imprimir" value=""></td>
                                                     <td v-else style="background: #ffffff;" ><input type="checkbox" v-model="permisos.imprimir" value=""></td>
                                                 </tr>
+
+                                                <!--<tr v-for="permisos in arrayPermisos" :key="permisos.id">
+                                                    <td v-text="permisos.nombre"></td>
+
+                                                    <td><input type="checkbox" v-model="permisos.lectura" value=""></td>
+
+                                                    <td><input type="checkbox" v-model="permisos.escritura" value=""></td>
+
+                                                    <td><input type="checkbox" v-model="permisos.edicion" value=""></td>
+
+                                                    <td><input type="checkbox" v-model="permisos.anular" value=""></td>
+
+                                                    <td><input type="checkbox" v-model="permisos.imprimir" value=""></td>
+                                                </tr>-->
                                             </tbody>
                                         </table>
                                     </div>
@@ -465,7 +479,7 @@
                                 //console.log(data);
                                 this.rol_id = data['id'];
                                 this.modal=1;
-                                this.tituloModal='Actualizar Cliente';
+                                this.tituloModal='Actualizar Rol';
                                 this.tipoAccion=2;
                                 this.nombre = data['nombre'];
                                 this.validarNombre = data['nombre'];

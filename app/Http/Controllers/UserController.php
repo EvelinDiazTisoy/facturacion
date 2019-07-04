@@ -19,13 +19,13 @@ class UserController extends Controller
         if ($buscar==''){
             $personas = User::join('personas','users.id','=','personas.id')
             ->join('roles','users.idrol','=','roles.id')
-            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono','personas.email','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol')
+            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono1','personas.email','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol')
             ->orderBy('personas.id', 'desc')->paginate(6);
         }
         else{
             $personas = User::join('personas','users.id','=','personas.id')
             ->join('roles','users.idrol','=','roles.id')
-            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono','personas.email','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol')
+            ->select('personas.id','personas.nombre','personas.tipo_documento','personas.num_documento','personas.direccion','personas.telefono1','personas.email','users.usuario','users.password','users.condicion','users.idrol','roles.nombre as rol')
             ->where('personas.'.$criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);
         }
         
@@ -54,7 +54,7 @@ class UserController extends Controller
             $persona->tipo_documento = $request->tipo_documento;
             $persona->num_documento = $request->num_documento;
             $persona->direccion = $request->direccion;
-            $persona->telefono = $request->telefono;
+            $persona->telefono1 = $request->telefono;
             $persona->email = $request->email;
             $persona->save();
 
@@ -85,7 +85,7 @@ class UserController extends Controller
             $persona->tipo_documento = $request->tipo_documento;
             $persona->num_documento = $request->num_documento;
             $persona->direccion = $request->direccion;
-            $persona->telefono = $request->telefono;
+            $persona->telefono1 = $request->telefono;
             $persona->email = $request->email;
             $persona->save();
 

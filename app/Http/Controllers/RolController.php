@@ -14,18 +14,19 @@ class RolController extends Controller
     public function index(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         
         if ($buscar==''){
-            $roles = Rol::orderBy('id', 'desc')->get();
+            $roles = Rol::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->get();
         }
         else{
-            $roles = Rol::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->get();
+            $roles = Rol::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->get();
         }
         
-        $roles2 = Rol::select('id','nombre','estado')->groupBy('nombre')->orderBy('id','desc')->paginate(6);
+        $roles2 = Rol::select('id','nombre','estado')->where('id_empresa','=',$id_empresa)->groupBy('nombre')->orderBy('id','desc')->paginate(6);
 
         return [
             'pagination' => [
@@ -172,9 +173,10 @@ class RolController extends Controller
     }
 
     public function listarPermisos(Request $request){
-        // if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
 
         $id_rol = $request->id_rol;
+        $id_empresa = $request->session()->get('id_empresa');
         
         $total = array();
         $modu = array();

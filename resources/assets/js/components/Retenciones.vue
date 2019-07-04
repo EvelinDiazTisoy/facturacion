@@ -61,7 +61,7 @@
 
                                     <td v-text="retencion.monto_base"></td>
 
-                                    <td v-if="retencion.tipo_mov==1">Gasto</td>
+                                    <td v-if="retencion.tipo_mov==1">Egreso</td>
                                     <td v-else-if="retencion.tipo_mov==2">Ingreso</td>
                                     <td v-else-if="retencion.tipo_mov==0">Ambos</td>
                                     <td>
@@ -182,13 +182,17 @@
                                         <div class="col-md-9 float-right">
                                             <select v-model="tipo_mov" class="form-control">
                                                 <option value="">Seleccione</option>
-                                                <option value="1">Gasto</option>
-                                                <option value="2">Ingreso</option>
-                                                <option value="0">Ambos</option>
+                                                <option value="1">Salidas de almacen</option>
+                                                <option value="2">Compras</option>
+                                                <option value="0">Ventas</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6">
+                                        <label class="col-md-3 form-control-label float-left">Porcentaje</label>
+                                        <div class="col-md-9 float-right">
+                                            <input type="number" :min="0" :max="99" v-model="porcentaje" class="form-control col-md-3 float-left"><span style="font-size: 2em;margin-left: 3px;">%</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -207,7 +211,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModal('retenciones')">Cerrar</button>
                             <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarRetencion()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarConcentracion()">Actualizar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarRetencion()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -267,19 +271,17 @@
         props : ['ruta', 'permisosUser'],
         data (){
             return {
-                concentracion_id: 0,
-                nombre : '',
-                arrayConcentracion : [],
-
                 retencion_id: 0,
                 retencion: '',
                 id_cuenta : '',
                 codigo_cuenta : '',
                 cuenta: '',
+                tipo_cuenta: '',
                 autoretenedor: '',
                 declarante: '',
                 monto_base: '0,00',
                 tipo_mov: '',
+                porcentaje: 0,
                 arrayRetenciones: [],
 
                 modal : 0,
@@ -385,10 +387,12 @@
                 axios.post(this.ruta +'/retenciones/registrar',{
                     'retencion': this.retencion,
                     'cuenta': this.id_cuenta,
+                    'tipo_cuenta': this.tipo_cuenta,
                     'autoretenedor': this.autoretenedor,
                     'declarante': this.declarante,
                     'monto_base': this.monto_base,
                     'tipo_mov': this.tipo_mov,
+                    'porcentaje': this.porcentaje,
                 }).then(function (response) {
                     me.cerrarModal('retenciones');
                     me.listarRetenciones(1,'','nombre');
@@ -396,7 +400,7 @@
                     console.log(error);
                 });
             },
-            actualizarConcentracion(){
+            actualizarRetencion(){
                 // if (this.validarConcentracion()){
                 //     return;
                 // }
@@ -406,10 +410,12 @@
                 axios.put(this.ruta +'/retenciones/actualizar',{
                     'retencion': this.retencion,
                     'cuenta': this.id_cuenta,
+                    'tipo_cuenta': this.tipo_cuenta,
                     'autoretenedor': this.autoretenedor,
                     'declarante': this.declarante,
                     'monto_base': this.monto_base,
                     'tipo_mov': this.tipo_mov,
+                    'porcentaje': this.porcentaje,
                     'id': this.retencion_id
                 }).then(function (response) {
                     me.cerrarModal('retenciones');
@@ -517,6 +523,11 @@
                         this.declarante='';
                         this.monto_base='';
                         this.tipo_mov='';
+                        this.id_cuenta = '';
+                        this.cuenta = '';
+                        this.porcentaje = '';
+                        this.retencion_id = 0;
+                        this.tipo_cuenta = '';
                         break;
                     }
                     case 'cuentas':{
@@ -536,15 +547,17 @@
                             case 'registrar':
                             {
                                 this.modal = 1;
-                                this.tituloModal = 'Registrar retencion';
+                                this.tituloModal = 'Registrar retención';
                                 this.retencion = '';
                                 this.id_cuenta = '';
                                 this.codigo_cuenta = '';
                                 this.cuenta = '';
+                                this.tipo_cuenta = '';
                                 this.autoretenedor = '';
                                 this.declarante = '';
                                 this.monto_base = '';
                                 this.tipo_mov = '';
+                                this.porcentaje = 0;
                                 this.tipoAccion = 1;
                                 break;
                             }
@@ -552,17 +565,19 @@
                             {
                                 //console.log(data);
                                 this.modal=1;
-                                this.tituloModal='Actualizar Concentracion';
+                                this.tituloModal='Actualizar retención';
                                 this.tipoAccion=2;
                                 this.retencion_id=data['id'];
                                 this.retencion = data['retencion'];
                                 this.id_cuenta = data['id_cuenta'];
                                 this.codigo_cuenta = data['codigo_cuenta'];
                                 this.cuenta = data['cuenta'];
+                                this.tipo_cuenta = data['naturaleza'];
                                 this.autoretenedor = data['autoretenedor'];
                                 this.declarante = data['declarante'];
                                 this.monto_base = data['monto_base'];
                                 this.tipo_mov = data['tipo_mov'];
+                                this.porcentaje = data['porcentaje'];
                                 break;
                             }
                             case 'buscar':

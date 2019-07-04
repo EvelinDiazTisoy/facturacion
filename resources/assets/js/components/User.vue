@@ -219,15 +219,15 @@
                                     <div class="card-header">
                                     <!--</div>-->
                                     <!--<div class="card-body">-->
-                                        <table class="table table-bordered table-sm">
+                                        <table class="table table-bordered table-sm" style="overflow-y: auto;max-height: 26em !important;display: block;border: none;">
                                             <thead>
                                                 <tr>
-                                                    <th>Módulo</th>
-                                                    <th>Crear</th>
-                                                    <th>Leer</th>
-                                                    <th>Actualizar</th>
-                                                    <th>Anular</th>
-                                                    <th>Imprimir</th>
+                                                    <th class="col-md-7">Módulo</th>
+                                                    <th class="col-md-1">Crear</th>
+                                                    <th class="col-md-1">Leer</th>
+                                                    <th class="col-md-1">Actualizar</th>
+                                                    <th class="col-md-1">Anular</th>
+                                                    <th class="col-md-1">Imprimir</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

@@ -77,13 +77,15 @@ class FormatoController extends Controller
     {
         
        // $formatos = DB::table('formatos')->get()->orderBy('id','desc')->limit('1');
-        $formato = $request->$tipo_formato;
+        $formato = $request->tipo_formato;
         $formatos = DB::table('formatos')->where('formato','=',$formato)->orderBy('id','desc')->limit(1)->get();
         
         $Numero = $formatos[0]->numero + 1;
         
         return [
-            'numero' => $Numero
+            'numero' => $Numero,
+            'formatos' => $formatos,
+            'tipo_foramto' => $formato,
         ];
     }
    
@@ -143,7 +145,8 @@ class FormatoController extends Controller
             $formatos->forma_pago = $request->forma_pago;
             $formatos->num_cheque = $request->num_cheque;
             $formatos->doc_afecta_long = $request->doc_afecta_long; 
-            $formatos->id_empresa = $id_empresa;    
+            $formatos->id_empresa = $id_empresa;
+            $formatos->id_retencion = $request->id_retencion;
             $formatos->save();
 
             $cuents = $request->data;
@@ -231,7 +234,8 @@ class FormatoController extends Controller
             $formatos->forma_pago = $request->forma_pago;
             $formatos->num_cheque = $request->num_cheque;
             $formatos->doc_afecta_long = $request->doc_afecta_long;
-            $formatos->id_empresa = $id_empresa;     
+            $formatos->id_empresa = $id_empresa;
+            $formatos->id_retencion = $request->id_retencion;
             $formatos->save();
 
             $cuents = $request->data;
@@ -308,8 +312,9 @@ class FormatoController extends Controller
         $formatos = Formatos::join('personas','formatos.tercero','=','personas.id')
         ->join('users','formatos.usuario','=','users.id')
         ->join('conf_formatos','formatos.formato','=','conf_formatos.id')
+        ->join('retenciones','formatos.id_retencion','=','retenciones.id')
         ->select('formatos.id','conf_formatos.nombre_formato','formatos.numero','formatos.fecha','formatos.detalle', 'formatos.condicion','personas.nombre','personas.num_documento','personas.id as id_persona','personas.nombre1','personas.apellido1','users.usuario',
-        'conf_formatos.tipo','formatos.haberes','formatos.debes', 'subtotal','impuesto', 'vr_impuesto', 'total', 'cerrado','forma_pago','formatos.formato')
+        'conf_formatos.tipo','formatos.haberes','formatos.debes', 'subtotal','impuesto', 'vr_impuesto', 'total', 'cerrado','forma_pago','formatos.formato','formatos.id_retencion','retenciones.retencion')
         ->where('formatos.id','=',$id)->orderBy('formatos.id', 'desc')->take(1)->get();
         
         return ['formato' => $formatos];
@@ -320,7 +325,7 @@ class FormatoController extends Controller
         $id = $request->id;
         $detalles = Cuentas::join('plan_cuentas','cuentas.cuenta','=','plan_cuentas.id')
         ->leftJoin('personas','cuentas.tercero','=','personas.id')
-        ->select('cuenta as id_cuenta','num_cuenta','debe as debito','haber as credito','cuentas.tercero as id_tercero','personas.num_documento as doc_tercero','doc_afecta_long','doc_externo')
+        ->select('cuenta as id_cuenta','num_cuenta','debe as debito','haber as credito','cuentas.tercero as id_tercero','personas.num_documento as doc_tercero','doc_afecta_long','doc_externo','naturaleza','plan_cuentas.nombre as plan_cuentas_nom')
         ->where('cuentas.id_formato','=',$id)
         ->orderBy('cuentas.id', 'desc')->take(10000)->get();
         

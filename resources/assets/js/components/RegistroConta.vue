@@ -264,7 +264,7 @@
                             </div>
 
 
-                            <div class="form-group row" v-if="tipo_f_nom!='Cuentas'">
+                            <div class="form-group row" v-if="tipo_f_nom!='Cuentas' && tipo_f_nom!='Egreso'">
                                 <div style="    margin-left: 22px;" class="col-md-1">
                                     <label><b>Forma Pago*</b></label>
                                 </div>
@@ -284,8 +284,6 @@
                                         <option value="">NA</option>                                    
                                         <option v-for="fuente in arrayFuentes" :key="fuente.id" :value="fuente.id" v-text="fuente.nombre"></option>
                                     </select>
-                                    
-                                   
                                 </div>
                                 <div class="col-md-1">
                                     <label><b>Cheque</b></label>
@@ -296,7 +294,6 @@
                                 <div class="col-md-1" title="Buscar documento">                            
                                     <button @click="abrirModal2()" class="btn btn-primary">Afectar Documentos</button>
                                 </div>
-                                <br><br>
                             </div>
                             
                         </div>
@@ -415,11 +412,16 @@
                                 </table>
                             </div>
                         </div>
+                        
                         <div class="form-group row">
-                            <div class="col-md-12">
+                            <div class="col-md-6 float-left">
                                 <button type="button" @click="ocultarDetalle()" class="btn btn-secondary">Cerrar</button>
                                 <button v-if="editar==0" type="button" class="btn btn-primary" @click="registrarFormato()">Registrar Formato</button>
                                 <button v-if="editar==1" type="button" class="btn btn-primary" @click="actualizarFormato()">Actualizar Formato</button>
+                            </div>
+                            <div class="col-md-6 float-right">
+                                <button v-if="tercero_id!='' && tipoAutoretenedorTercero!=2" type="button" @click="abrirModalRetenciones('listar')" style="min-width: 30px;" class="btn btn-success form-control">Aplicar retencion</button>
+                                <button v-else type="button" @click="alertaRete()" style="min-width: 30px;" class="btn btn-secondary form-control">Aplicar retencion</button>
                             </div>
                         </div>
                     </div>
@@ -573,7 +575,94 @@
                     </div>
                 </div>
             </div>
-        <!-- Fin Modal buscar proveedores -->
+        <!-- Fin Modal buscar tercero -->
+
+        <!-- Modal busqueda retenciones-->
+        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalRetenciones}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModalRetenciones"></h4>
+                        <button v-if="tipoAccionRetenciones==1" type="button" class="close" @click="cerrarModalRetenciones('listar')" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                        <button v-else-if="tipoAccionRetenciones==2" type="button" class="close" @click="cerrarModalRetenciones('editar')" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div v-if="tipoAccionRetenciones == 1" class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm">
+                                
+                                    <tr>
+                                        <th>Codigo</th>
+                                        <th>Cuenta</th>
+                                        <th>-</th>
+                                    </tr>
+                                
+                                    <tr v-for="retenciones in arrayRetenciones" :key="retenciones.id">
+
+                                        <td v-if="(retenciones.tipo_mov=='2' && tipo_f_nom!='Ingreso') ||  (retenciones.tipo_mov=='1' && tipo_f_nom!='Egreso')" v-text="retenciones.id"></td>
+
+                                        <td v-if="(retenciones.tipo_mov=='2' && tipo_f_nom!='Ingreso') ||  (retenciones.tipo_mov=='1' && tipo_f_nom!='Egreso')" v-text="retenciones.retencion"></td>
+
+                                        <td v-if="(retenciones.tipo_mov=='2' && tipo_f_nom!='Ingreso') ||  (retenciones.tipo_mov=='1' && tipo_f_nom!='Egreso')">
+                                            <button type="button" style=" margin-right: -8px;" @click="abrirModalRetenciones('editar', retenciones)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </td>
+
+                                    </tr>
+                                
+                            </table>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="cerrarModalRetenciones('listar')" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="tipoAccionRetenciones == 2" class="modal-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>-</th>
+                                        <th>Cuenta</th>
+                                        <th>tc</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="detalle in arrayDetalle" :key="detalle.id">
+                                        <td><input type="checkbox" checked v-model="detalle.checked"></td>
+                                        <td v-text="detalle.num_cuenta+' - '+detalle.plan_cuentas_nom"></td>
+                                        <td>
+                                            <span v-if="tipoCuentaRetencion=='Credito'" v-text="detalle.credito"></span>
+                                            <span v-else-if="tipoCuentaRetencion=='Debito'" v-text="detalle.debito"></span>
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color: #CEECF5;">
+                                        <td colspan="2"></td>
+                                        <td>{{ calcularTotalRetencion }}</td>
+                                    </tr>
+                                    <tr style="background-color: #CEECF5;">
+                                        <td colspan="2">Valor manualmente</td>
+                                        <td><input type="number" class="form-control" v-model="valorTotalRetencion"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <button type="button" @click="cerrarModalRetenciones('editar')" class="btn btn-secondary">Cerrar</button>
+
+                                <button type="button" @click="cerrarModalRetenciones('editar')" class="btn btn-primary">Aplicar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 
@@ -669,6 +758,7 @@ export default {
             tercero_id : '',
             tercero_doc : '',
             terc_busq : '',
+            tipoAutoretenedorTercero : '',
 
             // variables modulo terceros 2
             tipoAccionModalTerceros : 0,
@@ -676,6 +766,17 @@ export default {
             tercero2 : '',
             tercero_id2 : '',
             tercero_doc2 : '',
+
+            // variables modulo retenciones
+            modalRetenciones : 0,
+            arrayRetenciones : [],
+            retencion : '',
+            id_retencion : '',
+            rete_busq : '',
+            tituloModalRetenciones : '',
+            tipoAccionRetenciones : 0,
+            tipoCuentaRetencion : '',
+            valorTotalRetencion : 0,
         }
     },
     components: {
@@ -755,7 +856,24 @@ export default {
             });*/
             return totalA;
           
-        }
+        },
+        calcularTotalRetencion: function(){
+            var totalRetencion = 0;
+
+            for(var i=0;i<this.arrayDetalle.length;i++){    
+                if(this.tipoCuentaRetencion==this.arrayDetalle[i].naturaleza && this.tipoCuentaRetencion=='Debito')
+                {
+                    totalRetencion = totalRetencion+parseFloat(this.arrayDetalle[i].debito);
+                }
+
+                if(this.tipoCuentaRetencion==this.arrayDetalle[i].naturaleza && this.tipoCuentaRetencion=='Credito')
+                {
+                    totalRetencion = totalRetencion+parseFloat(this.arrayDetalle[i].credito);
+                }
+            }
+            
+            return totalRetencion;
+        },
     },
     methods : {
         limpia_debito(){    
@@ -1020,6 +1138,8 @@ export default {
                     documento : '',
                     doc_externo: '',
                     doc_afecta_long:'',
+                    naturaleza : me.naturaleza,
+                    checked : true,
                 });
                 me.debito = 0;
                 me.credito = 0;
@@ -1031,6 +1151,7 @@ export default {
                 me.tercero_id2 = '';
                 me.tercero2 = '';
                 me.diferencia = parseFloat(me.debito) - parseFloat(me.credito);
+                me.naturaleza = '';
 
                 // var mylist = document.getElementById("tercero_detalle_id");
                 // var listitems= mylist.getElementsByClassName("form-control");
@@ -1077,7 +1198,7 @@ export default {
             else{
                 
                 me.listado=0;
-                console.log('numero: '+me.numero);
+                // console.log('numero: '+me.numero);
                 $('#tipo_formato_new').attr('readonly', true);
                 $('#tipo_formato_new').attr('disabled', true);
                 
@@ -1091,6 +1212,8 @@ export default {
             this.detalle='';
             this.numero = '';
             this.tipo_formato_new = '';
+            this.id_retencion = '';
+            this.retencion = '';
             $('#tipo_formato_new').attr('readonly', false);
             $('#tipo_formato_new').attr('disabled', false);
         },
@@ -1118,7 +1241,8 @@ export default {
                 'data': this.arrayDetalle,
                 'afectados' : this.arrayAfectados,
                 'numero' : this.numero,
-                'doc_afecta_long' : this.doc_afecta_long
+                'doc_afecta_long' : this.doc_afecta_long,
+                'id_retencion' : this.id_retencion,
                 
             }).then(function (response) {
                 me.listado=1;
@@ -1172,6 +1296,8 @@ export default {
                 me.tercero_doc2 = '';
                 me.tercero_id2 = '';
 
+                me.id_retencion = '';
+                me.retencion = '';
             }).catch(function (error) {
                 console.log(error);
             });  
@@ -1368,6 +1494,9 @@ export default {
                 me.doc_afecta_long = AuxFormato[0]['doc_afecta_long'],
                 me.cambiar_tipo_f();
                 // me.selectCliente2(me.id_tercero);
+                
+                me.id_retencion = AuxFormato[0]['id_retencion'];
+                me.retencion = AuxFormato[0]['retencion'];
             })
             .catch(function (error) {
                 console.log(error);
@@ -1381,6 +1510,12 @@ export default {
                 var respuesta= response.data;
                 //console.log(response.data.detalles);
                 me.arrayDetalle = response.data.detalles;
+                
+                // campo checked = true en arrayDetalle para que se marque el checkbox en el modulo de retenciones
+                for(var i=0; i<me.arrayDetalle.length; i++)
+                {
+                    me.arrayDetalle[i].checked = true;
+                }
             })
             .catch(function (error) {
                 console.log(error);
@@ -1409,7 +1544,8 @@ export default {
                 'data': this.arrayDetalle,
                 'afectados' : this.arrayAfectados,
                 'numero' : this.numero,
-                'doc_afecta_long' : this.doc_afecta_long
+                'doc_afecta_long' : this.doc_afecta_long,
+                'id_retencion' : this.id_retencion,
             }).then(function (response) {
                 me.listado=1;     
                 window.open(this.ruta +'/formatos/pdf/'+ me.registro_id + ',' + '_blank');           
@@ -1462,6 +1598,9 @@ export default {
                 me.tercero2 = '';
                 me.tercero_doc2 = '';
                 me.tercero_id2 = '';
+
+                me.id_retencion = '';
+                me.retencion = '';
 
                 me.listarRegistros(1);
                 
@@ -1694,6 +1833,74 @@ export default {
             this.modal2=0;
             this.tituloModal='';            
         }, 
+        buscarRete(){
+            let me=this;            
+            var url= this.ruta +'/retenciones/selectReteInfo';
+
+            axios.get(url).then(function (response) {
+                var respuesta= response.data;
+                me.arrayRetenciones = respuesta.retenciones;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        },
+        cargarRete(data){
+            let me=this;
+            me.id_retencion = data['id'];
+            me.retencion = data['retencion'];
+            me.cerrarModalRetenciones();
+        },
+        alertaRete(){
+            swal({
+            type: 'error',
+            title: 'Error',
+            text: 'Seleccione un tercero que pertenezca al regimen simplificado!',
+            // footer: '<a href>Why do I have this issue?</a>'
+            })
+        },
+        abrirModalRetenciones(accion, data){
+            let me = this;
+            switch(accion){
+                case 'listar':{
+                    me.modalRetenciones = 1;
+                    me.tituloModalRetenciones = 'Retenciones';
+                    me.arrayRetenciones = [];
+                    me.rete_busq = '';
+                    me.tipoAccionRetenciones = 1;
+                    me.buscarRete();
+                    break;
+                }
+                case 'editar':{
+                    me.modalRetenciones = 2;
+                    me.tituloModalRetenciones = 'Editar retencion';
+                    me.rete_busq = '';
+                    me.tipoAccionRetenciones = 2;
+                    me.tipoCuentaRetencion = data['naturaleza'];
+                    break;
+                }
+            }
+        },
+        cerrarModalRetenciones(accion){
+            let me = this;
+            switch(accion)
+            {
+                case 'listar':{
+                    me.modalRetenciones = 0;
+                    me.tituloModalRetenciones = '';
+                    me.arrayRetenciones = [];
+                    me.rete_busq = '';
+                    me.tipoAccionRetenciones = 0;
+                    break;
+                }
+                case 'editar':{
+                    me.modalRetenciones = 1;
+                    me.tipoAccionRetenciones = 1;
+                    break;
+                }
+            }
+        },
         formatPrice(value) {
             let val = (value/1).toFixed(2).replace('.', ',')
             return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -1736,6 +1943,7 @@ export default {
                     this.tercero = tercero['num_documento']+' - '+tercero['nombre1']+' '+tercero['apellido1'];
                     this.tercero_id = tercero['id'];
                     this.tercero_doc = tercero['num_documento'];
+                    this.tipoAutoretenedorTercero = tercero['autoretenedor']
                     break;
                 }
                 case 2:{
@@ -1780,6 +1988,10 @@ export default {
                     this.tercero2 = '';
                     break;
                 }
+                case 3:{
+                    this.id_retencion = '';
+                    this.retencion = '';
+                }
             }
         }
     },
@@ -1804,7 +2016,6 @@ export default {
         this.selectTipoFormato();
         this.selectFuentes();
         this.getNumeroNext();
-        console.log(this.permisosUser);
     },
 }
 </script>

@@ -5,23 +5,33 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Plancuentas_model;
+use App\PlanCuentasCategorias;
+use Illuminate\Support\Facades\Auth;
 
 
 class PlanCuentas extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         // echo "criterio=$criterio buscar=$buscar"; exit;     
         if ($buscar==''){
-            $planCuenta = Plancuentas_model::where('id_empresa','=',$id_empresa)->orderBy('codigo', 'asc')->paginate(10);
+            $planCuenta = Plancuentas_model::leftJoin('plan_cuentas as cuentas2','plan_cuentas.id_cuenta_cierre','=','cuentas2.id')
+            ->leftJoin('personas','plan_cuentas.id_tercero','=','personas.id')
+            ->select('plan_cuentas.id','plan_cuentas.codigo','plan_cuentas.nombre','plan_cuentas.naturaleza','plan_cuentas.tipo','plan_cuentas.corriente','plan_cuentas.banco','plan_cuentas.diferido','plan_cuentas.tercero','plan_cuentas.niif','plan_cuentas.id_empresa','plan_cuentas.condicion','plan_cuentas.anio','plan_cuentas.id_cuenta_cierre','plan_cuentas.evitar_saldo_negativo','cuentas2.nombre as cuenta_cierre','cuentas2.codigo as codigo_cuenta_cierre','plan_cuentas.id_tercero','plan_cuentas.tipo_cuenta','personas.nombre2 as nom_tercero','personas.apellido1 as apellido_tercero','personas.num_documento as num_doc_tercero')
+            ->where('plan_cuentas.id_empresa','=',$id_empresa)->orderBy('plan_cuentas.codigo', 'asc')->paginate(10);
         }
         else{
-            $planCuenta = Plancuentas_model::where('id_empresa','=',$id_empresa)->where($criterio, 'like',  $buscar . '%')->orderBy('codigo', 'asc')->paginate(10);
+            $planCuenta = Plancuentas_model::leftJoin('plan_cuentas as cuentas2','plan_cuentas.id_cuenta_cierre','=','cuentas2.id')
+            ->leftJoin('personas','plan_cuentas.id_tercero','=','personas.id')
+            ->select('plan_cuentas.id','plan_cuentas.codigo','plan_cuentas.nombre','plan_cuentas.naturaleza','plan_cuentas.tipo','plan_cuentas.corriente','plan_cuentas.banco','plan_cuentas.diferido','plan_cuentas.tercero','plan_cuentas.niif','plan_cuentas.id_empresa','plan_cuentas.condicion','plan_cuentas.anio','plan_cuentas.id_cuenta_cierre','plan_cuentas.evitar_saldo_negativo','cuentas2.nombre as cuenta_cierre','cuentas2.codigo as codigo_cuenta_cierre','plan_cuentas.id_tercero','plan_cuentas.tipo_cuenta','personas.nombre2 as nom_tercero','personas.apellido1 as apellido_tercero','personas.num_documento as num_doc_tercero')
+            ->where('plan_cuentas.id_empresa','=',$id_empresa)
+            ->where('plan_cuentas.'.$criterio, 'like',  $buscar . '%')
+            ->orderBy('plan_cuentas.codigo', 'asc')->paginate(10);
         }
         
 
@@ -91,11 +101,7 @@ class PlanCuentas extends Controller
         if (!$request->ajax()) return redirect('/');
         $planCuenta = new Plancuentas_model();
         $id_empresa = $request->session()->get('id_empresa');
-        
-       
-        //echo "<pre>"; print_r($request); 
-        //echo "</pre>";
-        
+        $id_usuario = Auth::user()->id;
         
         $planCuenta->codigo = $request->codigo;
         $planCuenta->nombre = $request->nombre;
@@ -106,12 +112,26 @@ class PlanCuentas extends Controller
         $planCuenta->tercero = $request->tercero;
         $planCuenta->niif = $request->niif;
         $planCuenta->id_empresa = $id_empresa;
-        $planCuenta->anio = $request->anio;        
+        $planCuenta->anio = $request->anio;
+        $planCuenta->id_cuenta_cierre = $request->id_cuenta_cierre;
+        $planCuenta->evitar_saldo_negativo = $request->evitar_saldo_negativo;
+        $planCuenta->id_tercero = $request->id_tercero;
+        $planCuenta->tipo_cuenta = $request->tipo_cuenta;
         $planCuenta->condicion = $request->condicion; 
         if($request->banco)
-            $planCuenta->banco = 1; 
+            $planCuenta->banco = 1;
         $planCuenta->save();
         //echo "lleggaaaaa ".$request->nombre;
+
+        $id_categorias = $request->id_categorias;
+        foreach($id_categorias as $id_cat){
+            $categorias = new PlanCuentasCategorias();
+            $categorias->id_plan_cuentas = $planCuenta->id;
+            $categorias->id_categoria = $id_cat['id'];
+            $categorias->usu_crea = $id_usuario;
+            $categorias->save();
+        }
+
     }
   
 
@@ -120,6 +140,7 @@ class PlanCuentas extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
+        $id_usuario = Auth::user()->id;
         $planCuenta = Plancuentas_model::findOrFail($request->id);
         
         //return "request = ".$request->banco; 
@@ -132,11 +153,26 @@ class PlanCuentas extends Controller
         $planCuenta->tercero = $request->tercero;
         $planCuenta->niif = $request->niif;
         $planCuenta->id_empresa = $id_empresa;
-        $planCuenta->anio = $request->anio; 
+        $planCuenta->anio = $request->anio;
+        $planCuenta->id_cuenta_cierre = $request->id_cuenta_cierre;
+        $planCuenta->evitar_saldo_negativo = $request->evitar_saldo_negativo;
         if($request->banco == 1) 
-            $planCuenta->banco = '1';        
+            $planCuenta->banco = '1';
+        $planCuenta->tipo_cuenta = $request->tipo_cuenta;
+        $planCuenta->id_tercero = $request->id_tercero;        
         $planCuenta->condicion = '1';
         $planCuenta->save();
+
+        $borrar = PlanCuentasCategorias::where('id_plan_cuentas','=',$planCuenta->id)->delete();
+
+        $id_categorias = $request->id_categorias;
+        foreach($id_categorias as $id_cat){
+            $categorias = new PlanCuentasCategorias();
+            $categorias->id_plan_cuentas = $planCuenta->id;
+            $categorias->id_categoria = $id_cat['id'];
+            $categorias->usu_crea = $id_usuario;
+            $categorias->save();
+        }
     }
 
     public function desactivar(Request $request)

@@ -73,7 +73,7 @@
                                 </tr>
                             </tbody>
                             <tbody v-else>
-                                <tr colspan="4"><span>Nada para mostrar</span></tr>
+                                <tr colspan="4"><span>No hay registros para mostrar</span></tr>
                             </tbody>
                         </table>
                         <nav>
@@ -106,7 +106,7 @@
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <div class="form-group row">
-                                    <label class="col-md-2 form-control-label" for="text-input">Codigo</label>
+                                    <label class="col-md-2 form-control-label" for="text-input">NIIF</label>
                                     <div class="col-md-2">
                                         <input type="text" v-model="codigo" class="form-control" placeholder="Codigo">
                                         
@@ -124,7 +124,7 @@
                                         <input type="number" v-model="anio" min='2015' max="2025" class="form-control" placeholder="Año">
                                     </div>
 
-                                    <label class="col-md-2 form-control-label" for="text-input">NIIF</label>
+                                    <label class="col-md-2 form-control-label" for="text-input">PUC Fiscal</label>
                                     <div class="col-md-6">
                                         <input type="text" v-model="niif" class="form-control" placeholder="NIIF">
                                     </div>                           
@@ -169,7 +169,69 @@
                                             <option value="0">Inactivo</option>
                                         </select>
                                     </div>
-                                </div>                                
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-2 form-control-label">Cuenta de cierre <span style="color:red;" v-show="id_cuenta_cierre==''">(*Seleccione)</span></label>
+                                    <div class="form-inline col-md-4">
+                                        <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuenta_cierre">
+                                        <button type="button" @click="abrirModal('planCuentas','buscar')" class="btn btn-primary">...</button>
+                                    </div>
+
+                                    <label class="col-md-3 form-control-label" for="text-input">Evitar saldo negativo</label>
+                                    <div class="col-md-1">                                        
+                                        <input type="checkbox" v-model="evitar_saldo_negativo" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-2 form-control-label" for="text-input">Tercero</label>
+                                    <div class="form-inline col-md-4">
+                                        <input type="text" readonly class="form-control" style="width: 68%;" v-model="tercero">
+                                        <button type="button" @click="abrirModal('planCuentas','tercero')" class="btn btn-primary">...</button>
+                                        <button type="button" @click="quitar()" class="btn btn-danger">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <label class="col-md-2 form-control-label">Categoria <span style="color:red;" v-show="id_categoria.length==0">(*Seleccione)</span></label>
+                                    <div class="form-inline col-md-4">
+                                        <div class="col-md-10 float-left">
+                                            <multiselect v-model="id_categoria" :options="arrayCategoria" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" :custom-label="arrayCategoria.nombre" placeholder="Seleccione alguna" label="nombre" track-by="nombre" :preselect-first="true" style="width:  12.5em !important;margin-left: -10%;">
+                                                <template slot="selection" slot-scope="{ values, search, isOpen }" style="height: 0px !important;"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} seleccionadas</span></template>
+                                            </multiselect>
+                                        </div>
+
+                                        <button type="button" @click="abrirModal('planCuentas','categorias')" class="btn btn-primary col-md-2 float-right"><i class="fa fa-plus-circle"></i></button>
+                                    </div>
+                                </div>
+                                <div style="display:none;" :class="{'form-group row mostrar-crear' : modalCrear==1}">
+                                    <div class="col-md-10 float-left">
+                                        <div class="form-group col-md-6 float-left">
+                                            <span v-text="tituloModalCrear" class="form-control-label col-md-4 float-left"></span>
+                                            <input type="text" class="form-control col-md-8 float-right" v-model="nombre_crear">
+                                        </div>
+                                        <div class="col-md-6 float-left">
+                                            <span class="form-control-label col-md-4 float-left">Descripción</span>
+                                            <input type="text" class="form-control col-md-8 float-right" v-model="descripcion_crear">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('categoria')"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Cuenta compra</label>
+                                    <div class="col-md-1">                                        
+                                        <input type="radio" v-model="tipo_cuenta" value="Cuenta compra" class="form-control">
+                                    </div>
+
+                                    <label class="col-md-3 form-control-label" for="text-input">Cuenta salida de almacen</label>
+                                    <div class="col-md-1">                                        
+                                        <input type="radio" v-model="tipo_cuenta" value="Cuenta salida almacen" class="form-control">
+                                    </div>
+                                </div>
                                 
                                 <div v-show="errorPlanCuentas" class="form-group row div-error">
                                     <div class="text-center text-error">
@@ -192,6 +254,95 @@
                 <!-- /.modal-dialog -->
             </div>
             <!--Fin del modal-->
+
+            <!-- Modal busqueda cuentas-->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModal2"></h4>
+                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <div style="max-width: 120px !important;" class="col-md-2   ">
+                                    <label style='margin-top: 3px; '><b>Cuenta</b></label>                                
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="cta_busq" v-model="cta_busq" @keyup="buscarCuentaB()">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                    
+                                        <tr><th>Codigo</th><th>Cuenta</th><th>-</th></tr>
+                                    
+                                        <tr v-for="cuentas in arrayCuentasBusq" :key="cuentas.id">
+                                            <td v-text="cuentas.codigo"></td>
+                                            <td v-text="cuentas.nombre"></td>
+                                            <td>
+                                                <button type="button" style=" margin-right: -8px;" @click="cargarCuentaB(cuentas)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                    <i class="icon-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Fin del modal-->
+
+            <!-- Modal busqueda tercero-->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalTerceros}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="titulomodalTerceros"></h4>
+                            <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <div style="max-width: 120px !important;" class="col-md-2   ">
+                                    <label style='margin-top: 3px; '><b>Tercero</b></label>                                
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="cta_busq" v-model="terc_busq" @keyup="buscarTercero()">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                    
+                                        <tr><th>Documento</th><th>Nombre</th><th style="    width: 35px;">-</th></tr>
+                                    
+                                        <tr v-for="tercero in arrayTerceros" :key="tercero.id">
+                                            <td v-text="tercero.num_documento"></td>
+                                            <td v-if="tercero.nombre && !tercero.nombre1">{{ tercero.nombre }}  </td>
+                                            <td v-else>{{ tercero.nombre1 + ' ' + validarUnder(tercero.nombre2)+' '+tercero.apellido1+' '+validarUnder(tercero.apellido2) }} </td>
+                                            <td>
+                                                <button type="button" style=" margin-right: -8px;" @click="cargarTercero(tercero)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                    <i class="icon-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Fin Modal buscar tercero -->
         </main>
 </template>
 
@@ -211,8 +362,15 @@
                 tercero : '',
                 niif : '',
                 anio : '',
+                id_cuenta_cierre : '',
+                codigo_cuenta_cierre : '',
+                cuenta_cierre : '',
+                evitar_saldo_negativo : false,
+                id_categoria : [],
                 condicion : '',
                 arrayPlanCuentas : [],
+                arrayCategoria : [],
+
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
@@ -228,7 +386,34 @@
                 },
                 offset : 20,
                 criterio : 'nombre',
-                buscar : ''
+                buscar : '',
+
+                modal2 : 0,
+                tituloModal2 : '',
+                cta_busq : '',
+                arrayCuentasBusq : [],
+
+                /* Variables para crear categorias*/
+                nombre_crear : '',
+                descripcion_crear : '',
+                modalCrear : 0,
+                tituloModalCrear : '',
+                tipoAccionCrear : 0,
+                errorCrear : 0,
+                errorMostrarMsjCrear : [],
+
+                // variables modulo terceros
+                tipoAccionModalTerceros : 0,
+                arrayTerceros : [],
+                titulomodalTerceros : '',
+                modalTerceros : 0,
+                tercero : '',
+                tercero_id : '',
+                tercero_doc : '',
+                terc_busq : '',
+                tipoAutoretenedorTercero : '',
+
+                tipo_cuenta : '',
             }
         },
         computed:{
@@ -273,6 +458,126 @@
                     console.log(error);
                 });
             },
+            selectCategoria(){
+                let me=this;
+                var url= this.ruta + '/categoria/selectCategoria';
+                axios.get(url).then(function (response) {
+                    //console.log(response);
+                    var respuesta= response.data;
+                    me.arrayCategoria = respuesta.categorias;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            selectCategoriaPlanCuentas(id){
+                let me=this;
+                var url= this.ruta + '/planCuentasCategorias/selectPlanCuentasCategorias?id_plan_cuentas='+id;
+                axios.get(url).then(function (response) {
+                    //console.log(response);
+                    var respuesta= response.data;
+                    me.id_categoria = respuesta.planCuentasCategorias;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            crearExtras(nombre){
+                if (this.validarExtras()){
+                    return;
+                }
+                
+                let me = this;
+
+                axios.post(this.ruta +'/'+nombre+'/registrar',{
+                    'nombre': this.nombre_crear,
+                    'descripcion': this.descripcion_crear
+                }).then(function (response) {
+                    me.cerrarModalCrear();
+                    me.selectCategoria();
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            validarExtras(){
+                this.errorCrear=0;
+                this.errorMostrarMsjCrear =[];
+
+                if (!this.nombre_crear) this.errorMostrarMsjCrear.push("El nombre no puede estar vacío.");
+
+                if (this.errorMostrarMsjCrear.length) this.errorCrear = 1;
+
+                return this.errorCrear;
+            },
+            cerrarModalCrear(){
+                this.modalCrear=0;
+                this.tituloModalCrear='';
+                this.nombre_crear = '';
+                this.descripcion_crear = '';
+		        this.errorCrear=0;
+            },
+            buscarCuentaB(){
+                let me=this;            
+                var url= this.ruta +'/planCuentas/selectCuentaInfo?busqueda=' + me.cta_busq;
+
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayCuentasBusq = respuesta.cuentas;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            },
+            cargarCuentaB(cuenta){
+                let me=this;
+                me.codigo_cuenta_cierre= cuenta['codigo'];
+                me.id_cuenta_cierre= cuenta['id'];
+                me.cuenta_cierre= cuenta['nombre'];
+
+                // cerrar el modal 2
+                me.modal2=0;
+                me.tituloModal2='';
+                me.cta_busq='';
+                me.arrayCuentasBusq=[];
+            },
+            cargarTercero(tercero){
+                this.tercero = tercero['num_documento']+' - '+tercero['nombre1']+' '+tercero['apellido1'];
+                this.tercero_id = tercero['id'];
+                this.tercero_doc = tercero['num_documento'];
+                this.tipoAutoretenedorTercero = tercero['autoretenedor']
+                
+                this.cerrarModalT();
+            },
+            buscarTercero(){
+                let me=this;
+                var search = this.terc_busq;
+                var url= this.ruta +'/cliente/selectCliente?filtro='+search;
+                    axios.get(url).then(function (response) {
+                    var respuesta = response.data;
+                    me.arrayTerceros = respuesta.clientes;                    
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            validarUnder(valor)
+            {
+                if(valor == "undefined" || valor=="" || !valor)
+                    return "";
+                else
+                    return valor;
+            },
+            quitar(){
+                this.tercero_id = '';
+                this.tercero = '';
+            },
+            cerrarModalT(){
+                let me=this;
+                me.modalTerceros=0;
+                me.titulomodalTerceros='';
+                me.terc_busq = '';
+            },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -297,8 +602,12 @@
                     'niif': this.niif,
                     'condicion': this.condicion,
                     'anio': this.anio,
-                    'banco': this.banco
-
+                    'banco': this.banco,
+                    'id_cuenta_cierre': this.id_cuenta_cierre,
+                    'evitar_saldo_negativo': this.evitar_saldo_negativo,
+                    'id_categorias': this.id_categoria,
+                    'id_tercero': this.tercero_id,
+                    'tipo_cuenta': this.tipo_cuenta,
                 }).then(function (response) {
                     me.cerrarModal();
                     me.listarPlanCuentas(1,'','codigo');
@@ -324,6 +633,11 @@
                     'condicion': this.condicion,
                     'banco': this.banco,
                     'anio': this.anio,
+                    'id_cuenta_cierre': this.id_cuenta_cierre,
+                    'evitar_saldo_negativo': this.evitar_saldo_negativo,
+                    'id_categorias': this.id_categoria,
+                    'id_tercero': this.tercero_id,
+                    'tipo_cuenta': this.tipo_cuenta,
                     'id': this.cuenta_id
                 }).then(function (response) {
                     me.cerrarModal();
@@ -361,11 +675,18 @@
                 this.banco='';
                 this.tercero='';
                 this.anio='';
+                this.id_cuenta_cierre='';
+                this.codigo_cuenta_cierre = '';
+                this.cuenta_cierre = '';
+                this.modal2=0;
+                this.id_categoria = [];
+                this.tipo_cuenta = '';
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
                     case "planCuentas":
                     {
+                        this.selectCategoria();
                         switch(accion){
                             case 'registrar':
                             {
@@ -378,7 +699,8 @@
                                 this.diferido='';
                                 this.niif='';
                                 this.condicion='';
-                                this.anio
+                                this.anio;
+                                this.evitar_saldo_negativo=0;
                                 this.tipoAccion = 1;
                                 this.condicion = 1;
                                 break;
@@ -400,6 +722,47 @@
                                 this.banco = data['banco'];
                                 this.condicion = data['condicion'];
                                 this.anio = data['anio'];
+                                this.id_cuenta_cierre = data['id_cuenta_cierre'];
+                                this.cuenta_cierre = data['cuenta_cierre'];
+                                this.codigo_cuenta_cierre = data['codigo_cuenta_cierre'];
+                                this.evitar_saldo_negativo = data['evitar_saldo_negativo'];
+                                this.tipo_cuenta = data['tipo_cuenta'];
+
+                                if(data['id_tercero']!=0 && data['id_tercero']!=null){
+                                    this.tercero_id = data['id_tercero'];
+                                    this.tercero = data['nom_tercero']+' '+data['apellido_tercero'];
+                                    this.tercero_doc = data['num_doc_tercero'];
+                                }
+                                else{
+                                    this.tercero_id = data['id_tercero'];
+                                    this.tercero = 'No se ha seleccionado un tercero';
+                                    this.tercero_doc = '';
+                                }
+                                
+                                this.selectCategoriaPlanCuentas(data['id']);
+                                break;
+                            }
+                            case 'buscar':
+                            {
+                                this.modal2 = 1;
+                                this.tituloModal2 = 'Seleccione una cuenta';
+                                break;
+                            }
+                            case "categorias":
+                            {   
+                                this.modalCrear = 1;
+                                this.tituloModalCrear = 'Categoria';
+                                this.nombre_crear= '';
+                                this.descripcion_crear = '';
+                                this.tipoAccionCrear = 1;
+                                break;
+                            }
+                            case 'tercero':
+                            {
+                                this.arrayTerceros=[];
+                                this.modalTerceros = 1;
+                                this.titulomodalTerceros = 'Seleccione un tercero filtro 1';
+                                this.tipoAccionModalTerceros = 1;
                                 break;
                             }
                         }
@@ -450,5 +813,9 @@
     .text-error{
         color: red !important;
         font-weight: bold;
+    }
+
+    .mostrar-crear{
+        display: inline !important;
     }
 </style>

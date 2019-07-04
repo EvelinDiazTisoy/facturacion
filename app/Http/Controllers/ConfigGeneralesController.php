@@ -16,12 +16,13 @@ class ConfigGeneralesController extends Controller
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
+        $id_empresa = $request->session()->get('id_empresa');
         
         if ($buscar==''){
-            $configgenerales = ConfigGenerales::orderBy('id', 'desc')->paginate(6);
+            $configgenerales = ConfigGenerales::where('id','=',$id_empresa)->orderBy('id', 'desc')->paginate(6);
         }
         else{
-            $configgenerales = ConfigGenerales::where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(6);
+            $configgenerales = ConfigGenerales::where($criterio, 'like', '%'. $buscar . '%')->where('id','=',$id_empresa)->orderBy('id', 'desc')->paginate(6);
         }
         return [
             'pagination' => [
@@ -106,100 +107,6 @@ class ConfigGeneralesController extends Controller
                 $config->update($archivo);
             }
         }
-    }
-
-    public function listarPermisos(Request $request){
-        // if (!$request->ajax()) return redirect('/');
-
-        $id_rol = $request->id_rol;
-        
-        $total = array();
-        $modu = array();
-        $permi = array();
-        $permisos = array();
-
-        $modulos = Modulo::join('users','modulos.usu_crea','=','users.id')
-        ->select('modulos.id','modulos.nombre','modulos.descripcion','modulos.componente','modulos.menu','modulos.tipo','modulos.icono','modulos.template','modulos.padre','modulos.estado')
-        ->where('tipo','=','1')
-        ->where('estado','=','1')
-        ->orderBy('nombre', 'asc')
-        ->get();
-
-        foreach($modulos as $mod)
-        {
-            $total[] = $mod;
-            $modulos2= Modulo::where('tipo','=','2')
-            ->where('padre','=',$mod['id'])
-            ->where('estado','=','1')
-            ->orderBy('nombre','asc')
-            ->get();
-            foreach($modulos2 as $mod2)
-            {
-                $total[] = $mod2;
-            }
-        }
-
-        if($id_rol!='' && $id_rol!=null && $id_rol!=0)
-        {
-            foreach($total as $t)
-            {
-                $modu = array(
-                    'id' => $t['id'],
-                    'nombre' => $t['nombre'],
-                    'id_rol' => $id_rol,
-                    'tipo' => $t['tipo'],
-                );
-
-                $permisos = RolPermisos::where('id_rol','=',$id_rol)
-                ->where('id_modulo', '=', $t['id'])
-                ->get();
-                
-                if(count($permisos)!=0)
-                {
-                    foreach($permisos as $pe)
-                    {
-                        $permi = array(
-                            'lectura' => $pe['lectura'],
-                            'escritura' => $pe['escritura'],
-                            'edicion' => $pe['edicion'],
-                            'anular' => $pe['anular'],
-                            'imprimir' => $pe['imprimir'],
-                        );
-                    }
-                }
-                else
-                {
-                    $permi = array(
-                        'lectura' => '',
-                        'escritura' => '',
-                        'edicion' => '',
-                        'anular' => '',
-                        'imprimir' => '',
-                    );
-                }
-
-                $respuesta[] = array_merge($modu, $permi);
-            }
-        }
-        else
-        {
-            $respuesta = $total;
-        }
-        
-        
-        return [
-            'permisos' => $respuesta,
-        ];
-    }
-
-    public function selectRol(Request $request)
-    {
-        if (!$request->ajax()) return redirect('/');
-        $roles = ConfigGenerales::where('estado', '=', '1')
-        ->select('id','nombre')
-        ->orderBy('nombre', 'asc')->get();
-
-        return ['roles' => $roles];
     }
 
     public function desactivar(Request $request)

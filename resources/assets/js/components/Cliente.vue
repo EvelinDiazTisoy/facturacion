@@ -9,7 +9,10 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Clientes
-                        <button type="button" @click="abrirModal('persona','registrar')" class="btn btn-secondary">
+                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('persona','registrar')" class="btn btn-primary">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>
+                        <button v-else type="button" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -17,43 +20,55 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>
                                       <option value="num_documento">Documento</option>
                                       <option value="email">Email</option>
                                       <option value="telefono">Teléfono</option>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarPersona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <select v-else disabled class="form-control col-md-3" v-model="criterio">
+                                    </select>
+
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarPersona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-else disabled type="text" v-model="buscar"  class="form-control" placeholder="Texto a buscar">
+
+                                    <button v-if="permisosUser.leer" type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
-                                    <th>Opciones</th>
                                     <th>Nombre</th>
                                     <th>Tipo Documento</th>
                                     <th>Número</th>
                                     <th>Dirección</th>
                                     <th>Teléfono</th>
                                     <th>Email</th>
+                                    <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="permisosUser.leer">
                                 <tr v-for="persona in arrayPersona" :key="persona.id">
-                                    <td>
-                                        <button type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
-                                          <i class="icon-pencil"></i>
-                                        </button>
-                                    </td>
                                     <td v-text="persona.nombre"></td>
                                     <td v-text="persona.tipo_documento"></td>
                                     <td v-text="persona.num_documento"></td>
                                     <td v-text="persona.direccion"></td>
                                     <td v-text="persona.telefono"></td>
                                     <td v-text="persona.email"></td>
+                                    <td>
+                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                    </td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr><td colspan="7">No hay resultados para mostrar</td></tr>
                             </tbody>
                         </table>
                         <nav>
@@ -152,7 +167,7 @@
 
 <script>
     export default {
-        props : ['ruta'],
+        props : ['ruta', 'permisosUser'],
         data (){
             return {
                 persona_id: 0,

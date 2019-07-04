@@ -6,6 +6,7 @@
  */
 
 import './bootstrap';
+import Multiselect from 'vue-multiselect'
 
 window.Vue = require('vue');
 
@@ -26,6 +27,25 @@ Vue.component('registroconta', require('./components/RegistroConta.vue'));
 Vue.component('configgenerales', require('./components/ConfigGenerales.vue'));
 Vue.component('auxiliares_conta', require('./components/AuxiliaresConta.vue'));
 Vue.component('retenciones', require('./components/Retenciones.vue'));
+Vue.component('colaboradores', require('./components/Colaboradores.vue'));
+Vue.component('zona', require('./components/Zona.vue'));
+Vue.component('bancos', require('./components/Bancos.vue'));
+Vue.component('facturacion', require('./components/Facturacion.vue'));
+Vue.component('articulo', require('./components/Articulo.vue'));
+Vue.component('categoria', require('./components/Categoria.vue'));
+Vue.component('categoria2', require('./components/Categoria2.vue'));
+Vue.component('presentacion', require('./components/Presentacion.vue'));
+Vue.component('und_medida', require('./components/UndMedida.vue'));
+Vue.component('concentracion', require('./components/Concentracion.vue'));
+Vue.component('stock', require('./components/Stock.vue'));
+Vue.component('ingreso', require('./components/Ingreso.vue'));
+Vue.component('egreso', require('./components/Egreso.vue'));
+Vue.component('cliente', require('./components/Cliente.vue'));
+Vue.component('con_tarifario', require('./components/ConTarifario.vue'));
+// Vue.component('tarifario', require('./components/Tarifario.vue'));
+Vue.component('iva', require('./components/Iva.vue'));
+Vue.component('formato_procesos', require('./components/FormatoProceso.vue'));
+Vue.component('multiselect', Multiselect);
 
 const app = new Vue({
     el: '#app', 
