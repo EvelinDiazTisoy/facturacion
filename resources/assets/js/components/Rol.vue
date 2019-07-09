@@ -106,12 +106,12 @@
                                         <table class="table table-bordered table-striped table-sm" style="overflow-y: auto;max-height: 26em !important;display: block;border: none;">
                                             <thead>
                                                 <tr>
-                                                    <th class="col-md-7">Modulo</th>
-                                                    <th class="col-md-1">Ver</th>
-                                                    <th class="col-md-1">Crear</th>
-                                                    <th class="col-md-1">Editar</th>
-                                                    <th class="col-md-1">Anular</th>
-                                                    <th class="col-md-1">Imprimir</th>
+                                                    <th style="width: 70% !important;">Modulo</th>
+                                                    <th style="width: 5% !important;">Ver</th>
+                                                    <th style="width: 5% !important;">Crear</th>
+                                                    <th style="width: 5% !important;">Editar</th>
+                                                    <th style="width: 5% !important;">Anular</th>
+                                                    <th style="width: 5% !important;">Imprimir</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

@@ -347,12 +347,13 @@
                                             <td style="text-align: right;">
                                                 $ {{detalle.precio}}
                                             </td>
-                                            <td>
+                                            <!--<td>
                                                 <input v-model="detalle.cantidad" type="number" class="form-control" style="width: 9em; text-align: right;" :min="1" :max="detalle.stock" @blur="if(detalle.cantidad>detalle.stock)
                                                 detalle.cantidad=detalle.stock">
                                                 <span v-text="'Disponible: '+detalle.stock"></span>
-
-                                                <!-- <input v-model="detalle.cantidad" v-else-if="tipoAccion2==2" type="number" class="form-control" style="width: 9em; text-align: right;" :min="detalle.cantidad2" :max="detalle.stock" @blur="if(detalle.cantidad>detalle.cantidad2) detalle.cantidad=detalle.cantidad2"> -->
+                                            </td>-->
+                                            <td style="text-align: right;">
+                                                {{detalle.cantidad}}
                                             </td>
                                             <td>
                                                 <input v-model="detalle.valor_descuento" v-if="tipoAccion2==1" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva)) detalle.valor_descuento=((detalle.precio*detalle.cantidad)-detalle.valor_iva)">
@@ -552,49 +553,58 @@
                             <div class="form-group row">
                                 <div class="col-md-6">
                                     <div class="input-group">
-                                        <select class="form-control col-md-3" v-model="criterioA">
-                                        <option value="nombre">Nombre</option>
-                                        <option value="descripcion">Descripción</option>
-                                        <option value="codigo">Código</option>
-                                        </select>
-                                        <input type="text" v-model="buscarA" @keyup.enter="listarArticulo(buscarA,criterioA)" class="form-control" placeholder="Texto a buscar">
-                                        <button type="submit" @click="listarArticulo(buscarA,criterioA)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                        <input type="text" v-model="buscarA" @keyup="listarArticulo(buscarA,criterioA,buscarCategoriaA)" class="form-control" placeholder="Texto a buscar">
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <select class="form-control" v-model="buscarCategoriaA" @change="listarArticulo(buscarA,criterioA,buscarCategoriaA)">
+                                        <option value="">Seleccione</option>
+                                        <option v-for="categoria in arrayCategoria2" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Opciones</th>
                                             <th>Código</th>
+                                            <th>IMG</th>
                                             <th>Nombre</th>
+                                            <th>Modelo contable</th>
                                             <th>Categoría</th>
                                             <th>Precio Venta</th>
                                             <th>Stock</th>
-                                            <th>Estado</th>
+                                            <th>Cant</th>
+                                            <th>Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                            <td v-if="articulo.condicion==1">
-                                                <button type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm">
+                                            <td v-text="articulo.codigo"></td>
+                                            <td>
+                                                <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" height="30" width="30">
+
+                                                <img v-else :src="`${ruta}/img_productos/${articulo.img}`" height="30" width="30">
+                                            </td>
+                                            <td>
+                                                <span v-text="articulo.nombre"></span>
+                                                <span v-if="articulo.id_presentacion!=null" v-text="' - '+articulo.nom_presentacion"></span>
+                                                <span v-else> - N/A presentacion</span>
+                                                <span v-if="articulo.talla!=null" v-text="' - '+articulo.talla"></span>
+                                                <span v-else> - N/A talla</span>
+                                            </td>
+                                            <td v-text="articulo.condicion+' - '+articulo.id_empresa"></td>
+                                            <td v-text="articulo.nom_categoria"></td>
+                                            <td v-text="articulo.precio_venta"></td>
+                                            <td v-text="articulo.stock"></td>
+                                            <td><input type="number" v-model="articulo.cant"></td>
+                                            <td>
+                                                <button v-if="articulo.cant" type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm">
                                                 <i class="icon-check"></i>
                                                 </button>
-                                            </td>
-                                            <td v-text="articulo.codigo" v-if="articulo.condicion==1"></td>
-                                            <td v-text="articulo.nombre" v-if="articulo.condicion==1"></td>
-                                            <td v-text="articulo.nombre_categoria" v-if="articulo.condicion==1"></td>
-                                            <td v-text="articulo.precio_venta" v-if="articulo.condicion==1"></td>
-                                            <td v-text="articulo.stock" v-if="articulo.condicion==1"></td>
-                                            <td v-if="articulo.condicion==1">
-                                                <div v-if="articulo.condicion">
-                                                    <span class="badge badge-success">Activo</span>
-                                                </div>
-                                                <div v-else>
-                                                    <span class="badge badge-danger">Desactivado</span>
-                                                </div>
-                                                
+                                                <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                <i class="icon-check"></i>
+                                                </button>
                                             </td>
                                         </tr>                                
                                     </tbody>
@@ -702,6 +712,8 @@
                 buscar : '',
                 criterioA:'nombre',
                 buscarA: '',
+                buscarCategoriaA : '',
+                arrayCategoria2 : [],
                 arrayArticulo: [],
                 idarticulo: 0,
                 codigo: '',
@@ -881,6 +893,18 @@
                     q: search
                     me.arrayProveedor=respuesta.proveedores;
                     loading(false)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            selectCategoria2(){
+                let me=this;
+                var url= this.ruta + '/categoria/selectCategoria';
+                axios.get(url).then(function (response) {
+                    //console.log(response);
+                    var respuesta= response.data;
+                    me.arrayCategoria2 = respuesta.categorias;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1080,7 +1104,7 @@
                     me.arrayDetalle.push({
                         idarticulo: data['id'],
                         articulo: data['nombre'],
-                        cantidad: 1,
+                        cantidad: data['cant'],
                         valor_descuento: 0,
                         precio: data['precio_venta'],
                         iva: data['iva'],
@@ -1088,12 +1112,21 @@
                     }); 
                 }
             },
-            listarArticulo (buscar,criterio){
+            listarArticulo (buscar,criterio,categoria){
                 let me=this;
-                var url= this.ruta +'/articulo/listarArticulo?buscar='+ buscar + '&criterio='+ criterio;
+                var var_categoria='';
+                if(categoria && categoria!=''){var_categoria='&categoria='+categoria;}
+                var url= this.ruta +'/articulo/listarArticulo?buscar='+ buscar + '&criterio='+ criterio+var_categoria;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayArticulo = respuesta.articulos.data;
+                    me.arrayArticulo = [];
+                    me.arrayArticulo = respuesta.articulos;
+                    for(var i=0; i<me.arrayArticulo.length; i++)
+                    {
+                        me.arrayArticulo[i].push({
+                            cant:0,
+                        });
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1365,6 +1398,7 @@
                 this.arrayArticulo=[];
                 this.modal = 1;
                 this.tituloModal = 'Seleccione uno o varios artículos';
+                this.selectCategoria2();
             },
             desactivarIngreso(id){
                swal({

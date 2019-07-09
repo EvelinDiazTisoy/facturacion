@@ -20,14 +20,7 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
-                                      <option value="nombre">Nombre</option>
-                                      <option value="codigo">Codigo</option>
-                                    </select>
-                                    <select v-else disabled class="form-control col-md-3">
-                                    </select>
-
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarArticulo(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarArticulo(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" class="form-control" placeholder="Texto a buscar">
 
                                     <button v-if="permisosUser.leer" type="submit" @click="listarArticulo(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
@@ -38,6 +31,7 @@
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>IMG</th>
                                     <th>Código</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
@@ -51,8 +45,20 @@
                             </thead>
                             <tbody v-if="permisosUser.leer">
                                 <tr v-for="articulo in arrayArticulo" :key="articulo.id">
+                                    <td>
+                                        <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" height="40" width="40">
+
+                                        <img v-else :src="`${ruta}/img_productos/${articulo.img}`" height="40" width="40">
+                                    </td>
                                     <td v-text="articulo.codigo"></td>
-                                    <td v-text="articulo.nombre"></td>
+                                    <!--<td v-text="articulo.nombre"></td>-->
+                                    <td>
+                                        <span v-text="articulo.nombre"></span>
+                                        <span v-if="articulo.id_presentacion!=null" v-text="' - '+articulo.nom_presentacion"></span>
+                                        <span v-else> - N/A presentacion</span>
+                                        <span v-if="articulo.talla!=null" v-text="' - '+articulo.talla"></span>
+                                        <span v-else> - N/A talla</span>
+                                    </td>
                                     <td v-text="articulo.nombre_categoria"></td>
                                     <td v-text="articulo.precio_venta"></td>
                                     <td v-text="articulo.stock"></td>
@@ -333,6 +339,16 @@
                                         <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')"><i class="fa fa-save"></i></button>
                                         <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="col-md-3 form-control-label float-left">Imagen</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="file" id="img" name="img" @change="cargarImg" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                 </div>
                             </div>
                             <!--<div class="row">
@@ -869,6 +885,8 @@
                 descripcion : '',
                 talla : '',
                 tipo_movimiento : 1,
+                img: '',
+                arrayImg: '',
 
 
                 arrayArticulo : [],
@@ -1154,23 +1172,7 @@
                 axios.get(url).then(function (response) {
                     //console.log(response);
                     var respuesta= response.data;
-                    var respuesta2 = respuesta.presentacion;
                     me.arrayPresentacion = respuesta.presentacion;
-                    
-                    for(var i=0; i<respuesta2.length; i++)
-                    {
-                        for(var j=0; j<me.arrayPresentacionesAsociadas.length; j++)
-                        {
-                            if(me.arrayPresentacionesAsociadas[j]['id_presentacion']==respuesta2[i]['id'])
-                            {
-                                // console.log('entra: '+respuesta2[i]['nombre']);
-                            }
-                            else
-                            {
-                                // console.log('entra2: '+respuesta2[i]['nombre']);
-                            }
-                        }
-                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1238,6 +1240,10 @@
                     console.log(error);
                 });
             },
+            cargarImg(event){
+                let me=this;
+                me.arrayImg = event.target.files[0];
+            },
             validarExtras(){
                 this.errorCrear=0;
                 this.errorMostrarMsjCrear =[];
@@ -1262,7 +1268,7 @@
                 //Envia la petición para visualizar la data de esa página
                 me.listarStock(page_stock,id_articulo);
             },
-            registrarArticulo(){
+            /*registrarArticulo(){
                 if (this.validarArticulo()){
                     return;
                 }
@@ -1289,6 +1295,48 @@
                     'talla': this.talla,
                     'arrayTarifarios': this.arrayTarifarios,
                     'tipo_movimiento' : 1,
+                }).then(function (response) {
+                    me.idArticuloStock = response['id'];
+                    me.cantidadStock = response['stock'];
+                    me.tipoMovimientoStock = 1;
+                    me.sumatoria = response['stock'];
+                    // me.registrarStock();
+                    me.cerrarModal();
+                    me.listarArticulo(1,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },*/
+            registrarArticulo(){
+                // if (this.validarConcentracion()){
+                //     return;
+                // }
+                
+                let me = this;
+                var data = new FormData();
+                data.append('idcategoria', this.idcategoria);
+                data.append('idcategoria2', this.idcategoria2);
+                data.append('nombre', this.nombre);
+                data.append('codigo', this.codigo);
+                data.append('precio_venta', this.precio_venta);
+                data.append('stock', this.stock);
+                data.append('cod_invima', this.cod_invima);
+                data.append('lote', this.lote);
+                data.append('fec_vence', this.fec_vence);
+                data.append('id_und_medida', this.id_und_medida);
+                data.append('id_concentracion', this.id_concentracion);
+                data.append('id_presentacion', this.id_presentacion);
+                data.append('minimo', this.minimo);
+                data.append('tipo_articulo', this.tipo_articulo);
+                data.append('iva', this.iva);
+                data.append('descripcion', this.descripcion);
+                data.append('talla', this.talla);
+                data.append('arrayTarifarios', JSON.stringify(this.arrayTarifarios));
+                data.append('tipo_movimiento', 1);
+                data.append('img', this.arrayImg);
+
+                axios.post(this.ruta +'/articulo/registrar', data,{
+                    headers:{'Content-Type':'multipart/form-data'}
                 }).then(function (response) {
                     me.idArticuloStock = response['id'];
                     me.cantidadStock = response['stock'];
@@ -1339,7 +1387,7 @@
                     console.log(error);
                 });
             },
-            actualizarArticulo(){
+            /*actualizarArticulo(){
                if (this.validarArticulo()){
                     return;
                 }
@@ -1372,6 +1420,44 @@
                 }).catch(function (error) {
                     console.log(error);
                 }); 
+            },*/
+            actualizarArticulo(){
+                // if (this.validarConcentracion()){
+                //     return;
+                // }
+
+                let me = this;
+                
+                var data2 = new FormData();
+                data2.append('idcategoria', this.idcategoria);
+                data2.append('idcategoria2', this.idcategoria2);
+                data2.append('nombre', this.nombre);
+                data2.append('codigo', this.codigo);
+                data2.append('precio_venta', this.precio_venta);
+                data2.append('stock', this.stock);
+                data2.append('cod_invima', this.cod_invima);
+                data2.append('lote', this.lote);
+                data2.append('fec_vence', this.fec_vence);
+                data2.append('id_und_medida', this.id_und_medida);
+                data2.append('id_concentracion', this.id_concentracion);
+                data2.append('id_presentacion', this.id_presentacion);
+                data2.append('minimo', this.minimo);
+                data2.append('tipo_articulo', this.tipo_articulo);
+                data2.append('iva', this.iva);
+                data2.append('descripcion', this.descripcion);
+                data2.append('talla', this.talla);
+                data2.append('arrayTarifarios', JSON.stringify(this.arrayTarifarios));
+                data2.append('img', this.arrayImg);
+                data2.append('id', this.articulo_id);
+
+                axios.post(this.ruta +'/articulo/actualizar', data2,{
+                    headers:{'Content-Type':'multipart/form-data'},
+                }).then(function (response) {
+                    me.cerrarModal();
+                    me.listarArticulo(1,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                });
             },
             desactivarArticulo(id){
                 swal({

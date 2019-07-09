@@ -48,7 +48,7 @@ class ProductosAsociadosController extends Controller
     }
 
     public function selectProductoAsociado(Request $request){
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
         $id_producto = $request->id_producto;
 
@@ -60,7 +60,7 @@ class ProductosAsociadosController extends Controller
         ->orderBy('id', 'desc')
         ->get();
         
-        return ['productos_asociados' => $productos_asociados];
+        return ['productos_asociados' => $productos_asociados,'id_producto'=>$id_producto];
     }
 
     public function store(Request $request)

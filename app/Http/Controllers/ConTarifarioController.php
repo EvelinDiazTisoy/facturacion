@@ -42,13 +42,12 @@ class ConTarifarioController extends Controller
     public function selectConTarifario(Request $request){
         if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
-        $id_producto = $request->id_producto;
 
-        if($id_producto!='')
+        if($request->id_producto)
         {
             $tarifario = ConTarifario::leftJoin('productos_tarifarios','con_tarifarios.id','=','productos_tarifarios.id_tarifario')
             ->select('con_tarifarios.id','con_tarifarios.nombre','productos_tarifarios.valor')
-            ->where('productos_tarifarios.id_producto','=',$id_producto)
+            ->where('productos_tarifarios.id_producto','=',$request->id_producto)
             ->where('con_tarifarios.id_empresa','=',$id_empresa)
             ->orderBy('nombre', 'asc')
             ->get();

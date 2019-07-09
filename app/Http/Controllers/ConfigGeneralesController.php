@@ -79,7 +79,7 @@ class ConfigGeneralesController extends Controller
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
 
-        $carpetaEmpresa = '1_empresa'; 
+        $carpetaEmpresa = $id_empresa .'_empresa'; 
         $dirEmpresa = public_path("logos/$carpetaEmpresa");
         if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
