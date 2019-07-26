@@ -171,7 +171,7 @@
                                                 <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
-                                                <button type="button" v-else class="btn btn-default btn-sm">
+                                                <button type="button" v-else class="btn btn-secondary btn-sm">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
                                             </template>
@@ -257,8 +257,10 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Detalle</label>
-                                    <input type="text" class="form-control" v-model="detalle">
+                                    <label>Tarifario</label>
+                                    <select v-model="id_tarifario" class="form-control" @change="cargarPreciosTarifarios(id_tarifario)">
+                                        <option v-for="tarifario in arrayTarifario" :key="tarifario.id" :value="tarifario.id" v-text="tarifario.nombre"></option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -267,6 +269,12 @@
                                     <select v-model="lugar" class="form-control">
                                         <option v-for="zonas in arrayZonas" :key="zonas.id" :value="zonas.id" v-text="zonas.zona"></option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Detalle</label>
+                                    <input type="text" class="form-control" v-model="detalle">
                                 </div>
                             </div>
                             <div class="col-md-3" v-if="estado" style="display:none;">
@@ -287,8 +295,12 @@
                                 <div class="form-group">
                                     <label>Artículo <span style="color:red;" v-show="idarticulo==0">(*Seleccione)</span></label>
                                     <div class="form-inline">
-                                        <input type="text" class="form-control col-md-4" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
-                                        <button @click="abrirModal()" class="btn btn-primary">...</button>
+                                        <input v-if="id_tarifario!=0" type="text" class="form-control col-md-4" v-model="codigo" @keyup.enter="buscarArticulo()" placeholder="Ingrese artículo">
+                                        <input v-else type="text" class="form-control col-md-4" disabled placeholder="Ingrese artículo">
+
+                                        <button v-if="id_tarifario!=0" @click="abrirModal()" class="btn btn-primary">...</button>
+                                        <button v-else class="btn btn-secondary">...</button>
+
                                         <input type="text" readonly class="form-control col-md-4" v-model="articulo">
                                     </div>                                    
                                 </div>
@@ -342,7 +354,7 @@
                                                     <i class="icon-close"></i>
                                                 </button>
                                             </td>
-                                            <td v-text="detalle.articulo">
+                                            <td v-text="detalle.articulo+' - '+detalle.nom_presentacion">
                                             </td>
                                             <td style="text-align: right;">
                                                 $ {{detalle.precio}}
@@ -389,12 +401,11 @@
                                         </tr>
                                         <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Abono:</strong></td>
-                                            <td v-if="tipoAccion2==1"><input v-model="abono" :min="0" :max="calcularTotal" type="number" class="form-control" @blur="if(abono>calcularTotal) abono=calcularTotal" style="width: 9em; text-align: right;"></td>
+                                            <td v-if="tipoAccion2==1"><input v-model="abono" :min="0" :max="calcularTotal" type="number" class="form-control" @blur="
+                                            if(abono>calcularTotal) {abono=calcularTotal;}" style="width: 9em; text-align: right;"></td>
 
-                                            <td v-else-if="tipoAccion2==2"><input v-model="abono" :min="abono2" :max="calcularTotal" type="number" class="form-control" @blur="if(abono>calcularTotal)
-                                            abono=calcularTotal || 
-                                            (abono<abono2)
-                                            abono = abono2" style="width: 9em; text-align: right;"></td>
+                                            <td v-else-if="tipoAccion2==2"><input v-model="abono" :min="abono2" :max="calcularTotal" type="number" class="form-control" @blur="
+                                            if(abono>calcularTotal){ abono=calcularTotal;}else if(abono<abono2){ abono = abono2;}" style="width: 9em; text-align: right;"></td>
                                         </tr>
                                         <tr style="background-color: #CEECF5; text-align: right;">
                                             <td colspan="6" align="right"><strong>Saldo:</strong></td>
@@ -551,19 +562,25 @@
                         </div>
                         <div class="modal-body">
                             <div class="form-group row">
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="text" v-model="buscarA" @keyup="listarArticulo(buscarA,criterioA,buscarCategoriaA)" class="form-control" placeholder="Texto a buscar">
-                                    </div>
+                                <div class="col-sm-12 col-md-5 pb-sm-1">
+                                    <label class="control-label col-sm-3 col-md-4 float-left"><i class="fa fa-search"></i> Buscar</label>
+                                    <input type="text" v-model="buscarA" @keyup="listarArticulo(buscarA,criterioA,buscarCategoriaA)" class="form-control col-sm-9 col-md-8 float-right" placeholder="Texto a buscar">
                                 </div>
-                                <div class="col-md-6">
-                                    <select class="form-control" v-model="buscarCategoriaA" @change="listarArticulo(buscarA,criterioA,buscarCategoriaA)">
+                                <div class="col-sm-9 col-md-5">
+                                    <label class="control-label col-sm-4 col-md-4 float-left"><i class="fa fa-search"></i> Categoría</label>
+                                    <select class="form-control col-sm-8 col-md-8 float-right" v-model="buscarCategoriaA" @change="listarArticulo(buscarA,criterioA,buscarCategoriaA)">
                                         <option value="">Seleccione</option>
                                         <option v-for="categoria in arrayCategoria2" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
                                     </select>
                                 </div>
+                                <div class="col-sm-3 col-md-2 text-center">
+                                    <button v-if="tipo_vista_articulo==1" type="button" class="btn btn-info"><i class="fa fa-list"></i></button>
+                                    <button v-else type="button" class="btn btn-secondary" @click="tipo_vista_articulo=1"><i class="fa fa-list"></i></button>
+                                    <button v-if="tipo_vista_articulo==2" type="button" class="btn btn-info"><i class="fa fa-th-large"></i></button>
+                                    <button v-else type="button" class="btn btn-secondary" @click="tipo_vista_articulo=2"><i class="fa fa-th-large"></i></button>
+                                </div>
                             </div>
-                            <div class="table-responsive">
+                            <div v-if="tipo_vista_articulo==1" class="table-responsive" style="display: block;height: 35em;max-height: 35em;overflow-y: auto;">
                                 <table class="table table-bordered table-striped table-sm">
                                     <thead>
                                         <tr>
@@ -579,8 +596,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="articulo in arrayArticulo" :key="articulo.id">
-                                            <td v-text="articulo.codigo"></td>
+                                        <tr v-for="(articulo, index) in arrayArticulo">
+                                            <td v-if="articulo.padre==''" v-text="articulo.codigo"></td>
+                                            <td v-else></td>
                                             <td>
                                                 <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" height="30" width="30">
 
@@ -606,9 +624,26 @@
                                                 <i class="icon-check"></i>
                                                 </button>
                                             </td>
-                                        </tr>                                
+                                        </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div v-if="tipo_vista_articulo==2" class="container" style="display: block;height: 35em;max-height: 35em;overflow-y: auto;">
+                                <div v-for="articulo in arrayArticulo" :key="articulo.id" @click="abrirModalCantidadArticulo(articulo)" class="col-sm-6 col-md-3 p-sm-2 p-md-1 mosaico" style="height: 43%;">
+                                    <div class="border col-md-12" style="height: 100%;">
+                                        <div class="text-center py-md-2">
+                                            <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
+
+                                            <img v-else :src="`${ruta}/img_productos/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
+                                        </div>
+                                        <div class="text-center col-md-12">
+                                            <h6 v-text="articulo.nombre"></h6>
+                                        </div>
+                                        <div class="text-center col-md-12 pb-md-1">
+                                            <span v-text="articulo.precio_venta"></span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -622,6 +657,48 @@
                 <!-- /.modal-dialog -->
             </div>
             <!--Fin del modal-->
+            <!-- Modal cantidad por articulo-->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalCantidadArticulo}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content" style="width:35em !important;">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModalCantidadArticulo"></h4>
+                            <button type="button" class="close" @click="cerrarModalCantidadArticulo()" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12 pb-sm-2 pb-md-1">
+                                        <div class="col-sm-10 col-md-10 float-left">
+                                            <label class="col-sm-3 col-md-4 float-left">Cant</label>
+                                            <input type="number" class="form-control float-right col-sm-9 col-md-8" v-model="cantidadArticulo">
+                                        </div>
+                                        <div class="col-sm-2 col-md-2 float-right">
+                                            <button v-if="cantidadArticulo!=0" type="button" @click="agregarDetalleModalCantidadArticulo()" class="btn btn-success btn-sm float-right">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm float-right">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="col-sm-4 col-md-5">
+                                            <label class="col-sm-6 col-md-6 float-left">Stock</label>
+                                            <label class="col-sm-6 col-md-6 float-right" v-text="stockCantidadArticulo"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModalCantidadArticulo()">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Modal busqueda tercero-->
                 <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
@@ -720,6 +797,9 @@
                 articulo: '',
                 precio: 0,
                 cantidad:1,
+                nom_presentacion : '',
+                padreDetalle : '',
+                tipo_vista_articulo:1,
 
                 // variables modal buscar tercero
                 modal2 : '',
@@ -786,6 +866,17 @@
                 // array del select de zonas
                 arrayZonas : [],
                 lugar : '',
+
+                // modal cantidad articulo
+                modalCantidadArticulo : 0,
+                tituloModalCantidadArticulo : '',
+                cantidadArticulo : 0,
+                stockCantidadArticulo : 0,
+                arrayInfoArticuloModalCantidad : [],
+
+                // tarifarios
+                id_tarifario : 0,
+                arrayTarifario : []
             }
         },
         components: {
@@ -910,6 +1001,17 @@
                     console.log(error);
                 });
             },
+            selectTarifarios(){
+                let me=this;
+                var url= this.ruta + '/con_tarifario/selectConTarifario2';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayTarifario = respuesta.tarifario;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
             getDatosProveedor(val1){
                 let me = this;
                 me.loading = true;
@@ -933,6 +1035,7 @@
                         me.iva=me.arrayArticulo[0]['iva'];
                         // me.valor_iva = parseFloat(me.arrayArticulo[0]['precio']*me.arrayArticulo[0]['cantidad'])/((me.arrayArticulo[0]['iva']/100)+1);
                         me.stock = me.arrayArticulo[0]['stock'];
+                        me.padreDetalle = me.arrayArticulo[0]['padre'];
                     }
                     else{
                         me.articulo='No existe artículo';
@@ -940,6 +1043,7 @@
                         me.precio = 0;
                         me.cantidad = 0;
                         me.stock = 0;
+                        me.padreDetalle = '';
                     }
                 })
                 .catch(function (error) {
@@ -991,7 +1095,7 @@
                     };
                 }
 
-                swal({
+                Swal.fire({
                 title: 'Esta seguro de cambiar el estado a '+nomEstado+'?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1021,7 +1125,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }
@@ -1036,6 +1140,36 @@
                 //     console.log(error);
                 // });
             },
+            cargarPreciosTarifarios(id){
+                let me = this;
+
+                var arrayIds = [];
+                me.arrayDetalle.forEach(function(detalle){
+                    arrayIds.push({id : detalle['idarticulo']});
+                });
+
+                if(arrayIds.length)
+                {
+                    var url= this.ruta + '/producto_tarifario/cargarPreciosTarifarios?arrayDetalle='+JSON.stringify(arrayIds)+'&id_tarifario='+id;
+                    axios.get(url).then(function (response) {
+                        var respuesta= response.data;
+                        
+                        for(var i=0; i<me.arrayDetalle.length; i++)
+                        {
+                            for(var j=0; j<respuesta.producto_tarifario.length; j++)
+                            {
+                                if(me.arrayDetalle[i].idarticulo==respuesta.producto_tarifario[j].id_producto){
+                                    me.arrayDetalle[i].precio = respuesta.producto_tarifario[j].valor;
+                                }
+                            }
+                        }
+                        
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                }
+            },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
                 //Actualiza la página actual
@@ -1043,10 +1177,11 @@
                 //Envia la petición para visualizar la data de esa página
                 me.listarFacturacion(1,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro);
             },
-            encuentra(id){
+            encuentra(id,padre){
                 var sw=0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    if(this.arrayDetalle[i].idarticulo==id){
+                    if(this.arrayDetalle[i].padre==null){this.arrayDetalle[i].padre='';}
+                    if(this.arrayDetalle[i].idarticulo==id && this.arrayDetalle[i].padre==padre){
                         sw=true;
                     }
                 }
@@ -1061,8 +1196,8 @@
                 if(me.idarticulo==0 || me.cantidad==0 || me.precio==0){
                 }
                 else{
-                    if(me.encuentra(me.idarticulo)){
-                        swal({
+                    if(me.encuentra(me.idarticulo, me.padreDetalle)){
+                        Swal.fire({
                             type: 'error',
                             title: 'Error...',
                             text: 'Ese artículo ya se encuentra agregado!',
@@ -1077,7 +1212,9 @@
                             precio: me.precio,
                             iva: me.iva,
                             stock : me.stock,
-                            descuento : me.descuento
+                            descuento : me.descuento,
+                            nom_presentacion : me.nom_presentacion,
+                            padre : me.padreDetalle
                         });
                         me.codigo="";
                         me.idarticulo=0;
@@ -1086,15 +1223,17 @@
                         me.precio=0;
                         me.iva = 0;
                         me.descuento = 0;
+                        me.nom_presentacion = '';
+                        me.padreDetalle = '';
                     }
                     
                 }
             },
             agregarDetalleModal(data =[]){
                 let me=this;
-                
-                if(me.encuentra(data['id'])){
-                    swal({
+
+                if(me.encuentra(data['id'],data['padre'])){
+                    Swal.fire({
                         type: 'error',
                         title: 'Error...',
                         text: 'Ese artículo ya se encuentra agregado!',
@@ -1109,24 +1248,44 @@
                         precio: data['precio_venta'],
                         iva: data['iva'],
                         stock : data['stock'],
+                        nom_presentacion : data['nom_presentacion'],
+                        padre : data['padre'],
                     }); 
                 }
+            },
+            agregarDetalleModalCantidadArticulo(){
+                let me=this;
+                
+                if(me.encuentra(me.arrayInfoArticuloModalCantidad.id && me.arrayInfoArticuloModalCantidad.padre)){
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Error...',
+                        text: 'Ese artículo ya se encuentra agregado!',
+                        })
+                }
+                else{
+                    me.arrayDetalle.push({
+                        idarticulo: me.arrayInfoArticuloModalCantidad.id,
+                        articulo: me.arrayInfoArticuloModalCantidad.nombre,
+                        cantidad: me.cantidadArticulo,
+                        valor_descuento: 0,
+                        precio: me.arrayInfoArticuloModalCantidad.precio_venta,
+                        iva: me.arrayInfoArticuloModalCantidad.iva,
+                        stock : me.arrayInfoArticuloModalCantidad.stock,
+                        nom_presentacion : me.arrayInfoArticuloModalCantidad.nom_presentacion,
+                    }); 
+                }
+                me.cerrarModalCantidadArticulo();
             },
             listarArticulo (buscar,criterio,categoria){
                 let me=this;
                 var var_categoria='';
                 if(categoria && categoria!=''){var_categoria='&categoria='+categoria;}
-                var url= this.ruta +'/articulo/listarArticulo?buscar='+ buscar + '&criterio='+ criterio+var_categoria;
+                var url= this.ruta +'/articulo/listarArticulo?buscar='+ buscar + '&criterio='+ criterio+var_categoria+'&id_tarifario='+me.id_tarifario;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayArticulo = [];
                     me.arrayArticulo = respuesta.articulos;
-                    for(var i=0; i<me.arrayArticulo.length; i++)
-                    {
-                        me.arrayArticulo[i].push({
-                            cant:0,
-                        });
-                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1168,6 +1327,7 @@
                     'usu_envia': null,
                     'usu_anula': null,
                     'fecha': me.fecha,
+                    'id_tarifario': me.id_tarifario,
                     'data': me.arrayDetalle,
                     'tipo_movimiento' : 4,
                     'sumatoria' : 0
@@ -1221,6 +1381,7 @@
                     'usu_envia': null,
                     'usu_anula': null,
                     'fecha': me.fecha,
+                    'id_tarifario': me.id_tarifario,
                     'estado': me.estado,
                     'data': me.arrayDetalle,
                     'tipo_movimiento' : 4,
@@ -1313,6 +1474,7 @@
                                 me.fec_envia=data['fec_envia'];
                                 me.fec_anula=data['fec_anula'];
                                 me.fecha =data['fecha'];
+                                me.id_tarifario =data['id_tarifario'];
                                 me.estado = data['estado'];
                                 
 
@@ -1325,6 +1487,7 @@
                             };
                         }
                         me.selectZonas();
+                        me.selectTarifarios();
                     }
                 }
             },
@@ -1350,6 +1513,7 @@
                 me.fec_envia='',
                 me.fec_anula='',
                 // me.fecha = '',
+                me.id_tarifario = 0;
                 me.estado = 0,
                 // me.arrayFacturacion=[];
                 // me.arrayFacturacionT=[];
@@ -1393,15 +1557,33 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.buscar = '';
+                this.arrayArticulo = [];
+                this.buscarA = '';
+                this.buscarCategoriaA = '';
+                this.tipo_vista_articulo = 1;
             }, 
             abrirModal(){               
                 this.arrayArticulo=[];
                 this.modal = 1;
                 this.tituloModal = 'Seleccione uno o varios artículos';
+                this.listarArticulo('','');
                 this.selectCategoria2();
             },
+            cerrarModalCantidadArticulo(){
+                this.modalCantidadArticulo=0;
+                this.tituloModalCantidadArticulo='';
+                this.cantidadArticulo = 0;
+                this.stockCantidadArticulo = 0;
+                this.arrayInfoArticuloModalCantidad = [];
+            }, 
+            abrirModalCantidadArticulo(data){               
+                this.modalCantidadArticulo = 1;
+                this.tituloModalCantidadArticulo = 'Cantidad del articulo';
+                this.arrayInfoArticuloModalCantidad = data;
+                this.stockCantidadArticulo = data['stock']
+            },
             desactivarIngreso(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de anular este ingreso?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1421,7 +1603,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarFacturacion(1,'','','','','','','');
-                        swal(
+                        Swal.fire(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
                         'success'
@@ -1433,7 +1615,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }
@@ -1575,6 +1757,10 @@
     .text-error{
         color: red !important;
         font-weight: bold;
+    }
+    .mosaico{
+        display: inline-block;
+        float: left;
     }
     @media (min-width: 600px) {
         .btnagregar {

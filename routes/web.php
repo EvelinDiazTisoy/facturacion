@@ -307,14 +307,17 @@ Route::group(['middleware'=>['auth']],function(){
         Route::post('/con_tarifario/registrar', 'ConTarifarioController@store');
         Route::put('/con_tarifario/actualizar', 'ConTarifarioController@update');
         Route::get('/con_tarifario/selectConTarifario', 'ConTarifarioController@selectConTarifario');
+        Route::get('/con_tarifario/selectConTarifario2', 'ConTarifarioController@selectConTarifario2');
         Route::put('/con_tarifario/desactivar', 'ConTarifarioController@desactivar');
         Route::put('/con_tarifario/activar', 'ConTarifarioController@activar');
         Route::get('/con_tarifario/listarTarifarioPresentacion', 'ConTarifarioController@listarTarifarioPresentacion');
+        Route::put('/con_tarifario/marcarFavorito', 'ConTarifarioController@marcarFavorito');
 
         Route::get('/producto_tarifario', 'ProductoTarifarioController@index');
         Route::post('/producto_tarifario/registrar', 'ProductoTarifarioController@store');
         Route::put('/producto_tarifario/actualizar', 'ProductoTarifarioController@update');
         Route::get('/producto_tarifario/selectProductoTarifario', 'ProductoTarifarioController@selectProductoTarifario');
+        Route::get('/producto_tarifario/cargarPreciosTarifarios', 'ProductoTarifarioController@cargarPreciosTarifarios');
         Route::put('/producto_tarifario/desactivar', 'ProductoTarifarioController@desactivar');
         Route::put('/producto_tarifario/activar', 'ProductoTarifarioController@activar');
 
@@ -349,6 +352,13 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/formato_proceso/selectFormatoProceso', 'FormatoProcesoController@selectFormatoProceso');
         Route::put('/formato_proceso/desactivar', 'FormatoProcesoController@desactivar');
         Route::put('/formato_proceso/activar', 'FormatoProcesoController@activar');
+
+        Route::get('/cajas', 'CajasController@index');
+        Route::post('/cajas/registrar', 'CajasController@store');
+        Route::put('/cajas/actualizar', 'CajasController@update');
+        Route::get('/cajas/SelectCaja', 'CajasController@SelectCaja');
+        Route::put('/cajas/desactivar', 'CajasController@desactivar');
+        Route::put('/cajas/activar', 'CajasController@activar');
     });
 
 });

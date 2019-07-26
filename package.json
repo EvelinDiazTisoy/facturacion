@@ -19,6 +19,7 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
+        "sweetalert2": "^8.13.6",
         "vue-barcode": "^1.1.0",
         "vue-multiselect": "^2.1.6",
         "vue-select": "^2.4.0"

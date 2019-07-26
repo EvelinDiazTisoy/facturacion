@@ -209,13 +209,15 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Precio Venta</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="number" v-model="precio_venta" class="form-control" placeholder="">                                        
+                                        <input type="number" v-model="precio_venta" :min="1" @blur="(function(){
+                                            if(precio_venta<1) precio_venta=1;})" class="form-control" placeholder="">                                        
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label class="col-md-3 form-control-label float-left" for="text-input">Stock</label>
-                                    <div class="col-md-9 float-right">
-                                        <input type="number" v-model="stock" class="form-control" placeholder="">
+                                    <label v-if="tipo_articulo!=2" class="col-md-3 form-control-label float-left" for="text-input">Stock</label>
+                                    <div v-if="tipo_articulo!=2" class="col-md-9 float-right">
+                                        <input type="number" v-model="stock" :min="1" @blur="(function(){
+                                            if(stock<1) stock=1;})" class="form-control" placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -234,17 +236,22 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-6" v-if="tipo_articulo!=2 && tipo_articulo!=3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Fec. vence</label>
                                     <div class="col-md-9 float-right">
                                         <input type="date" v-model="fec_vence" class="form-control" placeholder="">                                        
                                     </div>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-6" v-else>
+                                </div>
+                                <div v-if="tipo_articulo!=2" class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Cant. minima</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="minimo" class="form-control" placeholder="">                                        
+                                        <input type="number" v-model="minimo" :min="1" @blur="(function(){
+                                            if(minimo<1) minimo=1;})" class="form-control" placeholder="">
                                     </div>
+                                </div>
+                                <div v-else class="form-group col-md-6">
                                 </div>
                             </div>
                             <div class="row">
@@ -259,11 +266,13 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-6" v-if="tipo_articulo!=2">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Talla</label>
                                     <div class="col-md-9 float-right">
                                         <input type="text" v-model="talla" class="form-control" placeholder="Talla del producto"> 
                                     </div>
+                                </div>
+                                <div class="form-group col-md-6" v-else>
                                 </div>
                             </div>
                             <div class="row">
@@ -345,7 +354,7 @@
                                 <div class="col-md-6">
                                     <label class="col-md-3 form-control-label float-left">Imagen</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="file" id="img" name="img" @change="cargarImg" class="form-control">
+                                        <input type="file" id="img" name="img" ref="inputFileImg"  @change="cargarImg" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -378,7 +387,7 @@
                             <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarArticulo()">Actualizar</button>
                             
                             <button type="button" class="btn btn-success" @click="abrirModal('articulo','tarifarios')">Tarifarios</button>
-                            <button v-if="tipoAccion==2" type="button" class="btn btn-success" @click="abrirModal('articulo','iva')">Config IVA</button>
+                            <button type="button" class="btn btn-success" @click="abrirModal('articulo','iva')">Config IVA</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -495,30 +504,20 @@
                                         <tbody>
                                             <tr v-for="(tarifario, index) in arrayTarifarios" :key="tarifario.index">
                                                 <td v-text="tarifario.nombre"></td>
-                                                <td style="text-align: right;"><input type="number" style="text-align: right;" v-model="tarifario.valor"></td>
+                                                <td style="text-align: right;">
+                                                    <input type="number" v-if="tipoAccionModal3==2" style="text-align: right;" v-model="tarifario.valor" :min="1" @blur="(function(){if(tarifario.valor<1) tarifario.valor=1;})">
+                                                    <span v-if="tipoAccionModal3==1" v-text="tarifario.valor"></span>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <!--<nav>
-                                        <ul class="pagination">
-                                            <li class="page-item" v-if="pagination_stock.current_page_stock > 1">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(pagination_stock.current_page_stock - 1,idArticuloStock)">Ant</a>
-                                            </li>
-                                            <li class="page-item" v-for="page_stock in pagesNumberStock" :key="page_stock" :class="[page_stock == isActived ? 'active' : '']">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(page_stock,idArticuloStock)" v-text="page_stock"></a>
-                                            </li>
-                                            <li class="page-item" v-if="pagination_stock.current_page_stock < pagination_stock.last_page_stock">
-                                                <a class="page-link" href="#" @click.prevent="cambiarPaginaStock(pagination_stock.current_page_stock + 1,idArticuloStock)">Sig</a>
-                                            </li>
-                                        </ul>
-                                    </nav>-->
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModalTarifario()">Cerrar</button>
-                            <!--<button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarArticulo()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarArticulo()">Actualizar</button>-->
+                            <button type="button"  v-if="tipoAccionModal3==2" class="btn btn-primary" @click="tipoAccionModal3=1, modal3=0">Guardar</button>
+                            <button type="button"  v-if="tipoAccionModal3==1" class="btn btn-success" @click="tipoAccionModal3=2">Editar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -762,13 +761,9 @@
                     <div class="modal-content" style="width:100% !important;margin-left: 15% !important;">
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal7"></h4>
-                            <button v-if="tipoAccion7==0" @click="abrirModal('articulo','iva_registrar')" class="btn btn-default">Agregar Nuevo</button>
-                            <button type="button" class="close" @click="cerrarModal7()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
                         </div>
                         <div class="modal-body">
-                            <form v-if="tipoAccion7==1" action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <div class="form-group row">
                                     <div class="col-md-6">
                                         <label class="col-md-3 form-control-label float-left" for="text-input">Iva compras</label>
@@ -805,29 +800,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <button type="button" class="btn btn-secondary" @click="tipoAccion7=0">Cerrar</button>
-                                        <button type="button" class="btn btn-primary" @click="registrarIvaProducto()">Guardar</button>
-                                    </div>
-                                </div>
-                                <div v-show="errorArticulo" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjCategoria" :key="error" v-text="error">
-                                        </div>
-                                    </div>
-                                </div>
-
                             </form>
 
-                            <div v-if="tipoAccion7==0">
+                            <!--<div v-if="tipoAccion7==0">
                                 <table class="table table-bordered table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th>Tipo</th>
                                             <th>Nombre</th>
                                             <th>%</th>
-                                            <th>Opc.</th>
+                                            <th class="col-md-1">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -838,15 +820,16 @@
                                             <td v-if="iva_producto.id_iva!=0" v-text="iva_producto.porcentaje_iva"></td>
                                             <td v-else>N/A</td>
                                             <td>
-                                                <button type="button" class="btn-danger btn-block btn-xs" @click="eliminarIvaProducto(iva_producto.id)"><i class="icon-trash"></i></button>
+                                                <button type="button" class="btn btn-danger btn-xs" @click="eliminarIvaProducto(iva_producto.id)"><i class="icon-trash"></i></button>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                            </div>-->
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModal7()">Cerrar</button>
+                            <button type="button" class="btn btn-primary" @click="modal7=0">Guardar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -952,8 +935,9 @@
                 // variables del modal 'tarifarios'
                 modal3 : 0,
                 tituloModal3 : '',
-                tipoAccionModal3 : '',
+                tipoAccionModal3 : 1,
                 arrayTarifarios : [],
+                errorTarifario : 0,
 
                 // variables modal crear categorias 1
                 modal4 : 0,
@@ -1008,6 +992,7 @@
                 arrayIvaVenta : [],
                 arrayIvaDevolucionesCompra : [],
                 arrayIvaDevolucionesVenta : [],
+                errorIva : 0,
             }
         },
         components: {
@@ -1106,13 +1091,70 @@
                     console.log(error);
                 });
             },
-            listarPresentacionesAsociadas(id){
+            listarPresentacionesAsociadas(id, id_presentacion){
                 let me=this;
                 var url= this.ruta + '/productos_asociados/selectProductoAsociado?id_producto='+id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayPresentacionesAsociadas = respuesta.productos_asociados;
                     // me.pagination= respuesta.pagination;
+
+                    var indices = [];
+
+                    for(var i=0; i<me.arrayPresentacion.length; i++)
+                    {
+                        if(me.arrayPresentacion[i]['id']==id_presentacion)
+                        {
+                            indices.push({
+                                indice: i,
+                            });
+                        }
+
+                        me.arrayPresentacionesAsociadas.forEach(function(dato2){
+                            if(me.arrayPresentacion[i]['id']==dato2['id_presentacion'])
+                            {
+                                indices.push({
+                                    indice: i,
+                                });
+                            }
+                        });
+                    }
+
+                    indices.forEach(function(dato){
+                        me.arrayPresentacion.splice(dato['indice'],1);
+                    });
+                    console.log(me.arrayPresentacion);
+
+                    /*me.arrayPresentacion.forEach(function(dato, index){
+                        if(dato['id']==id_presentacion)
+                        {
+                            indices.push({
+                                indice: index,
+                            });
+                            me.arrayPresentacion.splice(dato);
+                        }
+
+                        me.arrayPresentacionesAsociadas.forEach(function(dato2){
+                            if(dato['id']==dato2['id_presentacion'])
+                            {
+                                indices.push({
+                                    indice: index,
+                                });
+                            }
+                        });
+                    });
+                    
+                    if(indices.length)
+                    {
+                        indices.forEach(function(indice){
+                            me.arrayPresentacion.splice(indice['indice']);
+                            console.log('splice: '+indice['indice']);
+                        });
+                    }
+                    else
+                    {
+                        console.log('nada');
+                    }*/
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1203,6 +1245,26 @@
                     var respuesta= response.data;
                     me.arrayIvaProducto = respuesta.iva_producto;
 
+                    for(var i=0; i<me.arrayIvaProducto.length; i++)
+                    {
+                        if(me.arrayIvaProducto[i]['tipo_iva'] == 'compras')
+                        {
+                            me.idIvaCompra = me.arrayIvaProducto[i]['id_iva'];
+                        }
+                        if(me.arrayIvaProducto[i]['tipo_iva'] == 'ventas')
+                        {
+                            me.idIvaVenta = me.arrayIvaProducto[i]['id_iva'];
+                        }
+                        if(me.arrayIvaProducto[i]['tipo_iva'] == 'devoluciones_compras')
+                        {
+                            me.idIvaDevolucionCompra = me.arrayIvaProducto[i]['id_iva'];
+                        }
+                        if(me.arrayIvaProducto[i]['tipo_iva'] == 'devoluciones_ventas')
+                        {
+                            me.idIvaDevolucionVenta = me.arrayIvaProducto[i]['id_iva'];
+                        }
+                    }
+
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1243,6 +1305,8 @@
             cargarImg(event){
                 let me=this;
                 me.arrayImg = event.target.files[0];
+                // console.log(me.arrayImg);
+                // console.log(me.arrayImg['file'][1]);
             },
             validarExtras(){
                 this.errorCrear=0;
@@ -1308,9 +1372,9 @@
                 });
             },*/
             registrarArticulo(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarArticulo()){
+                    return;
+                }
                 
                 let me = this;
                 var data = new FormData();
@@ -1332,6 +1396,10 @@
                 data.append('descripcion', this.descripcion);
                 data.append('talla', this.talla);
                 data.append('arrayTarifarios', JSON.stringify(this.arrayTarifarios));
+                data.append('idIvaCompra', this.idIvaCompra);
+                data.append('idIvaVenta', this.idIvaVenta);
+                data.append('idIvaDevolucionCompra', this.idIvaDevolucionCompra);
+                data.append('idIvaDevolucionVenta', this.idIvaDevolucionVenta);
                 data.append('tipo_movimiento', 1);
                 data.append('img', this.arrayImg);
 
@@ -1350,9 +1418,9 @@
                 });
             },
             registrarStock(){
-                if (this.validarArticulo()){
-                    return;
-                }
+                // if (this.validarArticulo()){
+                //     return;
+                // }
                 
                 let me = this;
 
@@ -1387,40 +1455,6 @@
                     console.log(error);
                 });
             },
-            /*actualizarArticulo(){
-               if (this.validarArticulo()){
-                    return;
-                }
-                
-                let me = this;
-
-                axios.put( this.ruta + '/articulo/actualizar',{
-                    'idcategoria': this.idcategoria,
-                    'idcategoria2': this.idcategoria2,
-                    'nombre' : this.nombre,
-                    'codigo': this.codigo,
-                    'precio_venta': this.precio_venta,
-                    'stock': this.stock,
-                    'cod_invima': this.cod_invima,
-                    'lote': this.lote,
-                    'fec_vence': this.fec_vence,
-                    'id_und_medida': this.id_und_medida,
-                    'id_concentracion': this.id_concentracion,
-                    'id_presentacion': this.id_presentacion,
-                    'minimo': this.minimo,
-                    'tipo_articulo': this.tipo_articulo,
-                    'iva': this.iva,
-                    'descripcion': this.descripcion,
-                    'talla': this.talla,
-                    'arrayTarifarios': this.arrayTarifarios,
-                    'id': this.articulo_id
-                }).then(function (response) {
-                    me.cerrarModal();
-                    me.listarArticulo(1,'','nombre');
-                }).catch(function (error) {
-                    console.log(error);
-                }); 
-            },*/
             actualizarArticulo(){
                 // if (this.validarConcentracion()){
                 //     return;
@@ -1447,6 +1481,10 @@
                 data2.append('descripcion', this.descripcion);
                 data2.append('talla', this.talla);
                 data2.append('arrayTarifarios', JSON.stringify(this.arrayTarifarios));
+                data2.append('idIvaCompra', this.idIvaCompra);
+                data2.append('idIvaVenta', this.idIvaVenta);
+                data2.append('idIvaDevolucionCompra', this.idIvaDevolucionCompra);
+                data2.append('idIvaDevolucionVenta', this.idIvaDevolucionVenta);
                 data2.append('img', this.arrayImg);
                 data2.append('id', this.articulo_id);
 
@@ -1460,7 +1498,7 @@
                 });
             },
             desactivarArticulo(id){
-                swal({
+                Swal.fire({
                     title: 'Esta seguro de desactivar este artículo?',
                     type: 'warning',
                     showCancelButton: true,
@@ -1496,7 +1534,7 @@
                 }) 
             },
             activarArticulo(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este artículo?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1538,10 +1576,52 @@
                 this.errorArticulo=0;
                 this.errorMostrarMsjArticulo =[];
 
-                if (this.idcategoria==0) this.errorMostrarMsjArticulo.push("Seleccione una categoría.");
                 if (!this.nombre) this.errorMostrarMsjArticulo.push("El nombre del artículo no puede estar vacío.");
-                if (!this.stock) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser un número diferente a '0' y no puede estar vacío.");
-                if (!this.precio_venta) this.errorMostrarMsjArticulo.push("El precio venta del artículo debe ser un número y no puede estar vacío.");
+                if (this.idcategoria==0) this.errorMostrarMsjArticulo.push("Seleccione un modelo contable.");
+                if (this.idcategoria2==0) this.errorMostrarMsjArticulo.push("Seleccione una categoría.");
+                if (!this.precio_venta || this.precio_venta<=0) this.errorMostrarMsjArticulo.push("El precio de venta debe ser mayor a '0'.");
+                
+                if(!this.tipo_articulo) this.errorMostrarMsjArticulo.push('Seleccione el tipo de producto');
+
+                if(this.tipo_articulo==1){
+                    if (!this.stock || this.stock<=0) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser mayor a '0'.");
+                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
+                    if(!this.lote) this.errorMostrarMsjArticulo.push('Ingrese el lote del producto');
+                    if(!this.fec_vence) this.errorMostrarMsjArticulo.push('Ingrese la fecha de vencimiento');
+                    if(this.minimo<=0) this.errorMostrarMsjArticulo.push("La cantidad minima debe ser mayor a '0'.");
+                    if(!this.talla) this.errorMostrarMsjArticulo.push('Ingrese la talla del producto');
+                    if(this.und_medida==0) this.errorMostrarMsjArticulo.push('Seleccione la unidad de medida del producto');
+                }
+
+                if(this.tipo_articulo==2){
+                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
+                }
+
+                if(this.tipo_articulo==3){
+                    if (!this.stock || this.stock<=0) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser mayor a '0'.");
+                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
+                    if(!this.lote) this.errorMostrarMsjArticulo.push('Ingrese el lote del producto');
+                    if(this.minimo<=0) this.errorMostrarMsjArticulo.push("La cantidad minima debe ser mayor a '0'.");
+                    if(!this.talla) this.errorMostrarMsjArticulo.push('Ingrese la talla del producto');
+                    if(this.und_medida==0) this.errorMostrarMsjArticulo.push('Seleccione la unidad de medida del producto');
+                }
+
+                if(!this.id_presentacion) this.errorMostrarMsjArticulo.push('Seleccione la presentacion del producto');
+                if(!this.codigo) this.errorMostrarMsjArticulo.push('Ingrese el codigo de barras del producto');
+                if(this.tipoAccion==1 && this.$refs.inputFileImg.value=='') this.errorMostrarMsjArticulo.push('Seleccione una imagen para el producto');
+
+                this.errorTarifario = 0;
+                for(var i=0; i<this.arrayTarifarios.length; i++)
+                {
+                    if(!this.arrayTarifarios[i].valor || this.arrayTarifarios[i].valor=='' || this.arrayTarifarios.valor=='undefined')
+                    {
+                        this.errorTarifario = 1;
+                    }
+                }
+
+                if(this.errorTarifario==1) this.errorMostrarMsjArticulo.push('Debe asignar valores a todos los tarifarios del producto');
+
+                if(this.idIvaCompra==0 || this.idIvaVenta==0 || this.idIvaDevolucionCompra==0 || this.idIvaDevolucionVenta==0) this.errorMostrarMsjArticulo.push('Debe asignar valores a todos los Ivas del producto');
 
                 if (this.errorMostrarMsjArticulo.length) this.errorArticulo = 1;
 
@@ -1551,6 +1631,7 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.idcategoria= 0;
+                this.idcategoria2= 0;
                 this.nombreModeloContable=''
                 this.nombre_categoria = '';
                 this.codigo = '';
@@ -1569,6 +1650,9 @@
                 this.tipo_articulo = '',
                 this.iva = 0;
                 this.talla = '';
+                this.img = '';
+                this.arrayImg = [];
+                this.$refs.inputFileImg.value = '';
                 this.errorArticulo=0;
                 
                 this.idArticuloStock = 0;
@@ -1586,6 +1670,15 @@
                 this.unidadesPresentacionAsociada = 0;
                 this.idPresentacionAsociada = 0;
 
+                this.idIvaCompra = 0;
+                this.idIvaVenta = 0;
+                this.idIvaDevolucionCompra = 0;
+                this.idIvaDevolucionVenta = 0;
+
+                this.arrayIvaCompra = [];
+                this.arrayIvaVenta = [];
+                this.arrayIvaDevolucionesCompra = [];
+                this.arrayIvaDevolucionesVenta = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
@@ -1638,6 +1731,7 @@
                                 this.tipo_articulo=data['tipo_articulo'];
                                 this.descripcion= data['descripcion'];
                                 this.talla = data['talla'];
+                                this.selectIvaProducto(this.articulo_id);
                                 this.listarTarifarios(data['id']);
                                 break;
                             }
@@ -1653,7 +1747,8 @@
                                 this.tituloModal6 = 'Presentación asociados';
                                 this.idProductoPresentacionAsociada = data['id'];
                                 this.listarTarifarios('');
-                                this.listarPresentacionesAsociadas(data['id']);
+                                this.selectPresentacion();
+                                this.listarPresentacionesAsociadas(data['id'],data['id_presentacion']);
                                 break;
                             }
                             case 'iva':
@@ -1661,7 +1756,7 @@
                                 this.modal7 = 1;
                                 this.tituloModal7 = 'Configurar ivas';
                                 this.listarIvas();
-                                this.selectIvaProducto(this.articulo_id);
+                                // this.selectIvaProducto(this.articulo_id);
                                 break;
                             }
                             case 'iva_registrar':
@@ -1687,6 +1782,7 @@
                                         this.idIvaDevolucionVenta = this.arrayIvaProducto[i]['id_iva'];
                                     }
                                 }
+                                // console.log('compra: '+this.idIvaCompra+' venta: '+this.idIvaVenta+' dev compras: '+this.idIvaDevolucionCompra+' dev ventas: '+this.idIvaDevolucionVenta);
                                 break;
                             }
                         }
@@ -1781,6 +1877,18 @@
             cerrarModal7(){
                 this.modal7 = 0;
                 this.tituloModal7 = 0;
+                this.arrayIvas = [];
+                this.ivaCompra = 0;
+                this.ivaVenta = 0;
+                this.ivaDevCompra = 0;
+                this.ivaDevVenta = 0;
+            },
+            cerrarModalCrear7(){
+                this.tipoAccion7=0;
+                this.ivaCompra=0;
+                this.ivaVenta=0;
+                this.ivaDevCompra=0;
+                this.ivaDevVenta=0;
             },
             cerrarModalStock(){
                 this.modal2=0;
@@ -1795,6 +1903,7 @@
             cerrarModalTarifario(){
                 this.modal3=0;
                 this.tituloModal3='';
+                this.tipoAccionModal3=1
             },
             abrirModalStock(accion, data=[]){
                 switch(accion){

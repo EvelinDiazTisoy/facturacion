@@ -77,6 +77,23 @@
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
+
+                                        <template v-if="permisosUser.actualizar">
+                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-primary btn-sm">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="marcarFavorito(tarifario.id)">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
+                                        <template v-else>
+                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-secondary btn-sm">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
                                     </td>
                                 </tr>                                
                             </tbody>
@@ -161,34 +178,32 @@
                                     <div class="col-md-6">
                                     </div>
                                 </div>
-
                             </form>
-                                <div class="form-group row">
-                                    <div class="col-md-12">
-                                        <table class="table table-bordered table-striped table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th class="col-md-8">Nombre</th>
-                                                    <th class="col-md-4">Valor</th>
-                                                    <!--<th>Opciones</th>-->
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="productosTarifario in arrayProductosTarifario" :key="productosTarifario.id">
-                                                    <td v-text="productosTarifario.nom_articulo"></td>
-                                                    <td><input type="number" v-model="productosTarifario.valor"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div v-show="errorTarifario" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjTarifario" :key="error" v-text="error">
 
-                                        </div>
+                            <div class="row" style="padding: 0em 1em;">
+                                <table class="table table-bordered table-striped table-sm" style="display: block;max-height: 26em !important;overflow-y: auto;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 80% !important;">Nombre</th>
+                                            <th style="width: 20% !important;">Valor</th>
+                                            <!--<th>Opciones</th>-->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="productosTarifario in arrayProductosTarifario" :key="productosTarifario.id">
+                                            <td v-text="productosTarifario.nom_articulo"></td>
+                                            <td><input type="number" v-model="productosTarifario.valor"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-show="errorTarifario" class="form-group row div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjTarifario" :key="error" v-text="error">
+
                                     </div>
                                 </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
@@ -333,6 +348,16 @@
                 {
                     this.listarArticulos('','','');
                 }
+            },
+            marcarFavorito(id)
+            {
+                axios.put(this.ruta +'/con_tarifario/marcarFavorito',{
+                    'id': id
+                }).then(function (response) {
+                    me.listarTarifario(page,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                }); 
             },
             cambiarPagina(page,buscar,criterio){
                 let me = this;

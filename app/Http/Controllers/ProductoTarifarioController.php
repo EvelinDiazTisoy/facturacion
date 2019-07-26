@@ -8,6 +8,7 @@ use App\ProductoTarifario;
 use App\ConTarifario;
 use App\Articulo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductoTarifarioController extends Controller
 {
@@ -73,6 +74,27 @@ class ProductoTarifarioController extends Controller
         $producto_tarifario->nombre = $request->nombre;
         $producto_tarifario->descripcion = $request->descripcion;
         $producto_tarifario->save();
+    }
+    
+    public function cargarPreciosTarifarios(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
+
+        $arrayDetalles = json_decode($request->arrayDetalle);
+
+        $cadena = '';
+        foreach($arrayDetalles as $ad)
+        {
+            $cadena .= ','.$ad->id;
+        }
+        $cadena = substr($cadena,1);
+
+        $cons = 'SELECT id,id_tarifario,id_producto,valor FROM productos_tarifarios WHERE id_producto IN ('.$cadena.') AND id_tarifario='.$request->id_tarifario;
+
+        $valores = DB::select($cons);
+        
+        return ['cadena'=>$cons,'producto_tarifario' => $valores];
     }
 
     public function desactivar(Request $request)

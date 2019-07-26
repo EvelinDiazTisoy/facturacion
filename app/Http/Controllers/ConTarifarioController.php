@@ -60,6 +60,18 @@ class ConTarifarioController extends Controller
         return ['tarifario' => $tarifario];
     }
 
+    public function selectConTarifario2(Request $request){
+        // if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
+
+        $tarifario = ConTarifario::select('con_tarifarios.id','con_tarifarios.nombre','con_tarifarios.favorito')
+        ->where('con_tarifarios.id_empresa','=',$id_empresa)
+        ->orderBy('nombre', 'asc')
+        ->get();
+        
+        return ['tarifario' => $tarifario];
+    }
+
     public function store(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
@@ -105,6 +117,20 @@ class ConTarifarioController extends Controller
             $productosTarifario->valor = $PT['valor'];
             $productosTarifario->save();
         }
+    }
+
+    public function marcarFavorito(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
+
+        $desmarcar = ConTarifario::where('id_empresa','=',$id_empresa)->update(['favorito'=>0]);
+        // $desmarcar->favorito = '0';
+        // $desmarcar->save();
+
+        $tarifario = ConTarifario::findOrFail($request->id);
+        $tarifario->favorito = '1';
+        $tarifario->save();
     }
 
     public function desactivar(Request $request)

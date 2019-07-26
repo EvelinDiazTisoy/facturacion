@@ -31,7 +31,7 @@ class FacturacionController extends Controller
 
         $facturacion = Facturacion::join('personas', 'facturacion.id_tercero','=','personas.id')
         ->join('zona', 'facturacion.lugar','=','zona.id')
-        ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.lugar','zona.zona as nom_lugar','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.estado');
+        ->select('facturacion.id','facturacion.num_factura','facturacion.id_tercero','personas.nombre as nom_tercero','facturacion.id_usuario','facturacion.fec_crea','facturacion.fec_edita','facturacion.usu_edita','facturacion.subtotal','facturacion.valor_iva','facturacion.total','abono','facturacion.saldo','facturacion.detalle','facturacion.lugar','zona.zona as nom_lugar','facturacion.descuento','facturacion.fec_registra','facturacion.fec_envia','facturacion.fec_anula','facturacion.usu_registra','facturacion.usu_envia','facturacion.usu_anula','facturacion.fecha','facturacion.id_tarifario','facturacion.estado');
 
         if($numFacturaFiltro!='' && $numFacturaFiltro!='0')
         {
@@ -132,6 +132,7 @@ class FacturacionController extends Controller
         $facturacion->usu_envia = null;
         $facturacion->usu_anula = null;
         $facturacion->fecha = $request->fecha;
+        $facturacion->id_tarifario = $request->id_tarifario;
         $facturacion->id_empresa = $id_empresa;
         $facturacion->estado = '1';
         $facturacion->save();
@@ -144,6 +145,7 @@ class FacturacionController extends Controller
             $detalle = new DetalleFacturacion();
             $detalle->id_factura = $facturacion->id;
             $detalle->id_producto = $det['idarticulo'];
+            $detalle->padre = $det['padre'];
             $detalle->valor_venta = $det['precio'];
             $detalle->cantidad = $det['cantidad'];
             $detalle->valor_iva = $det['valor_iva'];
@@ -197,19 +199,20 @@ class FacturacionController extends Controller
         $facturacion->usu_envia = null;
         $facturacion->usu_anula = null;
         $facturacion->fecha = $request->fecha;
+        $facturacion->id_tarifario = $request->id_tarifario;
         $facturacion->estado = $request->estado;
         $facturacion->save();
 
         $borrar_detalles = DetalleFacturacion::where('id_factura','=',$request->id)->delete();
 
         $detalles = $request->data;//Array de detalles
-            //Recorro todos los elementos
 
         foreach($detalles as $ep=>$det)
         {
             $detalle = new DetalleFacturacion();
             $detalle->id_factura = $request->id;
             $detalle->id_producto = $det['idarticulo'];
+            $detalle->padre = $det['padre'];
             $detalle->valor_venta = $det['precio'];
             $detalle->cantidad = $det['cantidad'];
             $detalle->valor_iva = $det['valor_iva'];
@@ -218,45 +221,65 @@ class FacturacionController extends Controller
             $detalle->valor_subtotal = $det['valor_subtotal'];  
             $detalle->valor_final = $det['valor_subtotal']+$det['valor_iva'];
             $detalle->save();
-
-            $articulo = Articulo::findOrFail($det['idarticulo']);
-            $stock = Stock::where('id_facturacion','=',$request->id)->where('id_producto','=',$det['idarticulo'])->get();
-            
-            if(!empty($stock))
-            {
-                $stockTablaStock = $stock[0]->cantidad;
-                $stockTablaArticulo = $articulo->stock;
-                $nuevoStock = $stockTablaArticulo+$stockTablaStock;
-                $articulo->stock = $nuevoStock;
-                $articulo->save();
-                $stock2 = Stock::findOrFail($stock[0]->id);
-                $stock2->delete();
-            }
-
-            $stock = new Stock();
-            // $stock=Stock::findOrFail($det['idarticulo']);
-            $stock->id_producto = $det['idarticulo'];
-            $stock->id_facturacion = $facturacion->id;
-            $stock->id_usuario = $id_usuario;
-            $stock->cantidad = $det['cantidad'];
-            $stock->tipo_movimiento = $request->tipo_movimiento;
-            $stock->sumatoria = $request->sumatoria;
-            $stock->save();
-
-            $articulo->stock = $articulo->stock-$stock->cantidad;
-            $articulo->save();
         }
     }
 
     public function cambiarEstado(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
+        $id_usuario = Auth::user()->id;
+
         $facturacion = Facturacion::findOrFail($request->id);
         $facturacion->estado = $request->estado;
         if($request->estado==2 && $request->num_factura)
         {
+            $detalles = DetalleFacturacion::where('id_factura','=',$request->id)->get();
+
+            if(!empty($detalles))
+            {
+                foreach($detalles as $det)
+                {
+                    $articulo = Articulo::findOrFail($det['id_producto']);
+
+                    if($articulo->stock>=$det['cantidad'])
+                    {
+                        $stock = new Stock();
+                        $stock->id_producto = $det['id_producto'];
+                        $stock->id_usuario = $id_usuario;
+                        $stock->id_facturacion = $request->id;
+                        $stock->cantidad = $det['cantidad'];
+                        $stock->tipo_movimiento = 4;
+                        $stock->sumatoria = 0;
+                        $stock->save();
+
+                        $articulo->stock = $articulo->stock-$det['cantidad'];
+                        $articulo->save();
+                    }
+                }
+            }
+
             $facturacion->num_factura=$request->num_factura;
         }
+
+        if($request->estado==4)
+        {
+            $detalles = DetalleFacturacion::where('id_factura','=',$request->id)->get();
+
+            if(!empty($detalles))
+            {
+                foreach($detalles as $det)
+                {
+                    $articulo = Articulo::findOrFail($det['id_producto']);
+                    $stock = Stock::where('id_producto','=',$det['id_producto'])->where('id_facturacion','=',$request->id)->delete();
+
+                    $articulo->stock = $articulo->stock+$det['cantidad'];
+                    $articulo->save();
+                }
+            }
+
+            $facturacion->num_factura=$request->num_factura;
+        }
+
         $facturacion->save();
     }
 

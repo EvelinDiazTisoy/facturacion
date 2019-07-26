@@ -6,9 +6,13 @@
  */
 
 import './bootstrap';
-import Multiselect from 'vue-multiselect'
+import Multiselect from 'vue-multiselect';
+
+// ES6 Modules or TypeScript
+import Swal from 'sweetalert2';
 
 window.Vue = require('vue');
+window.Swal = Swal;
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -45,6 +49,7 @@ Vue.component('con_tarifario', require('./components/ConTarifario.vue'));
 // Vue.component('tarifario', require('./components/Tarifario.vue'));
 Vue.component('iva', require('./components/Iva.vue'));
 Vue.component('formato_procesos', require('./components/FormatoProceso.vue'));
+Vue.component('cajas', require('./components/Cajas.vue'));
 Vue.component('multiselect', Multiselect);
 
 const app = new Vue({
