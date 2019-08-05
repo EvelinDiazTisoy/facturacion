@@ -1114,7 +1114,7 @@
                 }
                 else{
                     if(me.encuentra(me.idarticulo)){
-                        swal({
+                        Swal.fire({
                             type: 'error',
                             title: 'Error...',
                             text: 'Ese artículo ya se encuentra agregado!',
@@ -1162,7 +1162,7 @@
             agregarDetalleModal(data =[]){
                 let me=this;
                 if(me.encuentra(data['id'])){
-                    swal({
+                    Swal.fire({
                         type: 'error',
                         title: 'Error...',
                         text: 'Ese artículo ya se encuentra agregado!',
@@ -1478,7 +1478,7 @@
                 });
             },
             desactivarIngreso(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de anular este ingreso?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1498,7 +1498,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarIngreso(1,'','num_comprobante');
-                        swal(
+                        Swal.fire(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
                         'success'
@@ -1510,7 +1510,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }
@@ -1518,7 +1518,7 @@
             },
             cerrarIngreso(data){
                 
-                swal({
+                Swal.fire({
                 title: 'Cerrar ingreso?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1547,7 +1547,7 @@
                         'data': data,
                     }).then(function (response) {
                         me.listarIngreso(1,'','num_comprobante');
-                        swal(
+                        Swal.fire(
                         'Cerrado!',
                         'El ingreso ha sido cerrado con éxito.',
                         'success'
@@ -1559,7 +1559,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }

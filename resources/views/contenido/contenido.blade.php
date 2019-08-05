@@ -4,7 +4,6 @@
     $menu_usuario2 = Session::get('menu_usu');
 ?>
     @if(Auth::check())
-		
             <template v-if="menu==0">
                 <h1>Escritorio</h1>
             </template>
@@ -37,7 +36,7 @@
 
             <template v-if="menu==999994">
                 <h1>Acerca de</h1>
-            </template>      
+            </template>   
 
 
     @endif

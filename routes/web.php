@@ -359,6 +359,16 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/cajas/SelectCaja', 'CajasController@SelectCaja');
         Route::put('/cajas/desactivar', 'CajasController@desactivar');
         Route::put('/cajas/activar', 'CajasController@activar');
+
+        Route::get('/cierres_caja', 'CierresXCajaController@index');
+        Route::post('/cierres_caja/registrar', 'CierresXCajaController@store');
+        Route::put('/cierres_caja/actualizar', 'CierresXCajaController@update');
+        Route::get('/cierres_caja/SelectCierreXCaja', 'CierresXCajaController@SelectCierreXCaja');
+        Route::get('/cierres_caja/consultarCajas', 'CierresXCajaController@consultarCajas');
+        Route::put('/cierres_caja/desactivar', 'CierresXCajaController@desactivar');
+        Route::put('/cierres_caja/activar', 'CierresXCajaController@activar');
+        Route::put('/cierres_caja/cerrar', 'CierresXCajaController@cerrar');
+        Route::get('/cierres_caja/selectValorInicialCaja', 'CierresXCajaController@selectValorInicialCaja');
     });
 
 });

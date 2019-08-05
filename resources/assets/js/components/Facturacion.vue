@@ -1,5 +1,6 @@
 <template>
-            <main class="main">
+        <main class="main">
+            <!--<cierresCaja></cierresCaja>-->
             <!-- Breadcrumb -->
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
@@ -8,13 +9,26 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Facturacion
-                        <button v-if="permisosUser.crear" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                        <button v-else type="button" v-show="listado==1" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
+                        <div class="col-md-6 float-left">
+                            <i class="fa fa-align-justify"></i> Facturacion
+                            <button v-if="permisosUser.crear && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
+                                <i class="icon-plus"></i>&nbsp;Nuevo
+                            </button>
+                            <button v-else type="button" v-show="listado==1" class="btn btn-secondary">
+                                <i class="icon-plus"></i>&nbsp;Nuevo
+                            </button>
+
+                            <button v-if="permisosUser.actualizar && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
+                                <i class="icon-plus"></i>&nbsp;Cerrar caja
+                            </button>
+                            <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="mostrarDetalle('cierres_caja','registrar')">
+                                <i class="icon-plus"></i>&nbsp;Abrir caja
+                            </button>
+                        </div>
+                        <div class="col-md-6 float-right">
+                            <span v-if="nom_caja_cierre_facturacion!=''" v-text="'Usted esta en la caja: '+nom_caja_cierre_facturacion"></span>
+                            <span v-else >No hay caja abierta</span>
+                        </div>
                     </div>
                     <!-- Listado-->
                     <template v-if="listado==1">
@@ -743,12 +757,197 @@
                         </div>
                     </div>
                 </div>
-            <!-- Fin Modal buscar proveedores -->
+            <!-- Fin Modal buscar tercero -->
+
+            <!-- Modal actualizar cierre de caja -->
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modalCierreCaja}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModalCierre"></h4>
+                            <button type="button" class="close" @click="cerrarModalCierreCaja()" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div v-if="tipoAccionCierre!=3 && tipoAccionCierre!=4" class="modal-body">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label class="col-md-1 float-left">Caja</label>
+                                    <div class="float-right col-md-11">
+                                        <select v-if="tipoAccionCierre==2" disabled class="form-control float-right" v-model="id_caja_cierre" style="width: 95.7% !important;">
+                                            <option></option>
+                                            <option v-for="(caja, index) in arrayCajas" :value="caja.id" v-text="caja.nombre"></option>
+                                        </select>
+                                        <select v-else class="form-control float-right" v-model="id_caja_cierre" @change="selectValorInicialCaja(id_caja_cierre)" style="width: 95.7% !important;">
+                                            <option></option>
+                                            <option v-for="(caja, index) in arrayCajas" :value="caja.id" v-text="caja.nombre"></option>
+                                        </select>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <label class="col-md-3 float-left">Vr. Inicial</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="number" v-if="tipoAccionCierre==2" disabled class="form-control" v-model="vr_inicial_cierre">
+                                        <input type="number" v-else class="form-control" v-model="vr_inicial_cierre">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="col-md-3 float-left">Obs. Inicial</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="text" class="form-control" v-model="obs_inicial_cierre">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" v-if="tipoAccionCierre==2">
+                                <div class="col-md-6">
+                                    <label class="col-md-3 float-left">Vr. Gastos</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="number" class="form-control" v-model="vr_gastos_cierre">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="col-md-3 float-left">Obs. Gastos</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="text" class="form-control" v-model="obs_gastos_cierre">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" v-if="tipoAccionCierre==2">
+                                <div class="col-md-6">
+                                    <label class="col-md-3 float-left">Vr. Final</label>
+                                    <div class="col-md-9 float-right">
+                                        <input type="number" class="form-control" v-model="vr_final_cierre">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="modal-body">
+                            <div  v-if="tipoAccionCierre==3" class="row container">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-md-10">Nombre</th>
+                                            <th class="col-md-1">Fecha</th>
+                                            <th class="col-md-1">Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody v-if="permisosUser.leer && arrayCierresUsuario.length">
+                                        <tr v-for="cierre_caja in arrayCierresUsuario" :key="cierre_caja.id">
+                                            <td v-text="cierre_caja.nombre"></td>
+                                            <td v-text="cierre_caja.created_at"></td>
+                                            <td>
+                                                <button v-if="permisosUser.leer" type="button" @click="mostrarDetalle('cierres_caja','ver',cierre_caja)" class="btn btn-info btn-sm">
+                                                    <i class="icon-eye"></i>
+                                                </button>
+                                                <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                    <i class="icon-eye"></i>
+                                                </button> &nbsp;
+
+                                                <!--<button v-if="permisosUser.actualizar && cierre_caja.estado" type="button" @click="mostrarDetalle('cierres_caja','actualizar',cierre_caja)" class="btn btn-warning btn-sm">
+                                                    <i class="icon-pencil"></i>
+                                                </button>
+                                                <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                    <i class="icon-pencil"></i>
+                                                </button> &nbsp;-->
+
+                                                <template v-if="permisosUser.actualizar">
+                                                    <button v-if="cierre_caja.estado==1" type="button" class="btn btn-warning btn-sm" @click="mostrarDetalle('cierres_caja','cerrar_caja',cierre_caja)">
+                                                        <i class="fa fa-window-close"></i>
+                                                    </button>
+                                                    <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                        <i class="fa fa-window-close"></i>
+                                                    </button>
+                                                </template>
+                                                <template v-else>
+                                                    <button type="button" class="btn btn-secondary btn-sm">
+                                                        <i class="fa fa-window-close"></i>
+                                                    </button>
+                                                </template>
+
+                                                <template v-if="permisosUser.anular">
+                                                    <button v-if="cierre_caja.estado==1" type="button" class="btn btn-danger btn-sm" @click="desactivarCierreXCaja(cierre_caja.id)">
+                                                        <i class="icon-trash"></i>
+                                                    </button>
+                                                    <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                        <i class="icon-trash"></i>
+                                                    </button>
+                                                </template>
+                                                <template v-else>
+                                                    <button type="button" class="btn btn-secondary btn-sm">
+                                                        <i class="icon-trash"></i>
+                                                    </button>
+                                                </template>
+                                            </td>
+                                        </tr>                                
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr><td colspan="2">No hay registros para mostrar</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-else-if="tipoAccionCierre==4" class="row">
+                                <div class="col-md-12">
+                                    <h3 v-text="nombre_caja"></h3>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-md-6 float-left">
+                                        <div class="col-md-12">
+                                            <label class="col-md-12 float-left" v-text="'Valor inicial: '+vr_inicial_cierre"></label>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="col-md-3 float-left">Observacion inicial:</label>
+                                            <div class="col-md-9 float-right">
+                                                <p v-text="obs_inicial_cierre" class="col-md-12 float-left" style="overflow-y: auto;max-height: 8em;"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 float-right">
+                                        <div class="col-md-12">
+                                            <label class="col-md-12 float-left" v-text="'Valor inicial: '+vr_gastos_cierre"></label>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="col-md-3 float-left">Observacion inicial:</label>
+                                            <div class="col-md-9 float-right">
+                                                <p v-text="obs_gastos_cierre" class="col-md-12 float-left" style="overflow-y: auto;max-height: 8em;"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <div class="col-md-12">
+                                            <label class="col-md-12 float-left" v-text="'Valor final: '+vr_final_cierre"></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <div class="col-md-12">
+                                            <button type="button" @click="tipoAccionCierre=3" class="btn btn-danger btn-sm"><i class="fa fa-arrow-left"></i> Atras</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModalCierreCaja()">Cerrar</button>
+                            <button type="button" v-if="tipoAccionCierre==1" class="btn btn-primary" @click="registrarCierreXCaja()">Guardar</button>
+                            <button type="button" v-if="tipoAccionCierre==2" class="btn btn-primary" @click="cerrarCierreXCaja(id_cierre_caja_facturacion)">Cerrar Caja</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
 </template>
 
 <script>
     import vSelect from 'vue-select';
+    import moment from 'moment';
     export default {
         props : ['ruta','permisosUser'],
         data (){
@@ -840,6 +1039,11 @@
                 fec_anula:'',
                 fecha : '',
                 stock : 0,
+                nom_caja_cierre_facturacion : '',
+                id_caja_facturacion : 0,
+                id_cierre_caja_facturacion : 0,
+                vr_inicial_cierre_facturacion : 0,
+                obs_inicial_cierre_facturacion : '',
 
                 arrayFacturacion : [],
                 arrayFacturacionT : [],
@@ -876,7 +1080,25 @@
 
                 // tarifarios
                 id_tarifario : 0,
-                arrayTarifario : []
+                arrayTarifario : [],
+
+                // variables cierre de caja
+                cierre_caja_id : 0,
+                nombre_caja : '',
+                id_caja_cierre : '',
+                vr_inicial_cierre : 0,
+                obs_inicial_cierre : '',
+                vr_gastos_cierre : 0,
+                obs_gastos_cierre : '',
+                vr_software_cierre : 0,
+                vr_final_cierre : 0,
+                arrayCierresXCajas : [],
+                arrayCierresUsuario : [],
+                arrayCajas: [],
+                modalCierreCaja : 0,
+                tituloModalCierre : '',
+                tipoAccionCierre : 0,
+                ban : 0,
             }
         },
         components: {
@@ -1011,6 +1233,340 @@
                 .catch(function (error) {
                     console.log(error);
                 });
+            },
+            listarCajas(page,buscar,criterio){
+                let me=this;
+                var ban1 = 0;
+                var ban2 = 0;
+                var url= this.ruta +'/cierres_caja?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio+ '&fec_desde=&fec_hasta=';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayCierresXCajas = respuesta.cierres_caja.data;
+
+                    if(!me.arrayCierresXCajas.length){
+                        me.mostrarDetalle('cierres_caja','registrar');
+                    }
+                    else
+                    {
+                        me.arrayCierresXCajas.forEach(function(cierre){
+                            if(cierre['usu_crea']==respuesta.id_usuario)
+                            {
+                                ban1 = 1;
+                                if(cierre['estado']==1)
+                                {
+                                    ban2 = 1;
+                                    
+                                    var d = new Date;
+                                    var dd = d.getDate(); var mm = d.getMonth()+1; var yyyy = d.getFullYear();
+                                    var h = d.getHours(); var min = d.getMinutes(); var sec = d.getSeconds();
+                                    
+                                    if(dd<10){dd='0'+dd;}  if(mm<10){mm='0'+mm;} if(h<10){h='0'+h;} if(min<10){min='0'+min;} if(sec<10){sec='0'+sec;}
+
+                                    var fechaHora = yyyy+'-'+mm+'-'+dd+' '+h+':'+min+':'+sec;
+                                    var fecha = yyyy+'-'+mm+'-'+dd;
+
+                                    var n1 = cierre['created_at'].split(" "); var n2 = n1[0].split("-"); var n3 = n1[1].split(":");
+                                                                        
+                                    if(yyyy == n2[0])
+                                    {
+                                        if(mm == n2[1])
+                                        {
+                                            var restaDia = parseFloat(dd)-parseFloat(n2[2]);
+                                            if(restaDia<=1)
+                                            {
+                                                if(restaDia==1)
+                                                {
+                                                    var horasDiaAnterior = 24-n3[0]
+                                                    var sumaHoras = horasDiaAnterior+h;
+                                                    if(sumaHoras<24)
+                                                    {
+                                                        me.id_cierre_caja_facturacion = cierre['id'];
+                                                        me.nom_caja_cierre_facturacion = cierre['nombre'];
+                                                        me.cierre_caja_id = cierre['id'];
+                                                        me.id_caja_cierre = cierre['id_caja'];
+                                                        me.nom_caja_cierre = cierre['nombre'];
+                                                        me.vr_inicial_cierre = cierre['vr_inicial'];
+                                                        me.obs_inicial_cierre = cierre['obs_inicial'];
+                                                        
+                                                        me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+                                                    }
+                                                    else{ me.mostrarDetalle('cierres_caja','listar_cierres',cierre); }
+                                                }
+                                                else
+                                                {
+                                                    me.id_cierre_caja_facturacion = cierre['id'];
+                                                    me.nom_caja_cierre_facturacion = cierre['nombre'];
+                                                    me.cierre_caja_id = cierre['id'];
+                                                    me.id_caja_cierre = cierre['id_caja'];
+                                                    me.nom_caja_cierre = cierre['nombre'];
+                                                    me.vr_inicial_cierre = cierre['vr_inicial'];
+                                                    me.obs_inicial_cierre = cierre['obs_inicial'];
+
+                                                    me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+                                                }
+                                            }
+                                            else{ me.mostrarDetalle('cierres_caja','listar_cierres',cierre); }
+                                        }
+                                        else{ me.mostrarDetalle('cierres_caja','listar_cierres',cierre); }
+                                    }
+                                    else{ me.mostrarDetalle('cierres_caja','listar_cierres',cierre); }
+                                }
+                            }
+                        });
+
+                        if(ban1 == 1)
+                        {
+                            if(ban2 == 0)
+                            {
+                                me.mostrarDetalle('cierres_caja','registrar');
+                            }
+                        }
+                        else
+                        {
+                            me.mostrarDetalle('cierres_caja','registrar');
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            SelectCierreXCaja(id){
+                let me=this;
+                var url= this.ruta +'/cierres_caja/SelectCierreXCaja?id='+id;
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data.cierres_caja[0];
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            selectCajas(){
+                let me=this;
+                var url= this.ruta +'/cajas/SelectCaja';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    me.arrayCajas = respuesta.cajas;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            selectValorInicialCaja(id){
+                let me=this;
+                var url= this.ruta +'/cierres_caja/selectValorInicialCaja?id='+id;
+                if(id!=0 && id!='')
+                {
+                    axios.get(url).then(function (response) {
+                        var respuesta= response.data;
+                        if(respuesta.cierres_caja[0])
+                        {
+                            me.vr_inicial_cierre = respuesta.cierres_caja[0]['vr_final'];
+                        }
+                        else
+                        {
+                            me.vr_inicial_cierre = 0;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                }
+                else
+                {
+                    alert('id vacio');
+                }
+            },
+            registrarCierreXCaja(){
+                // if (this.validarCierreXCaja()){
+                //     return;
+                // }
+                
+                let me = this;
+
+                axios.post(this.ruta +'/cierres_caja/registrar',{
+                    'id_caja': this.id_caja_cierre,
+                    'vr_inicial': this.vr_inicial_cierre,
+                    'obs_inicial': this.obs_inicial_cierre,
+                    'vr_gastos': this.vr_gastos_cierre,
+                    'obs_gastos': this.obs_gastos_cierre,
+                    'vr_final': this.vr_final_cierre,
+                }).then(function (response) {
+                    me.modalCierreCaja = 0;
+                    me.listarCajas(1,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+            actualizarCierreXCaja(){
+                // if (this.validarCierreXCaja()){
+                //     return;
+                // }
+                
+                let me = this;
+
+                axios.put(this.ruta +'/cierres_caja/actualizar',{
+                    'id_caja': this.id_caja_cierre,
+                    'vr_inicial': this.vr_inicial_cierre,
+                    'obs_inicial': this.obs_inicial_cierre,
+                    'vr_gastos': this.vr_gastos_cierre,
+                    'obs_gastos': this.obs_gastos_cierre,
+                    'vr_final': this.vr_final_cierre,
+                    'id': this.cierre_caja_id
+                }).then(function (response) {
+                    me.cerrarModal();
+                    me.listarCajas(1,'','nombre');
+                }).catch(function (error) {
+                    console.log(error);
+                }); 
+            },
+            desactivarCierreXCaja(id){
+               Swal.fire({
+                title: 'Esta seguro de desactivar esta cierre de caja?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/cierre_caja/desactivar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.cerrarModalCierreCaja();
+                        me.listarCajas(1,'','nombre');
+                        Swal.fire(
+                        'Desactivado!',
+                        'El registro ha sido desactivado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === Swal.fire.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
+            },
+            activarConcentracion(id){
+               Swal.fire({
+                title: 'Esta seguro de activar este cierre de caja?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/concentracion/activar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.listarCajas(1,'','nombre');
+                        Swal.fire(
+                        'Activado!',
+                        'El registro ha sido activado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === Swal.fire.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
+            },
+            cerrarCierreXCaja(id){
+                let me = this;
+                if(me.id_caja!='' && me.vr_inicial_cierre!=0 && me.vr_final_cierre!=0 && me.vr_gastos_cierre!=0)
+                {
+                    Swal.fire({
+                        title: 'Esta seguro de cerrar esta caja?',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Aceptar!',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonClass: 'btn btn-success',
+                        cancelButtonClass: 'btn btn-danger',
+                        buttonsStyling: false,
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.value) {
+                            let me = this;
+
+                            axios.put(this.ruta +'/cierres_caja/cerrar',{
+                                'id_caja': this.id_caja_cierre,
+                                'obs_inicial': this.obs_inicial_cierre,
+                                'vr_gastos': this.vr_gastos_cierre,
+                                'obs_gastos': this.obs_gastos_cierre,
+                                'vr_final': this.vr_final_cierre,
+                                'id': this.cierre_caja_id
+                            }).then(function (response) {
+                                me.id_caja_facturacion = 0;
+                                me.nom_caja_cierre_facturacion = '';
+                                me.cerrarModalCierreCaja();
+                                me.listarCajas(1,'','');
+                                Swal.fire(
+                                'Desactivado!',
+                            'El registro ha sido cerrado con éxito.',
+                            'success'
+                            )
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                        } else if (
+                            // Read more about handling dismissals
+                            result.dismiss === Swal.fire.DismissReason.cancel
+                        ) {}
+                    }) 
+                }
+                else
+                {
+                    alert('error al cerrar la caja');
+                }
+            },
+            cerrarModalCierreCaja(){
+                this.modalCierreCaja=0;
+                this.tituloModalCierre='';
+                // this.id_caja_cierre='';
+                // this.vr_inicial_cierre=0;
+                // this.obs_inicial_cierre = '';
+                // this.vr_gastos_cierre = 0;
+                // this.obs_gastos_cierre = '';
+                // this.vr_software_cierre = 0;
+                // this.vr_final_cierre = 0;
+                // this.cierre_caja_id = 0;
+                this.arrayCierresUsuario = 0;
+                this.arrayCierresXCajas = 0;
+                this.ban=0;
+
+                // this.id_caja_facturacion = 0;
+                // this.nom_caja_cierre_facturacion = '';
             },
             getDatosProveedor(val1){
                 let me = this;
@@ -1422,10 +1978,10 @@
             },
             mostrarDetalle(modelo, accion, data=[]){
                 let me=this;
-                me.listado=0;
                 
                 switch(modelo){
                     case 'facturacion':{
+                        me.listado=0;
                         switch(accion){
                             case 'registrar':{
                                 // me.sugerirNumFactura();
@@ -1488,6 +2044,112 @@
                         }
                         me.selectZonas();
                         me.selectTarifarios();
+                        break;
+                    }
+                    case "cierres_caja":
+                    {
+                        switch(accion){
+                            case 'registrar':
+                            {
+                                this.arrayCierresUsuario = [];
+                                this.modalCierreCaja = 1;
+                                this.tituloModalCierre = 'Abrir caja';
+                                this.id_caja_cierre='';
+                                this.vr_inicial_cierre=0;
+                                this.obs_inicial_cierre = '';
+                                this.vr_gastos_cierre = 0;
+                                this.obs_gastos_cierre = '';
+                                this.vr_software_cierre = 0;
+                                this.vr_final_cierre = 0;
+                                this.cierre_caja_id = 0;
+                                this.tipoAccionCierre = 1;
+                                break;
+                            }
+                            case 'cerrar_caja':
+                            {
+                                //console.log(data);
+                                if(data.length!=0)
+                                {
+                                    this.arrayCierresUsuario = [];
+                                    this.modalCierreCaja=1;
+                                    this.tituloModalCierre='Cerrar caja';
+                                    this.tipoAccionCierre=2;
+                                    this.cierre_caja_id=data['id'];
+                                    this.id_caja_cierre = data['id_caja'];
+                                    this.vr_inicial_cierre = data['vr_inicial'];
+                                    this.obs_inicial_cierre = data['obs_inicial'];
+                                    this.vr_gastos_cierre = data['vr_gastos'];
+                                    this.obs_gastos_cierre = data['obs_gastos'];
+                                    this.vr_software_cierre = 0;
+                                    this.vr_final_cierre = data['vr_final'];
+                                }
+                                else
+                                {
+                                    this.arrayCierresUsuario = [];
+                                    this.modalCierreCaja=1;
+                                    this.tituloModalCierre='Cerrar caja';
+                                    this.tipoAccionCierre=2;
+                                }
+                                break;
+                            }
+                            case 'listar_cierres':
+                            {
+                                Swal.fire({
+                                title: 'ERROR!',
+                                text: "Este usuario tiene una caja abierta desde hace mas de 24 horas",
+                                type: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Ok!'
+                                }).then((result) => {
+                                    if (result.value) {
+                                        this.arrayCierresUsuario.push({
+                                            created_at : data['created_at'],
+                                            estado : data['estado'],
+                                            id : data['id'],
+                                            id_caja : data['id_caja'],
+                                            nombre : data['nombre'],
+                                            obs_gastos : data['obs_gastos'],
+                                            obs_inicial : data['obs_inicial'],
+                                            vr_final : data['vr_final'],
+                                            vr_gastos : data['vr_gastos'],
+                                            vr_inicial : data['vr_inicial'],
+                                            vr_software : data['vr_software'],
+                                        });
+                                        
+                                        this.modalCierreCaja=1;
+                                        this.tituloModalCierre='Listado de cierres de caja';
+                                        this.tipoAccionCierre=3;
+
+                                        
+                                        // this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
+                                    } else {
+                                        // this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
+                                    }
+                                })
+                                
+                                // this.modalCierreCaja=1;
+                                // this.tituloModalCierre='Listado de cierres de caja';
+                                // this.tipoAccionCierre=3;
+                                break;
+                            }
+                            case 'ver':
+                            {
+                                this.tipoAccionCierre=4;
+                                this.id_caja = data['id_caja'];
+                                this.nombre_caja = data['nombre'];
+                                this.vr_inicial_cierre = data['vr_inicial'];
+                                this.obs_inicial_cierre = data['obs_inicial'];
+                                this.vr_gastos_cierre = data['vr_gastos'];
+                                this.obs_gastos_cierre = data['obs_gastos'];
+                                this.vr_software_cierre = data['vr_software'];
+                                this.vr_final_cierre = data['vr_final'];
+                                break;
+                            }
+                        }
+                        this.selectCajas();
+                        break;
                     }
                 }
             },
@@ -1715,7 +2377,6 @@
             let me= this;
             var d = new Date();
             
-            
             var dd = d.getDate();
             var mm = d.getMonth()+1;
             var yyyy = d.getFullYear();
@@ -1735,7 +2396,9 @@
             me.fecha = d;
             me.fechaHoraActual = d+' '+h+':'+min+':'+sec;
 
-            me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+            me.listarCajas(1,'','');
+
+            // me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
         }
     }
 </script>
