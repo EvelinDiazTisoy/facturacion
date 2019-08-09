@@ -75,7 +75,7 @@ class IngresoController extends Controller
 
         $id = $request->id;
         $detalles = DetalleIngreso::join('articulos','detalle_ingresos.idarticulo','=','articulos.id')
-        ->select('detalle_ingresos.cantidad','detalle_ingresos.precio','articulos.nombre as articulo')
+        ->select('detalle_ingresos.cantidad','detalle_ingresos.precio','detalle_ingresos.porcentaje_iva as porcentaje','articulos.nombre as articulo')
         ->where('detalle_ingresos.idingreso','=',$id)
         ->orderBy('detalle_ingresos.id', 'desc')->get();
         
@@ -127,7 +127,14 @@ class IngresoController extends Controller
                 $detalle = new DetalleIngreso();
                 $detalle->idingreso = $ingreso->id;
                 $detalle->idarticulo = $det['idarticulo'];
-                $detalle->cantidad = $det['cantidad'];
+                if($det['padre']!='')
+                {
+                    $detalle->cantidad = $det['cantidad']*$det['unidades'];
+                }
+                else
+                {
+                    $detalle->cantidad = $det['cantidad'];
+                }
                 $detalle->precio = $det['precio'];  
                 $detalle->vr_iva = $det['iva_individual'];
                 if($request->regimen_proveedor!='Simplificado')
@@ -144,13 +151,20 @@ class IngresoController extends Controller
                 $stock = new Stock();
                 $stock->id_producto = $det['idarticulo'];
                 $stock->id_usuario = $id_usuario;
-                $stock->cantidad = $det['cantidad'];
+                if($det['padre']!='')
+                {
+                    $stock->cantidad = $det['cantidad']*$det['unidades'];
+                }
+                else
+                {
+                    $stock->cantidad = $det['cantidad'];
+                }
                 $stock->tipo_movimiento = $request->tipo_movimiento;
                 $stock->sumatoria = $request->sumatoria;
                 $stock->save();
 
                 $cuentasArticulo = Articulo::leftJoin('modelo_contable','articulos.idcategoria','modelo_contable.id')
-                ->select('articulos.id','articulos.idcategoria','modelo_contable.nombre','modelo_contable.idCuentaProductos','modelo_contable.idCuentaSalidaProductos','idCuentaSaldosIniciales','idCuentaDonaciones')
+                ->select('articulos.id','articulos.idcategoria','modelo_contable.nombre','modelo_contable.idCuentaProductos','modelo_contable.idCuentaSalidaProductos','idCuentaSaldosIniciales','idCuentaDonaciones','idCuentaDevolucionesVentas','idCuentaDevolucionesCompras','idCuentaImpuestoConsumoVentas')
                 ->where('articulos.id','=',$detalle->idarticulo)
                 ->get();
 
@@ -166,7 +180,7 @@ class IngresoController extends Controller
                 if($ingreso->tipo_ingreso=='Compras'){
                     $id_cuenta = $cuentasArticulo[0]['idCuentaProductos'];
                 }elseif($ingreso->tipo_ingreso=='Devoluciones'){
-                    $id_cuenta = $cuentasArticulo[0]['idCuentaDevolucionesVentas'];
+                    $id_cuenta = $cuentasArticulo[0]['idCuentaDevolucionesCompras'];
                 }elseif($ingreso->tipo_ingreso=='Saldos iniciales'){
                     $id_cuenta = $cuentasArticulo[0]['idCuentaSaldosIniciales'];
                 }elseif($ingreso->tipo_ingreso=='Donaciones'){
@@ -360,26 +374,10 @@ class IngresoController extends Controller
 
         foreach($detalles as $det)
         {
-            $total_debe = 0;
-            if($request->tipo_ingreso!='Saldos iniciales')
-            {
-                $total_debe = $total_debe+$det['total_precio'];
-                $total_haber = $total_debe+$det['total_precio'];
-            }
-
             $cuentas = new Cuentas();
             $cuentas->id_formato = $formato->id;
             $cuentas->numero = $Numero;
             $cuentas->tercero = $request->tercero;
-            // if($request->tipo_ingreso!='Saldos iniciales')
-            // {
-            //     $cuentas->debe = $total_debe;
-            //     $cuentas->haber = 0;
-            // }
-            // else{
-            //     $cuentas->debe = 0;
-            //     $cuentas->haber = $total_haber;
-            // }
             $cuentas->debe = $det->total_iva;
             $cuentas->haber = $det->total_precio;
             $cuentas->centro_costos = null;

@@ -643,7 +643,7 @@
                                 </table>
                             </div>
                             <div v-if="tipo_vista_articulo==2" class="container" style="display: block;height: 35em;max-height: 35em;overflow-y: auto;">
-                                <div v-for="articulo in arrayArticulo" :key="articulo.id" @click="abrirModalCantidadArticulo(articulo)" class="col-sm-6 col-md-3 p-sm-2 p-md-1 mosaico" style="height: 43%;">
+                                <div v-for="(articulo, index) in arrayArticulo" @click="abrirModalCantidadArticulo(articulo)" class="col-sm-6 col-md-3 p-sm-2 p-md-1 mosaico" style="height: 43%;">
                                     <div class="border col-md-12" style="height: 100%;">
                                         <div class="text-center py-md-2">
                                             <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">

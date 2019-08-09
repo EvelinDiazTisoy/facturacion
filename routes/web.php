@@ -295,13 +295,13 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/detalle_egreso/desactivar', 'DetalleEgresoController@desactivar');
         Route::put('/detalle_egreso/activar', 'DetalleEgresoController@activar');
 
-        Route::get('/egreso', 'EgresoController@index');
-        Route::post('/egreso/registrar', 'EgresoController@store');
-        Route::put('/egreso/actualizar', 'EgresoController@update');
-        Route::put('/egreso/desactivar', 'EgresoController@desactivar');
-        Route::put('/egreso/cerrar', 'EgresoController@cerrar');
-        Route::get('/egreso/obtenerCabecera', 'EgresoController@obtenerCabecera');
-        Route::get('/egreso/obtenerDetalles', 'EgresoController@obtenerDetalles');
+        Route::get('/egreso', 'EgresosController@index');
+        Route::post('/egreso/registrar', 'EgresosController@store');
+        Route::put('/egreso/actualizar', 'EgresosController@update');
+        Route::put('/egreso/desactivar', 'EgresosController@desactivar');
+        Route::put('/egreso/cerrar', 'EgresosController@cerrar');
+        Route::get('/egreso/obtenerCabecera', 'EgresosController@obtenerCabecera');
+        Route::get('/egreso/obtenerDetalles', 'EgresosController@obtenerDetalles');
 
         Route::get('/con_tarifario', 'ConTarifarioController@index');
         Route::post('/con_tarifario/registrar', 'ConTarifarioController@store');

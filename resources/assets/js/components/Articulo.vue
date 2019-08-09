@@ -56,7 +56,7 @@
                                         <span v-text="articulo.nombre"></span>
                                         <span v-if="articulo.id_presentacion!=null" v-text="' - '+articulo.nom_presentacion"></span>
                                         <span v-else> - N/A presentacion</span>
-                                        <span v-if="articulo.talla!=null" v-text="' - '+articulo.talla"></span>
+                                        <span v-if="articulo.talla!=null && articulo.talla!='' && articulo.talla!='null'" v-text="' - '+articulo.talla"></span>
                                         <span v-else> - N/A talla</span>
                                     </td>
                                     <td v-text="articulo.nombre_categoria"></td>
