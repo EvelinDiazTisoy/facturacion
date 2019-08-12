@@ -1,138 +1,138 @@
 <template>
-        <main class="main">
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
-            </ol>
-            <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Unidad de medida
-                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('und_medida','registrar')" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                        <button v-else type="button" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
-                                      <option value="nombre">Nombre</option>>
-                                    </select>
-                                    <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+    <main class="main">
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+        </ol>
+        <div class="container-fluid">
+            <!-- Ejemplo de tabla Listado -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Unidad de medida
+                    <button v-if="permisosUser.crear" type="button" @click="abrirModal('und_medida','registrar')" class="btn btn-primary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                    <button v-else type="button" class="btn btn-secondary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <option value="nombre">Nombre</option>>
+                                </select>
+                                <select v-else disabled class="form-control col-md-3" v-model="criterio">
+                                </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarUndMedida(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
+                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarUndMedida(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarUndMedida(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
+                                <!--<button v-if="permisosUser.leer" type="submit" @click="listarUndMedida(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                             </div>
                         </div>
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th class="col-md-11">Nombre</th>
-                                    <th>Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody v-if="permisosUser.leer">
-                                <tr v-for="und_medida in arrayUndMedida" :key="und_medida.id">
-                                    <td v-text="und_medida.nombre"></td>
-                                    <td>
-                                        <button v-if="permisosUser.actualizar && und_medida.estado" type="button" @click="abrirModal('und_medida','actualizar',und_medida)" class="btn btn-warning btn-sm">
-                                          <i class="icon-pencil"></i>
+                    </div>
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th class="col-md-11">Nombre</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="permisosUser.leer">
+                            <tr v-for="und_medida in arrayUndMedida" :key="und_medida.id">
+                                <td v-text="und_medida.nombre"></td>
+                                <td>
+                                    <button v-if="permisosUser.actualizar && und_medida.estado" type="button" @click="abrirModal('und_medida','actualizar',und_medida)" class="btn btn-warning btn-sm">
+                                        <i class="icon-pencil"></i>
+                                    </button>
+                                    <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <i class="icon-pencil"></i>
+                                    </button> &nbsp;
+
+                                    <template v-if="permisosUser.anular">
+                                        <button v-if="und_medida.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarUndMedida(und_medida.id)">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                        <button v-else type="button" class="btn btn-info btn-sm" @click="activarUndMedida(und_medida.id)">
+                                            <i class="icon-check"></i>
+                                        </button>
+                                    </template>
+                                    <template v-else>
+                                        <button v-if="und_medida.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <i class="icon-trash"></i>
                                         </button>
                                         <button v-else type="button" class="btn btn-secondary btn-sm">
-                                          <i class="icon-pencil"></i>
-                                        </button> &nbsp;
-
-                                        <template v-if="permisosUser.anular">
-                                            <button v-if="und_medida.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarUndMedida(und_medida.id)">
-                                                <i class="icon-trash"></i>
-                                            </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarUndMedida(und_medida.id)">
-                                                <i class="icon-check"></i>
-                                            </button>
-                                        </template>
-                                        <template v-else>
-                                            <button v-if="und_medida.estado" type="button" class="btn btn-secondary btn-sm">
-                                                <i class="icon-trash"></i>
-                                            </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
-                                                <i class="icon-check"></i>
-                                            </button>
-                                        </template>
-                                    </td>
-                                </tr>                                
-                            </tbody>
-                            <tbody v-else>
-                                <tr><td colspan="2">No hay registros para mostrar</td></tr>
-                            </tbody>
-                        </table>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                                            <i class="icon-check"></i>
+                                        </button>
+                                    </template>
+                                </td>
+                            </tr>                                
+                        </tbody>
+                        <tbody v-else>
+                            <tr><td colspan="2">No hay registros para mostrar</td></tr>
+                        </tbody>
+                    </table>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" v-if="pagination.current_page > 1">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
+                            </li>
+                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
+                            </li>
+                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
-                <!-- Fin ejemplo de tabla Listado -->
             </div>
-            <!--Inicio del modal agregar/actualizar-->
-            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
-                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la unidad de medida">
-                                        
+            <!-- Fin ejemplo de tabla Listado -->
+        </div>
+        <!--Inicio del modal agregar/actualizar-->
+        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModal"></h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la unidad de medida">
+                                    
+                                </div>
+                            </div>
+                            <div v-show="errorUndMedida" class="form-group row div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjUndMedida" :key="error" v-text="error">
+
                                     </div>
                                 </div>
-                                <div v-show="errorUndMedida" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjUndMedida" :key="error" v-text="error">
+                            </div>
 
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarUndMedida()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarUndMedida()">Actualizar</button>
-                        </div>
+                        </form>
                     </div>
-                    <!-- /.modal-content -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarUndMedida()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarUndMedida()">Actualizar</button>
+                    </div>
                 </div>
-                <!-- /.modal-dialog -->
+                <!-- /.modal-content -->
             </div>
-            <!--Fin del modal-->
-        </main>
+            <!-- /.modal-dialog -->
+        </div>
+        <!--Fin del modal-->
+    </main>
 </template>
 
 <script>
@@ -254,7 +254,7 @@
                 return this.errorUndMedida;
             },
             desactivarUndMedida(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar esta unidad de medida?',
                 type: 'warning',
                 showCancelButton: true,
@@ -274,7 +274,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarUndMedida(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -286,14 +286,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarUndMedida(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar esta unidad de medida?',
                 type: 'warning',
                 showCancelButton: true,
@@ -313,7 +313,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarUndMedida(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -325,7 +325,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }

@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarPresentacion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarPresentacion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarPresentacion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarPresentacion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -128,9 +128,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPresentacion()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPresentacion()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarPresentacion()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarPresentacion()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -260,7 +260,7 @@
                 return this.errorPresentacion;
             },
             desactivarPresentacion(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar esta presentacion?',
                 type: 'warning',
                 showCancelButton: true,
@@ -280,7 +280,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarPresentacion(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -292,14 +292,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarPresentacion(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar esta presentacion?',
                 type: 'warning',
                 showCancelButton: true,
@@ -319,7 +319,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarPresentacion(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -331,7 +331,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.fire.DismissReason.cancel
                 ) {
                     
                 }

@@ -21,33 +21,22 @@ class ModeloContableController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
-            $modelo_contable = ModeloContable::leftJoin('plan_cuentas as pc1','modelo_contable.idCuentaProductos','pc1.id')
-            ->leftJoin('plan_cuentas as pc2','modelo_contable.idCuentaSalidaProductos','pc2.id')
-            ->leftJoin('plan_cuentas as pc3','modelo_contable.idCuentaSaldosIniciales','pc3.id')
-            ->leftJoin('plan_cuentas as pc4','modelo_contable.idCuentaDonaciones','pc4.id')
-            ->leftJoin('plan_cuentas as pc5','modelo_contable.idCuentaDevolucionesVentas','pc5.id')
-            ->leftJoin('plan_cuentas as pc6','modelo_contable.idCuentaDevolucionesCompras','pc6.id')
-            ->leftJoin('plan_cuentas as pc7','modelo_contable.idCuentaImpuestoConsumoVentas','pc7.id')
-            ->select('modelo_contable.id','modelo_contable.id as id_modelo_contable','modelo_contable.nombre','modelo_contable.descripcion','modelo_contable.idCuentaProductos','pc1.nombre as cuentaProductos','pc1.codigo as codCuentaProductos','modelo_contable.idCuentaSalidaProductos','pc2.nombre as cuentaSalidaProductos','pc2.codigo as codCuentaSalidaProductos','modelo_contable.idCuentaSaldosIniciales','pc3.nombre as cuentaSaldosIniciales','pc3.codigo as codCuentaSaldosIniciales','modelo_contable.idCuentaDonaciones','pc4.nombre as cuentaDonaciones','pc4.codigo as codCuentaDonaciones','pc5.nombre as cuentaDevolucionesVentas','pc5.codigo as codCuentaDevolucionesVentas','modelo_contable.idCuentaDevolucionesVentas','pc6.nombre as cuentaDevolucionesCompras','pc6.codigo as codCuentaDevolucionesCompras','modelo_contable.idCuentaDevolucionesCompras','pc7.nombre as cuentaImpuestoConsumoVentas','pc7.codigo as codCuentaImpuestoConsumoVentas','modelo_contable.idCuentaImpuestoConsumoVentas','modelo_contable.condicion')
-            ->where('modelo_contable.id_empresa','=',$id_empresa)
-            ->orderBy('id', 'desc')
-            ->paginate(3);
+        $modelo_contable = ModeloContable::leftJoin('plan_cuentas as pc1','modelo_contable.idCuentaProductos','pc1.id')
+        ->leftJoin('plan_cuentas as pc2','modelo_contable.idCuentaSalidaProductos','pc2.id')
+        ->leftJoin('plan_cuentas as pc3','modelo_contable.idCuentaSaldosIniciales','pc3.id')
+        ->leftJoin('plan_cuentas as pc4','modelo_contable.idCuentaDonaciones','pc4.id')
+        ->leftJoin('plan_cuentas as pc5','modelo_contable.idCuentaDevolucionesVentas','pc5.id')
+        ->leftJoin('plan_cuentas as pc6','modelo_contable.idCuentaDevolucionesCompras','pc6.id')
+        ->leftJoin('plan_cuentas as pc7','modelo_contable.idCuentaImpuestoConsumoVentas','pc7.id')
+        ->select('modelo_contable.id','modelo_contable.id as id_modelo_contable','modelo_contable.nombre','modelo_contable.descripcion','modelo_contable.idCuentaProductos','pc1.nombre as cuentaProductos','pc1.codigo as codCuentaProductos','modelo_contable.idCuentaSalidaProductos','pc2.nombre as cuentaSalidaProductos','pc2.codigo as codCuentaSalidaProductos','modelo_contable.idCuentaSaldosIniciales','pc3.nombre as cuentaSaldosIniciales','pc3.codigo as codCuentaSaldosIniciales','modelo_contable.idCuentaDonaciones','pc4.nombre as cuentaDonaciones','pc4.codigo as codCuentaDonaciones','pc5.nombre as cuentaDevolucionesVentas','pc5.codigo as codCuentaDevolucionesVentas','modelo_contable.idCuentaDevolucionesVentas','pc6.nombre as cuentaDevolucionesCompras','pc6.codigo as codCuentaDevolucionesCompras','modelo_contable.idCuentaDevolucionesCompras','pc7.nombre as cuentaImpuestoConsumoVentas','pc7.codigo as codCuentaImpuestoConsumoVentas','modelo_contable.idCuentaImpuestoConsumoVentas','modelo_contable.condicion');
+        if($buscar!='')
+        {
+            $modelo_contable = $modelo_contable->where('modelo_contable.nombre', 'like', '%'. $buscar . '%')
+            ->orWhere('modelo_contable.descripcion', 'like', '%'. $buscar . '%');
         }
-        else{
-            $modelo_contable = ModeloContable::leftJoin('plan_cuentas as pc1','modelo_contable.idCuentaProductos','pc1.id')
-            ->leftJoin('plan_cuentas as pc2','modelo_contable.idCuentaSalidaProductos','pc2.id')
-            ->leftJoin('plan_cuentas as pc3','modelo_contable.idCuentaSaldosIniciales','pc3.id')
-            ->leftJoin('plan_cuentas as pc4','modelo_contable.idCuentaDonaciones','pc4.id')
-            ->leftJoin('plan_cuentas as pc5','modelo_contable.idCuentaDevolucionesVentas','pc5.id')
-            ->leftJoin('plan_cuentas as pc6','modelo_contable.idCuentaDevolucionesCompras','pc6.id')
-            ->leftJoin('plan_cuentas as pc7','modelo_contable.idCuentaImpuestoConsumoVentas','pc7.id')
-            ->select('modelo_contable.id','modelo_contable.id as id_modelo_contable','modelo_contable.nombre','modelo_contable.descripcion','modelo_contable.idCuentaProductos','pc1.nombre as cuentaProductos','pc1.codigo as codCuentaProductos','modelo_contable.idCuentaSalidaProductos','pc2.nombre as cuentaSalidaProductos','pc2.codigo as codCuentaSalidaProductos','modelo_contable.idCuentaSaldosIniciales','pc3.nombre as cuentaSaldosIniciales','pc3.codigo as codCuentaSaldosIniciales','modelo_contable.idCuentaDonaciones','pc4.nombre as cuentaDonaciones','pc4.codigo as codCuentaDonaciones','pc5.nombre as cuentaDevolucionesVentas','pc5.codigo as codCuentaDevolucionesVentas','modelo_contable.idCuentaDevolucionesVentas','pc6.nombre as cuentaDevolucionesCompras','pc6.codigo as codCuentaDevolucionesCompras','modelo_contable.idCuentaDevolucionesCompras','pc7.nombre as cuentaImpuestoConsumoVentas','pc7.codigo as codCuentaImpuestoConsumoVentas','modelo_contable.idCuentaImpuestoConsumoVentas','modelo_contable.condicion')
-            ->where($criterio, 'like', '%'. $buscar . '%')
-            ->where('id_empresa','=',$id_empresa)
-            ->orderBy('id', 'desc')
-            ->paginate(3);
-        }
+        $modelo_contable = $modelo_contable->where('modelo_contable.id_empresa','=',$id_empresa)
+        ->orderBy('modelo_contable.id', 'desc')
+        ->paginate(3);
         
 
         return [

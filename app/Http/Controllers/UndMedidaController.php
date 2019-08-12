@@ -17,12 +17,9 @@ class UndMedidaController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
-            $und_medida = UndMedida::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(3);
-        }
-        else{
-            $und_medida = UndMedida::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
-        }
+        $und_medida = UndMedida::where('id_empresa','=',$id_empresa);
+        if($buscar!=''){$und_medida = $und_medida->where($criterio, 'like', '%'. $buscar . '%');}
+        $und_medida = $und_medida->orderBy('id', 'desc')->paginate(3);
         
 
         return [

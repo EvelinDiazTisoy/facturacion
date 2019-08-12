@@ -17,13 +17,12 @@ class PresentacionController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
-            $presentacion = Presentacion::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(3);
+        $presentacion = Presentacion::where('id_empresa','=',$id_empresa);
+        if($buscar!='')
+        {
+            $presentacion = $presentacion->where('nombre', 'like', '%'. $buscar . '%');
         }
-        else{
-            $presentacion = Presentacion::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
-        }
-        
+        $presentacion = $presentacion->orderBy('id', 'desc')->paginate(3);        
 
         return [
             'pagination' => [

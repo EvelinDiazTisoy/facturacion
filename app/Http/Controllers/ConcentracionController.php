@@ -17,13 +17,9 @@ class ConcentracionController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
-            $concentracion = Concentracion::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(3);
-        }
-        else{
-            $concentracion = Concentracion::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('id', 'desc')->paginate(3);
-        }
-        
+        $concentracion = Concentracion::where('id_empresa','=',$id_empresa);
+        if($buscar!=''){$concentracion = $concentracion->where($criterio, 'like', '%'. $buscar . '%');}
+        $concentracion = $concentracion->orderBy('id', 'desc')->paginate(3);        
 
         return [
             'pagination' => [

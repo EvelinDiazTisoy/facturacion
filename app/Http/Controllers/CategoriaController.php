@@ -21,13 +21,9 @@ class CategoriaController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
-            $categorias = Categoria::where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(3);
-        }
-        else{
-            $categorias = Categoria::where($criterio, 'like', '%'. $buscar . '%')->where('id_empresa','=',$id_empresa)->orderBy('id', 'desc')->paginate(3);
-        }
-        
+        $categorias = Categoria::where($criterio, 'like', '%'. $buscar . '%');
+        if($buscar!=''){$categorias = $categorias->where('id_empresa','=',$id_empresa);}
+        $categorias = $categorias->orderBy('id', 'desc')->paginate(3);        
 
         return [
             'pagination' => [

@@ -61,7 +61,7 @@
                                     </button> &nbsp;-->
 
                                     <template v-if="permisosUser.actualizar">
-                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-warning btn-sm" @click="cerrarCierreXCaja(cierre_caja.id)">
+                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-warning btn-sm" @click="abrirModal('cierres_caja','actualizar',cierre_caja)">
                                             <i class="fa fa-window-close"></i>
                                         </button>
                                         <button v-else type="button" class="btn btn-secondary btn-sm">
@@ -167,7 +167,11 @@
                             <div class="col-md-12">
                                 <label class="col-md-1 float-left">Caja</label>
                                 <div class="float-right col-md-11">
-                                    <select class="form-control float-right" v-model="id_caja" style="width: 95.7% !important;">
+                                    <select v-if="tipoAccion==1" class="form-control float-right" v-model="id_caja" style="width: 95.7% !important;">
+                                        <option></option>
+                                        <option v-for="(caja, index) in arrayCajas" :value="caja.id" v-text="caja.nombre"></option>
+                                    </select>
+                                    <select v-else disabled class="form-control float-right" v-model="id_caja" style="width: 95.7% !important;">
                                         <option></option>
                                         <option v-for="(caja, index) in arrayCajas" :value="caja.id" v-text="caja.nombre"></option>
                                     </select>
@@ -178,17 +182,19 @@
                             <div class="col-md-6">
                                 <label class="col-md-3 float-left">Vr. Inicial</label>
                                 <div class="col-md-9 float-right">
-                                    <input type="number" class="form-control" v-model="vr_inicial">
+                                    <input v-if="tipoAccion==1" type="number" class="form-control" v-model="vr_inicial">
+                                    <input v-else disabled type="number" class="form-control" v-model="vr_inicial">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="col-md-3 float-left">Obs. Inicial</label>
                                 <div class="col-md-9 float-right">
-                                    <input type="text" class="form-control" v-model="obs_inicial">
+                                    <input v-if="tipoAccion==1" type="text" class="form-control" v-model="obs_inicial">
+                                    <input v-else disabled type="text" class="form-control" v-model="obs_inicial">
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div v-if="tipoAccion==2" class="form-group row">
                             <div class="col-md-6">
                                 <label class="col-md-3 float-left">Vr. Gastos</label>
                                 <div class="col-md-9 float-right">
@@ -202,7 +208,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group row">
+                        <div v-if="tipoAccion==2" class="form-group row">
                             <div class="col-md-6">
                                 <label class="col-md-3 float-left">Vr. Final</label>
                                 <div class="col-md-9 float-right">
@@ -212,11 +218,17 @@
                             <div class="col-md-6">
                             </div>
                         </div>
+                        <div v-show="errorCierreXCaja" class="form-group row div-error">
+                            <div class="text-center text-error">
+                                <div v-for="error in errorMostrarMsjCierreXCaja" :key="error" v-text="error">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarCierreXCaja()">Guardar</button>
-                        <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarCierreXCaja()">Actualizar</button>
+                        <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarCierreXCaja()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="cerrarCierreXCaja(id_caja)">Cerrar Caja</button>
                     </div>
                 </div>
             </div>
@@ -319,9 +331,9 @@
                 me.listarCajas(page,buscar,criterio,fec_desde,fec_hasta);
             },
             registrarCierreXCaja(){
-                // if (this.validarCierreXCaja()){
-                //     return;
-                // }
+                if (this.validarCierreXCaja()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -334,15 +346,15 @@
                     'vr_final': this.vr_final,
                 }).then(function (response) {
                     me.cerrarModal();
-                    me.listarCajas(1,'','nombre','','');
+                    me.listarCajas(1,this.buscar,this.criterio,this.fec_desde,this.fec_hasta);
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
             actualizarCierreXCaja(){
-                // if (this.validarCierreXCaja()){
-                //     return;
-                // }
+                if (this.validarCierreXCaja()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -365,7 +377,13 @@
                 this.errorCierreXCaja=0;
                 this.errorMostrarMsjCierreXCaja =[];
 
-                if (!this.nombre) this.errorMostrarMsjCierreXCaja.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.id_caja || this.id_caja==0) this.errorMostrarMsjCierreXCaja.push("El nombre de la presentación no puede estar vacío.");
+                if(!this.vr_inicial || this.vr_inicial==0) this.errorMostrarMsjCierreXCaja.push("Ingrese valor inicial");
+                if(this.tipoAccion==2)
+                {
+                    if(!this.vr_gastos || this.vr_gastos==0) this.errorMostrarMsjCierreXCaja.push("Ingrese valor gastos");
+                    if(!this.vr_final || this.vr_final==0) this.errorMostrarMsjCierreXCaja.push("Ingrese valor final");
+                }
 
                 if (this.errorMostrarMsjCierreXCaja.length) this.errorCierreXCaja = 1;
 
@@ -404,7 +422,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -443,56 +461,65 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
-            cerrarCierreXCaja(id){
-               Swal.fire({
-                title: 'Esta seguro de cerrar esta caja?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar!',
-                cancelButtonText: 'Cancelar',
-                confirmButtonClass: 'btn btn-success',
-                cancelButtonClass: 'btn btn-danger',
-                buttonsStyling: false,
-                reverseButtons: true
-                }).then((result) => {
-                if (result.value) {
-                    let me = this;
+            cerrarCierreXCaja(){
+                let me = this;
+                if(me.id_caja!=0 && me.vr_inicial!=0 && me.vr_final!=0 && me.vr_gastos!=0)
+                {
+                    Swal.fire({
+                        title: 'Esta seguro de cerrar esta caja?',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Aceptar!',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonClass: 'btn btn-success',
+                        cancelButtonClass: 'btn btn-danger',
+                        buttonsStyling: false,
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.value) {
 
-                    axios.put(this.ruta +'/cierres_caja/cerrar',{
-                        'id': id
-                    }).then(function (response) {
-                        me.listarCajas(1,'','nombre','','');
-                        Swal.fire(
-                        'Desactivado!',
-                        'El registro ha sido cerrado con éxito.',
-                        'success'
-                        )
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-                    
-                    
-                } else if (
-                    // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
-                ) {
-                    
+                            axios.put(me.ruta +'/cierres_caja/cerrar',{
+                                'id_caja': me.id_caja,
+                                'obs_inicial': me.obs_inicial,
+                                'vr_gastos': me.vr_gastos,
+                                'obs_gastos': me.obs_gastos,
+                                'vr_final': me.vr_final,
+                                'id': me.cierre_caja_id
+                            }).then(function (response) {
+                                me.cerrarModal();
+                                me.listarCajas(1,me.buscar,me.criterio,me.fec_desde,me.fec_hasta);
+                                Swal.fire(
+                                'Cerrado!',
+                            'El registro ha sido cerrado con éxito.',
+                            'success'
+                            )
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                        } else if (
+                            // Read more about handling dismissals
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {}
+                    }) 
                 }
-                }) 
+                else
+                {
+                    me.validarCierreXCaja();
+                }
             },
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal='';
                 this.tipoAccion = 0;
-                this.id_caja='';
+                this.id_caja=0;
                 this.nombre_caja = '';
                 this.vr_inicial=0;
                 this.obs_inicial = '';
@@ -527,7 +554,7 @@
                             {
                                 //console.log(data);
                                 this.modal=1;
-                                this.tituloModal='Actualizar Cierre de caja';
+                                this.tituloModal='Cierre de caja';
                                 this.tipoAccion=2;
                                 this.cierre_caja_id=data['id'];
                                 this.id_caja = data['id_caja'];

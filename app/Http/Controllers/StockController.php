@@ -27,6 +27,10 @@ class StockController extends Controller
         if($request->fecIni!='' && $request->fecFin!=''){
             $stock = $stock->whereBetween('stock.fec_crea', [$fecIni, $fecFin]);
         };
+        if($request->buscar!=''){
+            $stock = $stock->where('articulos.'.$request->criterio, 'like', '%'. $request->buscar . '%')
+            ->orWhere('articulos.codigo', 'like', '%'. $request->buscar . '%');
+        };
         $stock = $stock->where('stock.id_empresa','=',$id_empresa)->orderBy('stock.fec_crea', 'desc')->paginate(12);
 
         // return [
