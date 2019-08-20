@@ -285,7 +285,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Detalle</label>
                                     <input type="text" class="form-control" v-model="detalle">
@@ -327,23 +327,25 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label>Cantidad <span style="color:red;" v-show="cantidad==0">(*Ingrese)</span></label>
+                                    <label>Cantidad <span style="color:red;" v-show="cantidad==0 && idarticulo!=0">(*Ingrese)</span></label>
                                     <!--<input type="number" v-if="stock!=0" :min="1" :max="stock" class="form-control" v-model="cantidad" @blur="if(cantidad>stock) cantidad=stock">-->
-                                    <input type="number" v-if="stock!=0" :min="1" :max="stock" class="form-control" v-model="cantidad" @blur="function(){if(cantidad>stock) cantidad=stock;}">
-                                    <input type="number" v-else disabled class="form-control">
+                                    <input type="number" v-if="stock!=0 && idarticulo!=0" :min="1" :max="stock" class="form-control" v-model="cantidad" @blur="function(){if(cantidad>stock) {cantidad=stock;}else if(cantidad<=0){cantidad=1;}}">
+                                    <input type="number" v-else disabled class="form-control" v-model="cantidad">
                                     <span  v-if="stock!=0" v-text="'Cantidad en stock: '+stock"></span>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Descuento</label>
-                                    <input type="number" :min="0" :max="Math.round((precio*cantidad)/((iva/100)+1))" @blur="if(descuento>Math.round((precio*cantidad)/((iva/100)+1))) descuento=Math.round((precio*cantidad)/((iva/100)+1))" class="form-control" v-model="descuento" >
-                                    <span v-if="descuento!=0" v-text="'Maximo descuento '+Math.round((precio*cantidad)/((iva/100)+1))"></span>
+                                    <input type="number" v-if="idarticulo!=0" :min="0" :max="Math.round((precio*cantidad)/((iva/100)+1))" @blur="if(descuento>Math.round((precio*cantidad)/((iva/100)+1))) descuento=Math.round((precio*cantidad)/((iva/100)+1))" class="form-control" v-model="descuento" >
+                                    <input type="number" v-else disabled class="form-control" v-model="descuento">
+                                    <span v-if="idarticulo!=0" v-text="'Maximo descuento '+Math.round((precio*cantidad)/((iva/100)+1))"></span>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <button @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
+                                    <button v-if="idarticulo!=0 && cantidad!=0" @click="agregarDetalle()" class="btn btn-success form-control btnagregar"><i class="icon-plus"></i></button>
+                                    <button v-else class="btn btn-secondary form-control btnagregar"><i class="icon-plus"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -382,7 +384,12 @@
                                                 {{detalle.cantidad}}
                                             </td>
                                             <td>
-                                                <input v-model="detalle.valor_descuento" v-if="tipoAccion2==1" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva)) detalle.valor_descuento=((detalle.precio*detalle.cantidad)-detalle.valor_iva)">
+                                                <input v-model="detalle.valor_descuento" v-if="tipoAccion2==1" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="function(){
+                                                        if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva) || detalle.valor_descuento>0)
+                                                        {detalle.valor_descuento=((detalle.precio*detalle.cantidad)-detalle.valor_iva);}
+                                                        else{ detalle.valor_descuento=0;}
+                                                    }
+                                                ">
 
                                                 <!--<input v-model="detalle.valor_descuento" v-else-if="tipoAccion2==2" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="detalle.valor_descuento2" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="
                                                 if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva)) 
@@ -390,15 +397,17 @@
                                                 detalle.valor_descuento=detalle.valor_descuento2
                                                 ">-->
 
-                                                <input v-model="detalle.valor_descuento" v-else-if="tipoAccion2==2" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="
-                                                if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva)) 
-                                                detalle.valor_descuento=((detalle.precio*detalle.cantidad)-detalle.valor_iva)">
+                                                <input v-model="detalle.valor_descuento" v-else-if="tipoAccion2==2" type="number" value="0" class="form-control" style="width: 9em; text-align: right;" :min="0" :max="((detalle.precio*detalle.cantidad)-detalle.valor_iva)" @blur="function(){
+                                                    if(detalle.valor_descuento>((detalle.precio*detalle.cantidad)-detalle.valor_iva) || detalle.valor_descuento>0) 
+                                                    {detalle.valor_descuento=((detalle.precio*detalle.cantidad)-detalle.valor_iva);}
+                                                    else{detalle.valor_descuento=0;}
+                                                }">
                                             </td>
                                             <td style="text-align: right;">
-                                                $ {{detalle.valor_iva=Math.round((detalle.precio*detalle.cantidad)-((detalle.precio*detalle.cantidad)/((detalle.iva/100)+1)))}}
+                                                $ {{detalle.valor_iva=Math.round(parseFloat(detalle.precio*detalle.cantidad)-parseFloat((detalle.precio*detalle.cantidad)/((detalle.iva/100)+1)))}}
                                             </td>
                                             <td style="text-align: right;">
-                                                $ {{detalle.valor_subtotal=(detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento}}
+                                                $ {{detalle.valor_subtotal=Math.round(parseFloat((detalle.precio*detalle.cantidad)-detalle.valor_iva-detalle.valor_descuento))}}
                                             </td>
                                         </tr>
                                         <tr style="background-color: #CEECF5; text-align: right;">
@@ -625,24 +634,30 @@
                                                 <span v-if="articulo.talla!=null" v-text="' - '+articulo.talla"></span>
                                                 <span v-else> - N/A talla</span>
                                             </td>
-                                            <td v-text="articulo.condicion+' - '+articulo.id_empresa"></td>
+                                            <td v-text="articulo.nom_modelo_contable"></td>
                                             <td v-text="articulo.nom_categoria"></td>
                                             <td v-text="articulo.precio_venta"></td>
-                                            <td v-text="articulo.stock"></td>
+                                            <td v-if="articulo.padre!=''" v-text="parseInt(articulo.stock/articulo.unidades)"></td>
+                                            <td v-else v-text="articulo.stock"></td>
                                             <td><input type="number" v-model="articulo.cant"></td>
-                                            <td>
-                                                <button v-if="articulo.cant" type="button" @click="agregarDetalleModal(articulo)" class="btn btn-success btn-sm">
-                                                <i class="icon-check"></i>
+                                            <td v-if="articulo.cant">
+                                                <button type="button" v-if="articulo.cant!=0 && articulo.cant!=''" @click="agregarDetalleModal(articulo),articulo.cant=''" class="btn btn-success btn-sm">
+                                                    <i class="icon-check"></i>
                                                 </button>
-                                                <button v-else type="button" class="btn btn-secondary btn-sm">
-                                                <i class="icon-check"></i>
+                                                <button type="button" v-else class="btn btn-secondary btn-sm">
+                                                    <i class="icon-check"></i>
                                                 </button>
                                             </td>
-                                        </tr>
+                                            <td v-else>
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    <i class="icon-check"></i>
+                                                </button>
+                                            </td>
+                                        </tr>                                
                                     </tbody>
                                 </table>
                             </div>
-                            <div v-if="tipo_vista_articulo==2" class="container" style="display: block;height: 35em;max-height: 35em;overflow-y: auto;">
+                            <div v-if="tipo_vista_articulo==2" class="container" style="display: block;height: 36em;max-height: 36em;overflow-y: auto;">
                                 <div v-for="(articulo, index) in arrayArticulo" @click="abrirModalCantidadArticulo(articulo)" class="col-sm-6 col-md-3 p-sm-2 p-md-1 mosaico" style="height: 43%;">
                                     <div class="border col-md-12" style="height: 100%;">
                                         <div class="text-center py-md-2">
@@ -652,9 +667,11 @@
                                         </div>
                                         <div class="text-center col-md-12">
                                             <h6 v-text="articulo.nombre"></h6>
+                                            <span v-if="articulo.id_presentacion!=null" v-text="articulo.nom_presentacion"></span>
+                                            <span v-else>N/A presentacion</span>
                                         </div>
                                         <div class="text-center col-md-12 pb-md-1">
-                                            <span v-text="articulo.precio_venta"></span>
+                                            <span v-text="'Precio: '+articulo.precio_venta"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -690,7 +707,7 @@
                                             <input type="number" class="form-control float-right col-sm-9 col-md-8" v-model="cantidadArticulo">
                                         </div>
                                         <div class="col-sm-2 col-md-2 float-right">
-                                            <button v-if="cantidadArticulo!=0" type="button" @click="agregarDetalleModalCantidadArticulo()" class="btn btn-success btn-sm float-right">
+                                            <button v-if="cantidadArticulo!=0 && cantidadArticulo!=''" type="button" @click="agregarDetalleModalCantidadArticulo()" class="btn btn-success btn-sm float-right">
                                                 <i class="icon-check"></i>
                                             </button>
                                             <button v-else type="button" class="btn btn-secondary btn-sm float-right">
@@ -699,7 +716,11 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-12">
-                                        <div class="col-sm-4 col-md-5">
+                                        <div class="col-sm-4 col-md-5 float-right">
+                                            <label class="col-sm-6 col-md-6 float-left">Saldo parcial</label>
+                                            <label class="col-sm-6 col-md-6 float-right" v-text="precioArticulo"></label>
+                                        </div>
+                                        <div class="col-sm-4 col-md-5 float-left">
                                             <label class="col-sm-6 col-md-6 float-left">Stock</label>
                                             <label class="col-sm-6 col-md-6 float-right" v-text="stockCantidadArticulo"></label>
                                         </div>
@@ -997,7 +1018,9 @@
                 precio: 0,
                 cantidad:1,
                 nom_presentacion : '',
+                id_presentacion : 0,
                 padreDetalle : '',
+                idDetalleAsociado : 0,
                 tipo_vista_articulo:1,
 
                 // variables modal buscar tercero
@@ -1075,8 +1098,11 @@
                 modalCantidadArticulo : 0,
                 tituloModalCantidadArticulo : '',
                 cantidadArticulo : 0,
+                precioArticulo : 0,
                 stockCantidadArticulo : 0,
+                saldoParcialCantidadArticulo : false,
                 arrayInfoArticuloModalCantidad : [],
+                accionCodigoBarras : 0,
 
                 // tarifarios
                 id_tarifario : 0,
@@ -1174,7 +1200,7 @@
             listarFacturacion (page,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro){
                 let me=this;
 
-                var url= this.ruta +'/facturacion?page=' + page + '&numFacturaFiltro='+ numFacturaFiltro + '&estadoFiltro='+ estadoFiltro + '&idTerceroFiltro='+ idTerceroFiltro + '&ordenFiltro='+ ordenFiltro + '&desdeFiltro='+ desdeFiltro + '&hastaFiltro='+ hastaFiltro + '&idVendedorFiltro='+ idVendedorFiltro;
+                var url= this.ruta +'/facturacion?page=' + page + '&numFacturaFiltro='+ numFacturaFiltro + '&estadoFiltro='+ estadoFiltro + '&idTerceroFiltro='+ idTerceroFiltro + '&ordenFiltro='+ ordenFiltro + '&desdeFiltro='+ desdeFiltro + '&hastaFiltro='+ hastaFiltro + '&idVendedorFiltro='+ idVendedorFiltro+'&id_cierre_caja='+me.id_cierre_caja_facturacion;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayFacturacion = respuesta.facturacion.data;
@@ -1454,7 +1480,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1493,7 +1519,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1541,7 +1567,7 @@
                             });
                         } else if (
                             // Read more about handling dismissals
-                            result.dismiss === Swal.fire.DismissReason.cancel
+                            result.dismiss === Swal.DismissReason.cancel
                         ) {}
                     }) 
                 }
@@ -1580,18 +1606,41 @@
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayArticulo = respuesta.articulos;
+                    console.log(me.arrayArticulo);
 
                     if (me.arrayArticulo.length>0){
-                        me.articulo=me.arrayArticulo[0]['nombre'];
-                        me.idarticulo=me.arrayArticulo[0]['id'];
-                        me.precio = me.arrayArticulo[0]['precio_venta'];
-                        me.cantidad = 1;
-                        me.descuento = 0;
-                        // me.cantidad=me.arrayArticulo[0]['stock'];
-                        me.iva=me.arrayArticulo[0]['iva'];
-                        // me.valor_iva = parseFloat(me.arrayArticulo[0]['precio']*me.arrayArticulo[0]['cantidad'])/((me.arrayArticulo[0]['iva']/100)+1);
-                        me.stock = me.arrayArticulo[0]['stock'];
-                        me.padreDetalle = me.arrayArticulo[0]['padre'];
+                        if (me.arrayArticulo[0]['productos_asociados'].length>0){
+                            me.buscarA = me.arrayArticulo[0]['codigo'];
+                            me.abrirModal();
+                        }
+                        else {
+                            var p = '';
+                            if(me.arrayArticulo[0]['padre']!='')
+                            {
+                                p = ' - (Presentacion asociada: '+me.arrayArticulo[0]['nom_presentacion']+')';
+                            }
+                            else
+                            {
+                                p = ' - '+me.arrayArticulo[0]['nom_presentacion'];
+                            }
+                            me.articulo=me.arrayArticulo[0]['codigo']+' - '+me.arrayArticulo[0]['nombre']+p;
+                            me.idarticulo=me.arrayArticulo[0]['id'];
+                            me.precio = me.arrayArticulo[0]['precio_venta'];
+                            me.cantidad = 1;
+                            me.stock = me.arrayArticulo[0]['stock'];
+                            for(var i=0; i<me.arrayArticulo[0]['productos_iva'].length; i++)
+                            { 
+                                if(me.arrayArticulo[0]['productos_iva'][i]['tipo_iva']=='Venta')
+                                {
+                                    me.porcentaje = me.arrayArticulo[0]['productos_iva'][i]['porcentaje'];
+                                }
+                            }
+                            // me.porcentaje = me.arrayArticulo[0]['porcentaje'];
+                            me.descuento = 0;
+                            me.id_presentacion = me.arrayArticulo[0]['id_presentacion'];
+                            me.idDetalleAsociado = me.arrayArticulo[0]['id_asociado'];
+                            // me.cantidad=me.arrayArticulo[0]['stock'];
+                        }
                     }
                     else{
                         me.articulo='No existe artículo';
@@ -1600,6 +1649,8 @@
                         me.cantidad = 0;
                         me.stock = 0;
                         me.padreDetalle = '';
+                        me.idDetalleAsociado = 0;
+                        me.descuento = 0;
                     }
                 })
                 .catch(function (error) {
@@ -1681,7 +1732,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1733,12 +1784,26 @@
                 //Envia la petición para visualizar la data de esa página
                 me.listarFacturacion(1,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro);
             },
-            encuentra(id,padre){
+            /*encuentra(id,presentacion){
                 var sw=0;
                 for(var i=0;i<this.arrayDetalle.length;i++){
-                    if(this.arrayDetalle[i].padre==null){this.arrayDetalle[i].padre='';}
-                    if(this.arrayDetalle[i].idarticulo==id && this.arrayDetalle[i].padre==padre){
+                    if(this.arrayDetalle[i].id==id && this.arrayDetalle[i].id_presentacion==presentacion){
                         sw=true;
+                    }
+                }
+                return sw;
+            },*/
+            encuentra(id,id_asociado){
+                let me=this;
+                var sw=0;
+                console.log('id: '+id+' id_asociado: '+id_asociado);
+                for(var i=0;i<this.arrayDetalle.length;i++){
+                    if(this.arrayDetalle[i].id==id)
+                    {
+                        if(this.arrayDetalle[i].id_asociado=='' && id_asociado=='')
+                        {
+                            sw=true;
+                        }
                     }
                 }
                 return sw;
@@ -1752,7 +1817,7 @@
                 if(me.idarticulo==0 || me.cantidad==0 || me.precio==0){
                 }
                 else{
-                    if(me.encuentra(me.idarticulo, me.padreDetalle)){
+                    if(me.encuentra(me.idarticulo, me.idDetalleAsociado)){
                         Swal.fire({
                             type: 'error',
                             title: 'Error...',
@@ -1770,6 +1835,7 @@
                             stock : me.stock,
                             descuento : me.descuento,
                             nom_presentacion : me.nom_presentacion,
+                            id_presentacion : me.id_presentacion,
                             padre : me.padreDetalle
                         });
                         me.codigo="";
@@ -1780,7 +1846,9 @@
                         me.iva = 0;
                         me.descuento = 0;
                         me.nom_presentacion = '';
+                        me.id_presentacion = 0;
                         me.padreDetalle = '';
+                        me.idDetalleAsociado = 0;
                     }
                     
                 }
@@ -1788,7 +1856,7 @@
             agregarDetalleModal(data =[]){
                 let me=this;
 
-                if(me.encuentra(data['id'],data['padre'])){
+                if(me.encuentra(data['id'], data['id_asociado'])){
                     Swal.fire({
                         type: 'error',
                         title: 'Error...',
@@ -1796,23 +1864,39 @@
                         })
                 }
                 else{
+                    var p = '';
+                    if(data['padre']!='') {p = ' - (Presentacion asociada: '+data['nom_presentacion']+')';}
+                    else {p = ' - '+data['nom_presentacion'];}
+
+                    var ivaVenta = 0;
+                    data['productos_iva'].forEach(function(iva){
+                        if(iva['tipo_iva']=='Venta'){ivaVenta=iva['porcentaje'];}
+                    });
+
+                    var descu = 0;
+                    if(data['descuento'] && data['descuento']!='') {descu=data['descuento'];}
+
                     me.arrayDetalle.push({
                         idarticulo: data['id'],
-                        articulo: data['nombre'],
+                        articulo: data['codigo']+' - '+data['nombre']+p,
+                        porcentaje : ivaVenta,
                         cantidad: data['cant'],
-                        valor_descuento: 0,
                         precio: data['precio_venta'],
-                        iva: data['iva'],
-                        stock : data['stock'],
+                        precio_venta: data['precio_venta'],
+                        iva : ivaVenta,
                         nom_presentacion : data['nom_presentacion'],
+                        id_presentacion : data['id_presentacion'],
                         padre : data['padre'],
+                        unidades : data['unidades'],
+                        descuento : 0,
+                        valor_descuento : 0,
                     }); 
                 }
             },
             agregarDetalleModalCantidadArticulo(){
                 let me=this;
                 
-                if(me.encuentra(me.arrayInfoArticuloModalCantidad.id && me.arrayInfoArticuloModalCantidad.padre)){
+                if(me.encuentra(me.arrayInfoArticuloModalCantidad.id && me.arrayInfoArticuloModalCantidad.id_asociado)){
                     Swal.fire({
                         type: 'error',
                         title: 'Error...',
@@ -1820,15 +1904,28 @@
                         })
                 }
                 else{
+                    var p = ''
+                    if(me.arrayInfoArticuloModalCantidad.padre!='') {p = ' - (Presentacion asociada: '+me.arrayInfoArticuloModalCantidad.padre+')';}
+                    else {p = ' - '+me.arrayInfoArticuloModalCantidad.padre;}
+
+                    var ivaVenta = 0;
+                    me.arrayInfoArticuloModalCantidad.productos_iva.forEach(function(iva){
+                        if(iva['tipo_iva']=='Venta'){ivaVenta=iva['porcentaje'];}
+                    });
+
                     me.arrayDetalle.push({
                         idarticulo: me.arrayInfoArticuloModalCantidad.id,
-                        articulo: me.arrayInfoArticuloModalCantidad.nombre,
+                        articulo: me.arrayInfoArticuloModalCantidad.codigo+' - '+me.arrayInfoArticuloModalCantidad.nombre+p,
+                        porcentaje : ivaVenta,
                         cantidad: me.cantidadArticulo,
-                        valor_descuento: 0,
                         precio: me.arrayInfoArticuloModalCantidad.precio_venta,
-                        iva: me.arrayInfoArticuloModalCantidad.iva,
-                        stock : me.arrayInfoArticuloModalCantidad.stock,
+                        precio_venta : me.arrayInfoArticuloModalCantidad.precio_venta,
+                        iva: ivaVenta,
                         nom_presentacion : me.arrayInfoArticuloModalCantidad.nom_presentacion,
+                        id_presentacion : me.arrayInfoArticuloModalCantidad.id_presentacion,
+                        padre : me.arrayInfoArticuloModalCantidad.padre,
+                        descuento : 0,
+                        valor_descuento : 0,
                     }); 
                 }
                 me.cerrarModalCantidadArticulo();
@@ -1884,6 +1981,7 @@
                     'usu_anula': null,
                     'fecha': me.fecha,
                     'id_tarifario': me.id_tarifario,
+                    'id_cierre_caja': me.id_cierre_caja_facturacion,
                     'data': me.arrayDetalle,
                     'tipo_movimiento' : 4,
                     'sumatoria' : 0
@@ -2228,14 +2326,16 @@
                 this.arrayArticulo=[];
                 this.modal = 1;
                 this.tituloModal = 'Seleccione uno o varios artículos';
-                this.listarArticulo('','');
                 this.selectCategoria2();
+                this.listarArticulo(this.buscarA,this.criterioA,this.buscarCategoriaA)
             },
             cerrarModalCantidadArticulo(){
                 this.modalCantidadArticulo=0;
                 this.tituloModalCantidadArticulo='';
                 this.cantidadArticulo = 0;
+                this.idDetalleAsociado = 0;
                 this.stockCantidadArticulo = 0;
+                this.saldoParcialCantidadArticulo = false;
                 this.arrayInfoArticuloModalCantidad = [];
             }, 
             abrirModalCantidadArticulo(data){               
@@ -2277,7 +2377,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

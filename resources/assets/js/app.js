@@ -57,7 +57,7 @@ const app = new Vue({
     el: '#app', 
     data :{
         menu : 0,
-        ruta : 'http://localhost/laravel_estudio/sistema2/public',
+        ruta : 'http://192.168.100.195/laravel_estudio/sistema2/public',
         permisosUser : []
     },
 

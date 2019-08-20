@@ -250,21 +250,22 @@
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>Precio Und <span style="color:red;" v-if="!saldo_parcial" v-show="precio==0">(*)</span></label>
-                                <input v-if="!saldo_parcial" type="number" :min="1" step="any" class="form-control" v-model="precio">
-                                <input v-else disabled type="number" :min="1" step="any" class="form-control">
+                                <input v-if="!saldo_parcial && codigo!='' && idarticulo!=0" type="number" :min="1" step="any" class="form-control" v-model="precio">
+                                <input v-else disabled type="number" :min="0" step="any" class="form-control" v-model="precio">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>Cantidad <span style="color:red;" v-show="cantidad==0">(*)</span></label>
-                                <input type="number" :min="1" class="form-control" v-model="cantidad">
+                                <input type="number" v-if="codigo!='' && idarticulo!=0" :min="1" class="form-control" v-model="cantidad">
+                                <input type="number" v-else :min="0" disabled class="form-control" v-model="cantidad">
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
                                 <label>Precio parcial <span style="color:red;" v-if="saldo_parcial" v-show="precio==0">(*)</span></label>
-                                <input v-if="saldo_parcial" type="number" :min="1" step="any" class="form-control" v-model="precio_parcial">
-                                <input v-else disabled type="number" :min="1" step="any" class="form-control">
+                                <input v-if="saldo_parcial && codigo!='' && idarticulo!=0" type="number" :min="1" step="any" class="form-control" v-model="precio_parcial">
+                                <input v-else disabled type="number" :min="0" step="any" class="form-control" v-model="precio_parcial">
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -314,9 +315,7 @@
                                         </td>
                                         <!--<td v-else><span>Nada</span></td>-->
 
-                                        <td v-if="detalle.porcentaje && regimen_tercero!='Simplificado'">
-                                            {{detalle.porcentaje+' %'}}
-                                        </td>
+                                        <td v-if="detalle.porcentaje && regimen_tercero!='Simplificado'">{{detalle.porcentaje+' %'}}</td>
                                         <td v-else>N/A</td>
                                         <td v-if="regimen_tercero!='Simplificado'">
                                             <span v-if="iva_incluido">
@@ -546,6 +545,7 @@
                                         <th>Nombre</th>
                                         <th>Modelo contable</th>
                                         <th>Categoría</th>
+                                        <th>Saldo parcial</th>
                                         <th>Precio Venta</th>
                                         <th>Stock</th>
                                         <th>Cant</th>
@@ -570,6 +570,7 @@
                                         </td>
                                         <td v-text="articulo.nom_modelo_contable"></td>
                                         <td v-text="articulo.nom_categoria"></td>
+                                        <td><input type="checkbox" v-model="articulo.saldo_parcial"></td>
                                         <td><input type="number" v-model="articulo.prec"></td>
                                         <td v-if="articulo.padre!=''" v-text="parseInt(articulo.stock/articulo.unidades)"></td>
                                         <td v-else v-text="articulo.stock"></td>
@@ -655,6 +656,10 @@
                                     <div class="col-sm-4 col-md-5">
                                         <label class="col-sm-6 col-md-6 float-left">Stock</label>
                                         <label class="col-sm-6 col-md-6 float-right" v-text="stockCantidadArticulo"></label>
+                                    </div>
+                                    <div class="col-sm-4 col-md-5">
+                                        <label class="col-sm-6 col-md-6 float-left">Saldo parcial</label>
+                                        <input type="checkbox" class="col-sm-6 col-md-6 float-right" v-model="saldoParcialCantidadArticulo">
                                     </div>
                                 </div>
                             </div>
@@ -925,7 +930,10 @@
                 cantidadArticulo : 0,
                 precioArticulo : 0,
                 stockCantidadArticulo : 0,
+                saldoParcialCantidadArticulo : false,
                 arrayInfoArticuloModalCantidad : [],
+
+                accionCodigoBarras : 0,
             }
         },
         components: {
@@ -1124,19 +1132,42 @@
                     me.arrayArticulo = respuesta.articulos;
 
                     if (me.arrayArticulo.length>0){
-                        me.articulo=me.arrayArticulo[0]['nombre'];
-                        me.idarticulo=me.arrayArticulo[0]['id'];
-                        me.precio = 1;
-                        me.cantidad = 1;
-                        me.porcentaje = me.arrayArticulo[0]['porcentaje'];
-                        me.precio_parcial = 1;
-                        // me.cantidad=me.arrayArticulo[0]['stock'];
+                        if (me.arrayArticulo[0]['productos_asociados'].length>0){
+                            me.buscarA = me.arrayArticulo[0]['codigo'];
+                            me.abrirModal();
+                        }
+                        else {
+                            var p = '';
+                            if(me.arrayArticulo[0]['padre']!='')
+                            {
+                                p = ' - (Presentacion asociada: '+me.arrayArticulo[0]['nom_presentacion']+')';
+                            }
+                            else
+                            {
+                                p = ' - '+me.arrayArticulo[0]['nom_presentacion'];
+                            }
+                            me.articulo=me.arrayArticulo[0]['codigo']+' - '+me.arrayArticulo[0]['nombre']+p;
+                            me.idarticulo=me.arrayArticulo[0]['id'];
+                            me.precio = 1;
+                            me.cantidad = 1;
+                            for(var i=0; i<me.arrayArticulo[0]['productos_iva'].length; i++)
+                            { 
+                                if(me.arrayArticulo[0]['productos_iva'][i]['tipo_iva']=='Compra')
+                                {
+                                    me.porcentaje = me.arrayArticulo[0]['productos_iva'][i]['porcentaje'];
+                                }
+                            }
+                            // me.porcentaje = me.arrayArticulo[0]['porcentaje'];
+                            me.precio_parcial = 1;
+                            // me.cantidad=me.arrayArticulo[0]['stock'];
+                        }
                     }
                     else{
                         me.articulo='No existe artículo';
                         me.idarticulo=0;
                         me.precio = 0;
                         me.cantidad = 0;
+                        me.precio_parcial = 0;
                         me.porcentaje = 0;
                     }
                 })
@@ -1324,7 +1355,7 @@
                     // me.iva_individual = 0;
                     // me.nom_presentacion = data['nom_presentacion'];
                     // me.padre = data['padre'];
-                    var p = ''
+                    var p = '';
                     if(data['padre']!='')
                     {
                         p = ' - (Presentacion asociada: '+data['nom_presentacion']+')';
@@ -1333,14 +1364,22 @@
                     {
                         p = ' - '+data['nom_presentacion'];
                     }
+                    var ivaCompra = 0;
+                    data['productos_iva'].forEach(function(iva){
+                        if(iva['tipo_iva']=='Devoluciones compra'){ivaCompra=iva['porcentaje'];}
+                    });
+
+                    var pre=0;
+                    if(data['saldo_parcial']==true){pre=parseFloat(data['prec'])/parseFloat(data['cant']);}
+                    else{pre=data['prec'];}
                     me.arrayDetalle.push({
                         idarticulo: data['id'],
                         articulo: data['codigo']+' - '+data['nombre']+p,
-                        porcentaje : data['porcentaje'],
+                        porcentaje : ivaCompra,
                         cantidad: data['cant'],
-                        precio: data['prec'],
+                        precio: pre,
                         precio_venta: data['precio_venta'],
-                        iva_individual : data['iva'],
+                        iva_individual : ivaCompra,
                         nom_presentacion : data['nom_presentacion'],
                         padre : data['padre'],
                         unidades : data['unidades'],
@@ -1368,16 +1407,26 @@
                     {
                         p = ' - '+me.arrayInfoArticuloModalCantidad.padre;
                     }
+                    
+                    var ivaCompra = 0;
+                    me.arrayInfoArticuloModalCantidad.productos_iva.forEach(function(iva){
+                        if(iva['tipo_iva']=='Devoluciones compra'){ivaCompra=iva['porcentaje'];}
+                    });
+
+                    var pre=0;
+                    if(me.saldoParcialCantidadArticulo==true){pre=parseFloat(me.precioArticulo)/parseFloat(me.cantidadArticulo);}
+                    else{pre=me.precioArticulo;}
                     me.arrayDetalle.push({
                         idarticulo: me.arrayInfoArticuloModalCantidad.id,
                         articulo: me.arrayInfoArticuloModalCantidad.codigo+' - '+me.arrayInfoArticuloModalCantidad.nombre+p,
-                        porcentaje : me.arrayInfoArticuloModalCantidad.porcentaje,
+                        porcentaje : ivaCompra,
                         cantidad: me.cantidadArticulo,
-                        precio: me.precioArticulo,
+                        precio: pre,
                         precio_venta : me.arrayInfoArticuloModalCantidad.precio_venta,
-                        iva_individual: me.arrayInfoArticuloModalCantidad.iva,
+                        iva_individual: ivaCompra,
                         nom_presentacion : me.arrayInfoArticuloModalCantidad.nom_presentacion,
                         padre : me.arrayInfoArticuloModalCantidad.padre,
+                        unidades : me.arrayInfoArticuloModalCantidad.unidades,
                     }); 
                 }
                 me.cerrarModalCantidadArticulo();
@@ -1777,6 +1826,7 @@
                 this.tituloModalCantidadArticulo='';
                 this.cantidadArticulo = 0;
                 this.stockCantidadArticulo = 0;
+                this.saldoParcialCantidadArticulo = false;
                 this.arrayInfoArticuloModalCantidad = [];
             }, 
             abrirModalCantidadArticulo(data){               

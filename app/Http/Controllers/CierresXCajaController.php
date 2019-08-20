@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\CierresXCaja;
+use App\Facturacion;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -149,13 +150,24 @@ class CierresXCajaController extends Controller
         if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
         $id_usuario = Auth::user()->id;
+        $valor_abonos = 0;
 
         $cierres_caja = CierresXCaja::findOrFail($request->id);
         $cierres_caja->id_caja = $request->id_caja;
         $cierres_caja->obs_inicial = $request->obs_inicial;
         $cierres_caja->vr_gastos = $request->vr_gastos;
         $cierres_caja->obs_gastos = $request->obs_gastos;
-        $cierres_caja->vr_software = 0;
+
+        $facturas = Facturacion::select('abono')->where('id_cierre_caja','=',$request->id)->get();
+        if(count($facturas)>0)
+        {
+            foreach($facturas as $fc)
+            {
+                $valor_abonos = $valor_abonos+$fc['abono'];
+            }
+        }
+        $cierres_caja->vr_software = $valor_abonos;
+
         $cierres_caja->vr_final = $request->vr_final;
         $cierres_caja->estado = 2;
         $cierres_caja->usu_crea = $id_usuario;

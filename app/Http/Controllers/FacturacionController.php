@@ -66,6 +66,7 @@ class FacturacionController extends Controller
         {
             $facturacion = $facturacion->orderBy('id', 'desc');
         }
+        if($request->id_cierre_caja && $request->id_cierre_caja!=0){$facturacion = $facturacion->where('id_cierre_caja','=',$request->id_cierre_caja);}
         $facturacion = $facturacion->where('facturacion.id_empresa','=',$id_empresa)->paginate(6);
         
         
@@ -133,6 +134,7 @@ class FacturacionController extends Controller
         $facturacion->usu_anula = null;
         $facturacion->fecha = $request->fecha;
         $facturacion->id_tarifario = $request->id_tarifario;
+        if($request->id_cierre_caja){$facturacion->id_cierre_caja = $request->id_cierre_caja;}
         $facturacion->id_empresa = $id_empresa;
         $facturacion->estado = '1';
         $facturacion->save();
