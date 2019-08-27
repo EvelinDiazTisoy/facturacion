@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarZona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarZona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
                                     
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarZona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarZona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -41,30 +41,30 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayZona.length">
                                 <tr v-for="zona in arrayZona" :key="zona.id">
                                     <td v-text="zona.zona"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && zona.estado" type="button" @click="abrirModal('zona','actualizar',zona)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && zona.estado" type="button" @click="abrirModal('zona','actualizar',zona)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="zona.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarZona(zona.id)">
+                                            <button v-if="zona.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarZona(zona.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarZona(zona.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarZona(zona.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="zona.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="zona.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -116,7 +116,7 @@
                                     <div class="form-group col-md-6">
                                         <label class="col-md-3 form-control-label float-left" for="text-input">Observación</label>
                                         <div class="col-md-9 float-right">
-                                            <textarea type="text" v-model="observacion" class="form-control"></textarea>
+                                            <textarea type="text" v-model="observacion" class="form-control col-md-12"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -131,9 +131,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarZona()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarZona()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarZona()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarZona()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -169,7 +169,7 @@
                     'to' : 0,
                 },
                 offset : 10,
-                criterio : 'nombre',
+                criterio : 'zona',
                 buscar : ''
             }
         },
@@ -223,9 +223,9 @@
                 me.listarZona(page,buscar,criterio);
             },
             registrarZona(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarZona()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -240,9 +240,9 @@
                 });
             },
             actualizarZona(){
-            //    if (this.validarConcentracion()){
-            //         return;
-            //     }
+                if (this.validarZona()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -257,18 +257,18 @@
                     console.log(error);
                 }); 
             },
-            validarConcentracion(){
-                this.errorConcentracion=0;
-                this.errorMostrarMsjConcentracion =[];
+            validarZona(){
+                this.errorZona=0;
+                this.errorMostrarMsjZona =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.zona || this.zona=='') this.errorMostrarMsjZona.push("Ingrese el nombre de la zona");
 
-                if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
+                if (this.errorMostrarMsjZona.length) this.errorZona = 1;
 
-                return this.errorConcentracion;
+                return this.errorZona;
             },
             desactivarZona(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar esta zona?',
                 type: 'warning',
                 showCancelButton: true,
@@ -288,7 +288,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarZona(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -300,14 +300,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarZona(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar esta zona?',
                 type: 'warning',
                 showCancelButton: true,
@@ -327,7 +327,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarZona(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -339,7 +339,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -349,6 +349,8 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
+                this.errorZona = 0;
+                this.errorMostrarMsjZona = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){

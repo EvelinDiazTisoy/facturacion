@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarCajas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarCajas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarCajas(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarCajas(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -41,30 +41,30 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayCajas.length">
                                 <tr v-for="cajas in arrayCajas" :key="cajas.id">
                                     <td v-text="cajas.nombre"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && cajas.estado" type="button" @click="abrirModal('cajas','actualizar',cajas)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && cajas.estado" type="button" @click="abrirModal('cajas','actualizar',cajas)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="cajas.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarCaja(cajas.id)">
+                                            <button v-if="cajas.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarCaja(cajas.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarCaja(cajas.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarCaja(cajas.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="cajas.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="cajas.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -114,7 +114,6 @@
                                 <div v-show="errorCaja" class="form-group row div-error">
                                     <div class="text-center text-error">
                                         <div v-for="error in errorMostrarMsjCaja" :key="error" v-text="error">
-
                                         </div>
                                     </div>
                                 </div>
@@ -122,9 +121,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarCaja()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarCaja()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarCaja()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarCaja()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -247,7 +246,7 @@
                 this.errorCaja=0;
                 this.errorMostrarMsjCaja =[];
 
-                if (!this.nombre) this.errorMostrarMsjCaja.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjCaja.push("Ingrese el nombre de la caja");
 
                 if (this.errorMostrarMsjCaja.length) this.errorCaja = 1;
 
@@ -335,6 +334,8 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
+                this.errorCaja = 0;
+                this.errorMostrarMsjCaja = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){

@@ -63,7 +63,7 @@ class RetencionesController extends Controller
         $retenciones->porcentaje = $request->porcentaje;
         $retenciones->usu_crea = $id_usuario;
         $retenciones->id_empresa = $id_empresa;
-        $retenciones->save();
+        // $retenciones->save();
     }
 
     public function update(Request $request)
@@ -80,7 +80,7 @@ class RetencionesController extends Controller
         $retenciones->monto_base = $request->monto_base;
         $retenciones->tipo_mov = $request->tipo_mov;
         $retenciones->porcentaje = $request->porcentaje;
-        $retenciones->save();
+        // $retenciones->save();
     }
 
     public function selectReteInfo(Request $request){

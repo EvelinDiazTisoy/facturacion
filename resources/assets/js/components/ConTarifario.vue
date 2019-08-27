@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarTarifario(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarTarifario(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarTarifario(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarTarifario(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -42,55 +42,55 @@
                                     <th class="col-md-2">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayTarifario.length">
                                 <tr v-for="tarifario in arrayTarifario" :key="tarifario.id">
                                     <td v-text="tarifario.nombre"></td>
                                     <td v-text="tarifario.descripcion"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button>
 
-                                        <button v-if="permisosUser.leer" type="button" @click="abrirModal('tarifario','ver',tarifario)" class="btn btn-success btn-sm">
+                                        <button v-if="permisosUser.leer" type="button" @click="abrirModal('tarifario','ver',tarifario)" class="btn btn-success btn-sm" title="Ver">
                                           <i class="icon-eye"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Ver">
                                           <i class="icon-eye"></i>
                                         </button>
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="tarifario.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarTarifario(tarifario.id)">
+                                            <button v-if="tarifario.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarTarifario(tarifario.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarTarifario(tarifario.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarTarifario(tarifario.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="tarifario.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="tarifario.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
 
                                         <template v-if="permisosUser.actualizar">
-                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-primary btn-sm">
+                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-primary btn-sm" title="Favorito">
                                                 <i class="icon-check"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="marcarFavorito(tarifario.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="marcarFavorito(tarifario.id)" title="Marcar como Favorito">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="tarifario.favorito==1" type="button" class="btn btn-secondary btn-sm" title="Marcar como favorito">
                                                 <i class="icon-check"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Marcar como favorito">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -129,8 +129,9 @@
                             </thead>
                             <tbody>
                                 <tr v-for="productosTarifario in arrayProductosTarifario" :key="productosTarifario.id">
-                                    <td v-text="productosTarifario.nom_articulo"></td>
-                                    <td v-text="productosTarifario.valor"></td>
+                                    <td v-if="productosTarifario.asociado==0" v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion" class="col-md-11"></td>
+                                    <td v-else v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion+' (Presentación asociada)'" class="col-md-11"></td>
+                                    <td v-text="productosTarifario.valor" class="col-md-1"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -146,7 +147,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -180,18 +181,19 @@
                                 </div>
                             </form>
 
-                            <div class="row" style="padding: 0em 1em;">
-                                <table class="table table-bordered table-striped table-sm" style="display: block;max-height: 26em !important;overflow-y: auto;">
+                            <div class="container-fluid" style="max-height: 25em !important;overflow-y: auto;">
+                                <table class="table table-bordered table-striped table-sm col-md-12">
                                     <thead>
                                         <tr>
-                                            <th style="width: 80% !important;">Nombre</th>
-                                            <th style="width: 20% !important;">Valor</th>
+                                            <th class="col-md-11">Nombre</th>
+                                            <th class="col-md-1">Valor</th>
                                             <!--<th>Opciones</th>-->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="productosTarifario in arrayProductosTarifario" :key="productosTarifario.id">
-                                            <td v-text="productosTarifario.nom_articulo"></td>
+                                            <td v-if="productosTarifario.asociado==0" v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion" class="col-md-11"></td>
+                                            <td v-else v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion+' (Presentación asociada)'" class="col-md-11"></td>
                                             <td><input type="number" v-model="productosTarifario.valor"></td>
                                         </tr>
                                     </tbody>
@@ -206,9 +208,9 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarTarifario()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarTarifario()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarTarifario()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarTarifario()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -310,17 +312,20 @@
             },
             listarArticulos(page,buscar,criterio){
                 let me=this;
-                var url= this.ruta +'/articulo?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= this.ruta +'/articulo/listarArticulo?page=1&buscar=&criterio=';
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayArticulos = respuesta.articulos.data;
+                    me.arrayArticulos = respuesta.articulos;
+                    console.log(me.arrayArticulos);
 
                     for(var i=0; i<me.arrayArticulos.length; i++)
                     {
+                        var id_asociado = 0;
                         me.arrayProductosTarifario.push({
                             'id_producto' : me.arrayArticulos[i].id,
                             'nom_articulo' : me.arrayArticulos[i].nombre,
                             'valor' : 0,
+                            'id_asociado' : me.arrayArticulos[i].id_asociado,
                         });
                     }
                 })
@@ -407,14 +412,14 @@
                 this.errorTarifario=0;
                 this.errorMostrarMsjTarifario =[];
 
-                if (!this.nombre) this.errorMostrarMsjTarifario.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjTarifario.push("Ingrese el nombre del Tarifario");
 
                 if (this.errorMostrarMsjTarifario.length) this.errorTarifario = 1;
 
                 return this.errorTarifario;
             },
             desactivarTarifario(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este tarifario?',
                 type: 'warning',
                 showCancelButton: true,
@@ -434,7 +439,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarTarifario(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -446,14 +451,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarTarifario(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este tarifario?',
                 type: 'warning',
                 showCancelButton: true,
@@ -473,7 +478,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarTarifario(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -485,7 +490,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -504,6 +509,9 @@
                 this.ver=0;
                 this.verTarifario = '';
                 this.verDescripcionTarifario = '';
+
+                this.errorTarifario = 0;
+                this.errorMostrarMsjTarifario = [];
             },
             abrirModal(modelo, accion, data = []){
                 this.selectTarifario(1,'','');
@@ -518,7 +526,7 @@
                                 this.nombre= '';
                                 this.descripcion = data['descripcion'];
                                 this.tipoAccion = 1;
-                                this.listarArticulos('','','');
+                                this.listarProductosTarifario('');
                                 break;
                             }
                             case 'actualizar':

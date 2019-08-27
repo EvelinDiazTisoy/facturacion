@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarColaboradores(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarColaboradores(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarColaboradores(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarColaboradores(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -41,30 +41,30 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayColaboradores.length">
                                 <tr v-for="colaborador in arrayColaboradores" :key="colaborador.id">
                                     <td v-text="colaborador.colaborador"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && colaborador.estado" type="button" @click="abrirModal('colaboradores','actualizar',colaborador)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && colaborador.estado" type="button" @click="abrirModal('colaboradores','actualizar',colaborador)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button"  class="btn btn-secondary btn-sm">
+                                        <button v-else type="button"  class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="colaborador.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarColaborador(colaborador.id)">
+                                            <button v-if="colaborador.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarColaborador(colaborador.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarColaborador(colaborador.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarColaborador(colaborador.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="colaborador.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="colaborador.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -143,9 +143,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarColaborador()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarColaborador()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarColaborador()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarColaborador()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -181,7 +181,7 @@
                     'to' : 0,
                 },
                 offset : 10,
-                criterio : 'nombre',
+                criterio : 'colaborador',
                 buscar : ''
             }
         },
@@ -235,9 +235,9 @@
                 me.listarColaboradores(page,buscar,criterio);
             },
             registrarColaborador(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarColaborador()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -254,9 +254,9 @@
                 });
             },
             actualizarColaborador(){
-            //    if (this.validarConcentracion()){
-            //         return;
-            //     }
+                if (this.validarColaborador()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -273,18 +273,18 @@
                     console.log(error);
                 }); 
             },
-            validarConcentracion(){
-                this.errorConcentracion=0;
-                this.errorMostrarMsjConcentracion =[];
+            validarColaborador(){
+                this.errorColaboradores=0;
+                this.errorMostrarMsjColaboradores =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.colaborador || this.colaborador=='') this.errorMostrarMsjColaboradores.push("Ingrese el nombre del colaborador.");
 
-                if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
+                if (this.errorMostrarMsjColaboradores.length) this.errorColaboradores = 1;
 
-                return this.errorConcentracion;
+                return this.errorColaboradores;
             },
             desactivarColaborador(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este registro?',
                 type: 'warning',
                 showCancelButton: true,
@@ -304,7 +304,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarColaboradores(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -316,14 +316,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarColaborador(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este registro?',
                 type: 'warning',
                 showCancelButton: true,
@@ -343,7 +343,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarColaboradores(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -355,7 +355,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -365,6 +365,8 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
+                this.errorColaboradores = 0;
+                this.errorMostrarMsjColaboradores = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){

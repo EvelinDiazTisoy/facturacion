@@ -14,14 +14,14 @@ class ArticuloController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
 
         $buscar = $request->buscar;
         $criterio = $request->criterio;
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
         
-        if ($buscar==''){
+        if ($buscar=='' || $buscar==null){
             $articulos = Articulo::leftJoin('modelo_contable','articulos.idcategoria','=','modelo_contable.id')
             ->leftJoin('presentacion','articulos.id_presentacion','=','presentacion.id')
             ->select('articulos.id','articulos.id as id_articulo','articulos.idcategoria','articulos.idcategoria2','articulos.codigo','articulos.nombre','modelo_contable.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','id_und_medida','id_concentracion','articulos.cod_invima','articulos.lote','articulos.fec_vence','articulos.minimo','tipo_articulo','articulos.descripcion','articulos.condicion','articulos.id_presentacion','articulos.talla','articulos.img','articulos.id_empresa','presentacion.nombre as nom_presentacion')
@@ -49,6 +49,7 @@ class ArticuloController extends Controller
                 'to'           => $articulos->lastItem(),
             ],
             'articulos' => $articulos,
+            'buscar' => $buscar,
         ];
     }
 

@@ -8,6 +8,7 @@ use App\DetalleFacturacion;
 use App\Stock;
 use App\Articulo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FacturacionController extends Controller
 {
@@ -329,5 +330,20 @@ class FacturacionController extends Controller
         $categoria->save();
     }
 
-    
+    public function PdfFacturacion(Request $request, $id)
+    {
+  
+        $cons="SELECT id,num_factura,id_tercero,subtotal,valor_iva,total,abono,saldo,detalle,lugar,descuento,fecha,estado FROM facturacion WHERE id=$id";
+        $factura = DB::select($cons); 
+        $factura = $factura[0];
+
+        $cons="SELECT nombre1,nombre2,apellido1,apellido2,num_documento, tipo_documento FROM personas WHERE id=".$factura->id_tercero;
+        $tercero = DB::select($cons); 
+        $tercero = $tercero[0];
+
+        // return ['facturacion'=>$factura,'tercero'=>$tercero];
+        $pdf = \PDF::loadView('pdf.Factura',['facturacion'=>$factura,'tercero'=>$tercero]);
+        return $pdf->download('pdf.factura-'.$factura->num_factura.'.pdf');
+        // return view('Factura')->with('facturacion', $factura)->with('tercero', $tercero);
+    }
 }

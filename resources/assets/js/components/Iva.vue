@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarIva(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarIva(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarIva(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarIva(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -41,30 +41,30 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayIva.length">
                                 <tr v-for="iva in arrayIva" :key="iva.id">
                                     <td v-text="iva.nombre"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && iva.estado" type="button" @click="abrirModal('iva','actualizar',iva)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && iva.estado" type="button" @click="abrirModal('iva','actualizar',iva)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="iva.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarIva(iva.id)">
+                                            <button v-if="iva.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarIva(iva.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarIva(iva.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarIva(iva.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="iva.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="iva.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -128,14 +128,17 @@
                                     <div class="col-md-6">
                                         <label class="col-md-3 form-control-label" for="text-input">Porcentaje</label>
                                         <div class="col-md-9">
-                                            <input type="number" v-model="porcentaje" class="form-control">
+                                            <input type="number" v-model="porcentaje" class="form-control" @blur="function(){
+                                                if(porcentaje<0){porcentaje=0;}
+                                                else if (porcentaje>99){porcentaje=99}
+                                                else if(porcentaje==''){porcentaje=0};
+                                            }">
                                         </div>
                                     </div>
                                 </div>
-                                <div v-show="errorConcentracion" class="form-group row div-error">
+                                <div v-show="errorIva" class="form-group row div-error">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjConcentracion" :key="error" v-text="error">
-
+                                        <div v-for="error in errorMostrarMsjIva" :key="error" v-text="error">
                                         </div>
                                     </div>
                                 </div>
@@ -143,9 +146,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarIva()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarIva()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarIva()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarIva()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -164,13 +167,13 @@
                 iva_id: 0,
                 nombre : '',
                 tipo: '',
-                porcentaje: '',
+                porcentaje: 0,
                 arrayIva : [],
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
-                errorConcentracion : 0,
-                errorMostrarMsjConcentracion : [],
+                errorIva : 0,
+                errorMostrarMsjIva : [],
                 pagination : {
                     'total' : 0,
                     'current_page' : 0,
@@ -271,17 +274,18 @@
                 }); 
             },
             validarIva(){
-                this.errorConcentracion=0;
-                this.errorMostrarMsjConcentracion =[];
+                this.errorIva=0;
+                this.errorMostrarMsjIva =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjIva.push("Ingrese el nombre del iva");
+                if(!this.tipo || this.tipo==0 || this.tipo=='') this.errorMostrarMsjIva.push("Seleccione un tipo");
 
-                if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
+                if (this.errorMostrarMsjIva.length) this.errorIva = 1;
 
-                return this.errorConcentracion;
+                return this.errorIva;
             },
             desactivarIva(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este registro?',
                 type: 'warning',
                 showCancelButton: true,
@@ -301,7 +305,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarIva(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -313,14 +317,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarIva(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este registro?',
                 type: 'warning',
                 showCancelButton: true,
@@ -340,7 +344,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarIva(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -352,7 +356,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -363,7 +367,9 @@
                 this.tituloModal='';
                 this.nombre='';
                 this.tipo = '';
-                this.porcentaje = '';
+                this.porcentaje = 0;
+                this.errorIva = 0;
+                this.errorMostrarMsjIva = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
@@ -376,7 +382,7 @@
                                 this.tituloModal = 'Registrar Iva';
                                 this.nombre= '';
                                 this.tipo = '';
-                                this.porcentaje = '';
+                                this.porcentaje = 0;
                                 this.tipoAccion = 1;
                                 break;
                             }

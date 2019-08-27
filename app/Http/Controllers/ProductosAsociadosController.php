@@ -91,7 +91,7 @@ class ProductosAsociadosController extends Controller
                 $productos_asociados->valor = 0;
             }
 
-            $productosTarifario->asociado = $productos_asociados->id;
+            $productosTarifario->asociado = $productos_asociados->id_producto;
             $productosTarifario->save();
         }
     }

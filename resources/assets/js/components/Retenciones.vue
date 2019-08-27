@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="retencion">Nombre</option>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarRetenciones(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarRetenciones(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarRetenciones(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarRetenciones(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayRetenciones.length">
                                 <tr v-for="retencion in arrayRetenciones" :key="retencion.id">
                                     <td v-text="retencion.retencion"></td>
                                     <td v-text="retencion.cuenta"></td>
@@ -66,11 +66,11 @@
                                     <td v-else-if="retencion.tipo_mov==0">Ambos</td>
                                     <td>
                                         <template>
-                                            <button v-if="permisosUser.actualizar && retencion.estado==1" type="button" @click="abrirModal('retenciones','actualizar',retencion)" class="btn btn-warning btn-sm" title="Buscar">
-                                            <i class="icon-pencil"></i>
+                                            <button v-if="permisosUser.actualizar && retencion.estado==1" type="button" @click="abrirModal('retenciones','actualizar',retencion)" class="btn btn-warning btn-sm" title="Editar">
+                                                <i class="icon-pencil"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
-                                            <i class="icon-pencil"></i>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm"  title="Editar (Desabilitado)">
+                                                <i class="icon-pencil"></i>
                                             </button>
                                         </template>
 
@@ -78,7 +78,7 @@
                                             <button v-if="permisosUser.anular" type="button" class="btn btn-danger btn-sm" @click="desactivarRetencion(retencion.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
@@ -86,7 +86,7 @@
                                             <button v-if="permisosUser.anular" type="button" class="btn btn-info btn-sm" @click="activarRetencion(retencion.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -94,7 +94,7 @@
                                 </tr>                                
                             </tbody>
                             <tbody v-else>
-                                <tr colspan="7">Nada para mostrar</tr>
+                                <tr colspan="7">No hay registros para mostrar</tr>
                             </tbody>
                         </table>
                         <nav>
@@ -121,7 +121,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal('retenciones')" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -191,14 +191,14 @@
                                     <div class="form-group col-md-6">
                                         <label class="col-md-3 form-control-label float-left">Porcentaje</label>
                                         <div class="col-md-9 float-right">
-                                            <input type="number" :min="0" :max="99" v-model="porcentaje" class="form-control col-md-3 float-left"><span style="font-size: 2em;margin-left: 3px;">%</span>
+                                            <input type="number" :min="0" :max="99" v-model="porcentaje" class="form-control col-md-3 float-left" @blur="function(){
+                                                if(porcentaje<0){porcentaje=0;}
+                                                else if (porcentaje>99){porcentaje=99}
+                                                else if(porcentaje==''){porcentaje=0};
+                                            }"><span style="font-size: 2em;margin-left: 3px;">%</span>
                                         </div>
                                     </div>
                                 </div>
-
-
-
-
                                 <div v-show="errorRetencion" class="form-group row div-error">
                                     <div class="text-center text-error">
                                         <div v-for="error in errorMostrarMsjRetencion" :key="error" v-text="error">
@@ -209,9 +209,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal('retenciones')">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarRetencion()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarRetencion()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal('retenciones')">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarRetencion()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarRetencion()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -378,9 +378,9 @@
                 me.listarRetenciones(page,buscar,criterio);
             },
             registrarRetencion(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarRetencion()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -401,9 +401,9 @@
                 });
             },
             actualizarRetencion(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarRetencion()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -424,18 +424,24 @@
                     console.log(error);
                 }); 
             },
-            validarConcentracion(){
-                this.errorConcentracion=0;
-                this.errorMostrarMsjConcentracion =[];
+            validarRetencion(){
+                this.errorRetencion=0;
+                this.errorMostrarMsjRetencion =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if(!this.retencion) this.errorMostrarMsjRetencion.push("Ingrese el nombre de la retención");
+                if(!this.id_cuenta || this.id_cuenta==0 || this.id_cuenta=='') this.errorMostrarMsjRetencion.push("Seleccione una cuenta");
+                if(!this.autoretenedor || this.autoretenedor==0 || this.autoretenedor=='') this.errorMostrarMsjRetencion.push("Seleccione el campo 'Autoretenedor'");
+                if(!this.declarante || this.declarante==0 || this.declarante=='') this.errorMostrarMsjRetencion.push("Seleccione el campo 'Declarante'");
+                if(!this.monto_base || this.monto_base==0 || this.monto_base=='') this.errorMostrarMsjRetencion.push('Ingrese el monto base');
+                if(!this.tipo_mov || this.tipo_mov==0 || this.tipo_mov=='') this.errorMostrarMsjRetencion.push("Seleccione el tipo de movimiento");
+                // if(this.porcentaje<0) this.errorMostrarMsjRetencion.push("Ingrese el porcentaje");
 
-                if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
+                if (this.errorMostrarMsjRetencion.length) this.errorRetencion = 1;
 
-                return this.errorConcentracion;
+                return this.errorRetencion;
             },
             desactivarRetencion(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar esta retención?',
                 type: 'warning',
                 showCancelButton: true,
@@ -455,7 +461,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarRetenciones(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'La retención ha sido desactivada con éxito.',
                         'success'
@@ -467,14 +473,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarRetencion(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar esta retención?',
                 type: 'warning',
                 showCancelButton: true,
@@ -494,7 +500,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarRetenciones(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'La retención ha sido activada con éxito.',
                         'success'
@@ -506,7 +512,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -528,6 +534,8 @@
                         this.porcentaje = '';
                         this.retencion_id = 0;
                         this.tipo_cuenta = '';
+                        this.errorRetencion = 0;
+                        this.errorMostrarMsjRetencion = [];
                         break;
                     }
                     case 'cuentas':{

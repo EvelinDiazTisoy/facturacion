@@ -181,10 +181,23 @@
                                                 </button>
                                             </template>
                                             
+                                            <!--<template>
+                                                <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
+                                                    <i class="fa fa-registered"></i>
+                                                </button>
+                                                <button type="button" v-else class="btn btn-secondary btn-sm">
+                                                    <i class="fa fa-registered"></i>
+                                                </button>
+                                            </template>-->
                                             <template>
                                                 <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
+
+                                                <button type="button" v-else-if="permisosUser.actualizar && facturacion.estado==2" @click="pdfFormato(facturacion.id)" class="btn btn-info btn-sm">
+                                                    <i class="icon-doc"></i>
+                                                </button>
+
                                                 <button type="button" v-else class="btn btn-secondary btn-sm">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
@@ -2471,7 +2484,10 @@
                     this.idVendedorFiltro = '';
                     this.vendedorFiltro = '';
                 }
-            }
+            },
+            pdfFormato(id){
+                window.open(this.ruta +'/facturacion/pdfFacturacion/'+ id);
+            },
         },
         mounted() {
             let me= this;

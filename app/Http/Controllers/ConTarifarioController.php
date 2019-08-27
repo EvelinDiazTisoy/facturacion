@@ -46,7 +46,7 @@ class ConTarifarioController extends Controller
         if($request->id_producto)
         {
             $tarifario = ConTarifario::leftJoin('productos_tarifarios','con_tarifarios.id','=','productos_tarifarios.id_tarifario')
-            ->select('con_tarifarios.id','con_tarifarios.nombre','productos_tarifarios.valor')
+            ->select('con_tarifarios.id','con_tarifarios.nombre','productos_tarifarios.valor','productos_tarifarios.asociado')
             ->where('productos_tarifarios.id_producto','=',$request->id_producto)
             ->where('con_tarifarios.id_empresa','=',$id_empresa)
             ->orderBy('nombre', 'asc')
@@ -115,6 +115,7 @@ class ConTarifarioController extends Controller
             $productosTarifario->id_tarifario = $tarifario->id;
             $productosTarifario->id_producto = $PT['id_producto'];
             $productosTarifario->valor = $PT['valor'];
+            $productosTarifario->asociado = $PT['asociado'];
             $productosTarifario->save();
         }
     }

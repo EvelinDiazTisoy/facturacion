@@ -9,17 +9,17 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Configuraciones generales
-                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('configgenerales','registrar')" class="btn btn-primary" title="Buscar">
+                        <button v-if="permisosUser.crear && !arrayConfigGenerales.length" type="button" @click="abrirModal('configgenerales','registrar')" class="btn btn-primary" title="Nuevo">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
-                        <button v-else type="button" class="btn btn-secondary" title="Buscar">
+                        <button v-else type="button" class="btn btn-secondary" title="Nuevo">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
                     <div class="card-body">
                         <div class="form-group row">
                             <div class="col-md-6">
-                                <div class="input-group">
+                                <!--<div class="input-group">
                                     <select v-if="permisosUser.crear" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>>
                                     </select>
@@ -27,25 +27,38 @@
                                       <option value="nombre">Nombre</option>>
                                     </select>
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarConfigGenerales(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarConfigGenerales(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
 
                                     <button v-if="permisosUser.leer" type="submit" @click="listarConfigGenerales(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
                                     <button v-else type="submit" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
+                                </div>-->
                             </div>
                         </div>
                         <table class="table table-bordered table-striped table-sm">
                             <thead>
                                 <tr>
+                                    <th>Nombre</th>
+                                    <th>Logo</th>
+                                    <th>Representante legal</th>
+                                    <th>NIT</th>
+                                    <th>Dirección</th>
+                                    <th>Res. Factura electrónica</th>
+                                    <th>Res. Factura POS</th>
+                                    <th>Correo</th>
+                                    <th>Celular</th>
+                                    <th>Teléfono</th>
                                     <th>Opciones</th>
-                                    <th class="col-md-1">Nombre</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="configgenerales in arrayConfigGenerales" :key="configgenerales.id">
                                     <td v-text="configgenerales.nombre"></td>
-                                    <td v-text="configgenerales.logo"></td>
+                                    <td>
+                                        <img v-if="`${configgenerales.logo}`!='default.png'" :src="`${ruta}/logos/${configgenerales.id}_empresa/${configgenerales.logo}`" height="40" width="40">
+
+                                        <img v-else :src="`${ruta}/logos/${configgenerales.logo}`" height="40" width="40">
+                                    </td>
                                     <td v-text="configgenerales.repre_legal"></td>
                                     <td v-text="configgenerales.nit"></td>
                                     <td v-text="configgenerales.direccion"></td>
@@ -65,9 +78,9 @@
                                 </tr>                                
                             </tbody>
                         </table>
-                        <nav>
+                        <!--<nav>
                             <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
+                                <li class="page-item" v-if="pagination.current_page > 1" title={{current_page-1}}>
                                     <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
                                 </li>
                                 <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
@@ -77,7 +90,7 @@
                                     <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
                                 </li>
                             </ul>
-                        </nav>
+                        </nav>-->
                     </div>
                 </div>
                 <!-- Fin ejemplo de tabla Listado -->
@@ -89,7 +102,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -106,7 +119,7 @@
                                     <div class="form-group col-md-6">
                                         <label class="col-md-3 form-control-label float-left">Logo</label>
                                         <div class="col-md-9 float-right">
-                                            <input type="file" id="logo" name="logo" @change="cargarLogo" class="form-control">
+                                            <input type="file" id="logo" name="logo"  ref="inputFileImg" @change="cargarLogo" class="form-control">
                                         </div>
                                     </div>
                                     <div class="form-group col-md-6">
@@ -168,9 +181,9 @@
                                     <div class="form-group col-md-6">
                                     </div>
                                 </div>
-                                <div v-show="errorConcentracion" class="form-group row div-error">
+                                <div v-show="errorConfigGenerales" class="form-group row div-error">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjConcentracion" :key="error" v-text="error">
+                                        <div v-for="error in errorMostrarMsjConfigGenerales" :key="error" v-text="error">
 
                                         </div>
                                     </div>
@@ -179,9 +192,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarConfigGeneral()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarConfigGeneral()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarConfigGeneral()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarConfigGeneral()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -203,8 +216,8 @@
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
-                errorConcentracion : 0,
-                errorMostrarMsjConcentracion : [],
+                errorConfigGenerales : 0,
+                errorMostrarMsjConfigGenerales : [],
                 
                 configgenerales_id: 0,
                 nombre : '',
@@ -282,7 +295,8 @@
             },
             cargarLogo(event){
                 let me=this;
-                me.arrayLogo = event.target.files[0];
+                // me.arrayLogo = event.target.files[0];
+                me.arrayLogo = this.$refs.inputFileImg.files[0];
             },
             cambiarPagina(page,buscar,criterio){
                 let me = this;
@@ -292,9 +306,9 @@
                 me.listarConfigGenerales(page,buscar,criterio);
             },
             registrarConfigGeneral(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarConcentracion()){
+                    return;
+                }
                 
                 let me = this;
                 var data = new FormData();
@@ -319,9 +333,9 @@
                 });
             },
             actualizarConfigGeneral(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarConcentracion()){
+                    return;
+                }
 
                 let me = this;
                 
@@ -348,21 +362,31 @@
                 });
             },
             validarConcentracion(){
-                this.errorConcentracion=0;
-                this.errorMostrarMsjConcentracion =[];
+                this.errorConfigGenerales=0;
+                this.errorMostrarMsjConfigGenerales =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjConfigGenerales.push("El nombre de la presentación no puede estar vacío.");
+                if(!this.repre_legal) this.errorMostrarMsjConfigGenerales.push("Ingrese el representante legal");
+                if(!this.nit) this.errorMostrarMsjConfigGenerales.push("Ingrese el NIT de la empresa");
+                if(!this.direccion) this.errorMostrarMsjConfigGenerales.push("Ingrese la dirección de la empresa");
+                if(!this.res_fact_elect) this.errorMostrarMsjConfigGenerales.push("Ingrese la resolución de facturación electronica");
+                if(!this.res_fact_pos) this.errorMostrarMsjConfigGenerales.push("ingrese la resolución de facturación POS");
+                if(!this.correo) this.errorMostrarMsjConfigGenerales.push("Ingrese el correo de la empresa");
+                if(!this.celular) this.errorMostrarMsjConfigGenerales.push("Ingrese el celular de la empresa");
+                if(!this.telefono) this.errorMostrarMsjConfigGenerales.push("Ingrese el telefono de la empresa");
 
-                if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
+                if(this.tipoAccion==1 && this.$refs.inputFileImg.value=='') this.errorMostrarMsjConfigGenerales.push('Seleccione una imagen para el producto');
 
-                return this.errorConcentracion;
+                if (this.errorMostrarMsjConfigGenerales.length) this.errorConfigGenerales = 1;
+
+                return this.errorConfigGenerales;
             },
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
                 this.logo= '';
-                this.arrayLogo = null;
+                this.arrayLogo = [];
                 this.repre_legal= '';
                 this.nit= '';
                 this.direccion= '';
@@ -371,6 +395,7 @@
                 this.correo= '';
                 this.celular= '';
                 this.telefono= '';
+                this.$refs.inputFileImg.value = '';
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){

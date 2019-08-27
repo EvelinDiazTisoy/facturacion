@@ -20,17 +20,17 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+                                    </select>-->
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarBancos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarBancos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar"class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarBancos(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarBancos(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -41,30 +41,30 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayBancos.length">
                                 <tr v-for="banco in arrayBancos" :key="banco.id">
                                     <td v-text="banco.nombre"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && banco.estado" type="button" @click="abrirModal('bancos','actualizar',banco)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && banco.estado" type="button" @click="abrirModal('bancos','actualizar',banco)" class="btn btn-warning btn-sm" title="Editar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="banco.estado==1" type="button" class="btn btn-danger btn-sm" @click="desactivarBanco(banco.id)">
+                                            <button v-if="banco.estado==1" type="button" class="btn btn-danger btn-sm" @click="desactivarBanco(banco.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else-if="banco.estado=0" type="button" class="btn btn-info btn-sm" @click="activarBanco(banco.id)">
+                                            <button v-else-if="banco.estado==0" type="button" class="btn btn-info btn-sm" @click="activarBanco(banco.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="banco.estado==1" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="banco.estado==1" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else-if="banco.estado==0" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else-if="banco.estado==0" type="button" class="btn btn-secondary btn-sm" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -123,9 +123,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarBanco()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarBanco()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarBanco()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarBanco()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -212,9 +212,9 @@
                 me.listarBancos(page,buscar,criterio);
             },
             registrarBanco(){
-                // if (this.validarBancos()){
-                //     return;
-                // }
+                if (this.validarBancos()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -228,9 +228,9 @@
                 });
             },
             actualizarBanco(){
-            //    if (this.validarBancos()){
-            //         return;
-            //     }
+                if (this.validarBancos()){
+                    return;
+                }
                 
                 let me = this;
 
@@ -248,14 +248,14 @@
                 this.errorBancos=0;
                 this.errorMostrarMsjBancos =[];
 
-                if (!this.nombre) this.errorMostrarMsjBancos.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjBancos.push("Ingrese el nombre del banco");
 
                 if (this.errorMostrarMsjBancos.length) this.errorBancos = 1;
 
                 return this.errorBancos;
             },
             desactivarBanco(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este banco?',
                 type: 'warning',
                 showCancelButton: true,
@@ -275,7 +275,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarBancos(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -287,14 +287,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarBanco(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este banco?',
                 type: 'warning',
                 showCancelButton: true,
@@ -314,7 +314,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarBancos(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -326,7 +326,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -336,6 +336,8 @@
                 this.modal=0;
                 this.tituloModal='';
                 this.nombre='';
+                this.errorBancos = 0;
+                this.errorMostrarMsjBancos = [];
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
