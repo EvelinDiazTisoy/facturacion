@@ -90,8 +90,8 @@ class ProductosAsociadosController extends Controller
             }else{
                 $productos_asociados->valor = 0;
             }
-
-            $productosTarifario->asociado = $productos_asociados->id_producto;
+            $productosTarifario->asociado = 1;
+            $productosTarifario->idPresentacionAsociada = $productos_asociados->id;
             $productosTarifario->save();
         }
     }

@@ -170,7 +170,7 @@
                                     <div class="col-md-6">
                                         <label class="col-md-3 form-control-label" for="text-input">Traer de ...</label>
                                         <div class="col-md-9">
-                                            <select class="form-control" v-model="idTraerDeTarifario" @change="traerDe(idTraerDeTarifario)">
+                                            <select class="form-control" v-model="idTraerDeTarifario" @change="listarProductosTarifario(idTraerDeTarifario)">
                                                 <option value="0">Seleccione</option>
                                                 <option v-for="tarifario in arraySelectTarifario" :key="tarifario.id" :value="tarifario.id" v-text="tarifario.nombre"></option>
                                             </select>
@@ -191,7 +191,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="productosTarifario in arrayProductosTarifario" :key="productosTarifario.id">
+                                        <tr v-for="(productosTarifario,index) in arrayProductosTarifario">
                                             <td v-if="productosTarifario.asociado==0" v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion" class="col-md-11"></td>
                                             <td v-else v-text="productosTarifario.nom_articulo+' - '+productosTarifario.nom_presentacion+' (Presentación asociada)'" class="col-md-11"></td>
                                             <td><input type="number" v-model="productosTarifario.valor"></td>
@@ -310,49 +310,16 @@
                     console.log(error);
                 });
             },
-            listarArticulos(page,buscar,criterio){
-                let me=this;
-                var url= this.ruta +'/articulo/listarArticulo?page=1&buscar=&criterio=';
-                axios.get(url).then(function (response) {
-                    var respuesta= response.data;
-                    me.arrayArticulos = respuesta.articulos;
-                    console.log(me.arrayArticulos);
-
-                    for(var i=0; i<me.arrayArticulos.length; i++)
-                    {
-                        var id_asociado = 0;
-                        me.arrayProductosTarifario.push({
-                            'id_producto' : me.arrayArticulos[i].id,
-                            'nom_articulo' : me.arrayArticulos[i].nombre,
-                            'valor' : 0,
-                            'id_asociado' : me.arrayArticulos[i].id_asociado,
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-            },
             listarProductosTarifario(id_tarifario){
                 let me=this;
                 var url= this.ruta +'/producto_tarifario/selectProductoTarifario?id_tarifario=' + id_tarifario;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayProductosTarifario = respuesta.producto_tarifario;
+                    me.arrayProductosTarifario = respuesta.productos_tarifario;
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
-            },
-            traerDe(id){
-                if(id!=0)
-                {
-                    this.listarProductosTarifario(id);
-                }
-                else
-                {
-                    this.listarArticulos('','','');
-                }
             },
             marcarFavorito(id)
             {

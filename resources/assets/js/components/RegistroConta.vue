@@ -1113,12 +1113,12 @@ export default {
             let me=this;
             if(me.terero_id=='')
             {
-                swal({  type: 'error',  title: 'Error...',
+                Swal.fire({  type: 'error',  title: 'Error...',
                     text: 'Debe seleccionar un tercero para el documento!!!',
                 })
             }
             else if((me.debito=='' && me.credito=='') || (me.debito<='0' && me.credito<='0') || me.id_cuenta == ''){
-                swal({  type: 'error',  title: 'Error...',
+                Swal.fire({  type: 'error',  title: 'Error...',
                     text: 'Debe seleccionar la cuenta y/o registrar los valores!!!',
                 })
             }   
@@ -1160,7 +1160,7 @@ export default {
             
         },
         eliminarDetalle(index){
-            swal({
+            Swal.fire({
                 title: 'Esta seguro de eliminar este registro?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1178,7 +1178,7 @@ export default {
                     me.arrayDetalle.splice(index, 1);
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1190,7 +1190,7 @@ export default {
             me.getNumeroNext();
             if(me.tipo_formato_new == '')
             {
-               swal({  type: 'error',  title: 'Error...',
+               Swal.fire({  type: 'error',  title: 'Error...',
                     text: 'Debe seleccionar un tipo de formato!!!',
                 })
                 $( "#tipo_formato_new" ).focus();
@@ -1321,7 +1321,7 @@ export default {
             return me.errorFormato;
         },
         anularFormato(id_formato){
-            swal({
+            Swal.fire({
                 title: 'Esta seguro de anular este formato?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1341,7 +1341,7 @@ export default {
                         'id': id_formato,
                     }).then(function (response) {
                         me.listarRegistros(1);
-                        swal(
+                        Swal.fire(
                         'Anulado!',
                         'El formato ha sido anuado con éxito.',
                         'success'
@@ -1353,14 +1353,14 @@ export default {
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
             }) 
         },
         cerrarFormato(id_formato){
-            swal({
+            Swal.fire({
                 title: 'Esta seguro de cerrar este formato?',
                 type: 'warning',
                 showCancelButton: true,
@@ -1380,7 +1380,7 @@ export default {
                         'id': id_formato,
                     }).then(function (response) {
                         me.listarRegistros(1);
-                        swal(
+                        Swal.fire(
                         'Cerrado!',
                         'El formato ha sido cerrado con éxito.',
                         'success'
@@ -1392,7 +1392,7 @@ export default {
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1808,12 +1808,12 @@ export default {
         },
         abrirModal2(){               
             if(this.banco == "")
-             swal({  type: 'error',  title: 'Error...',
+             Swal.fire({  type: 'error',  title: 'Error...',
                     text: 'Debe seleccionar la fuente del pago para realizar la afectación!!!',
                 })
             else{
                 if(this.tercero_id==""){
-                     swal({  type: 'error',  title: 'Error...',
+                     Swal.fire({  type: 'error',  title: 'Error...',
                         text: 'Debe seleccionar un tercero para realizar la afectación!!!',
                     })
                 }
@@ -1853,7 +1853,7 @@ export default {
             me.cerrarModalRetenciones();
         },
         alertaRete(){
-            swal({
+            Swal.fire({
             type: 'error',
             title: 'Error',
             text: 'Seleccione un tercero que pertenezca al regimen simplificado!',

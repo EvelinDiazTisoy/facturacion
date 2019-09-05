@@ -20,6 +20,6 @@ class Persona extends Model
 
     public function factura()
     {
-        return $this->hasOne('App\Facturacion');
+        return $this->hasMany('App\Facturacion');
     }
 }

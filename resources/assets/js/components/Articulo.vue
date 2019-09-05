@@ -84,10 +84,10 @@
                                     </td>
                                     <td>
                                         <template>
-                                            <button v-if="permisosUser.actualizar && articulo.condicion" type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm">
+                                            <button v-if="permisosUser.actualizar && articulo.condicion" type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm" title="Editar">
                                                 <i class="icon-pencil"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
                                                 <i class="icon-pencil"></i>
                                             </button>
                                         </template>
@@ -101,25 +101,25 @@
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="articulo.condicion" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="articulo.condicion" type="button" class="btn btn-secondary btn-sm" title="Anular">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
 
                                         <template>
-                                            <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" >
+                                            <button type="button" class="btn btn-info btn-sm" @click="abrirModalStock('ver', articulo.id)" title="Ver stock">
                                                 <i class="fa fa-archive"></i>
                                             </button>
                                         </template>
                                         
                                         <template>
-                                            <button v-if="permisosUser.actualizar && articulo.condicion" @click="abrirModal('articulo','productos_asociados',articulo)" type="button" class="btn btn-success btn-sm">
+                                            <button v-if="permisosUser.actualizar && articulo.condicion" @click="abrirModal('articulo','productos_asociados',articulo)" type="button" class="btn btn-success btn-sm" title="Presentación asociada">
                                                 <i class="fa fa-align-justify"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Presentación asociada">
                                                 <i class="fa fa-align-justify"></i>
                                             </button>
                                         </template>
@@ -154,7 +154,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -175,7 +175,7 @@
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="categoria in arrayCategoria" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
                                         </select>
-                                        <span class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('modelo_contable')"><i class="fa fa-plus-circle"></i></span>
+                                        <span class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('modelo_contable')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
@@ -185,7 +185,7 @@
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="categoria in arrayCategoria2" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
                                         </select>
-                                        <span class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('categoria2')"><i class="fa fa-plus-circle"></i></span>
+                                        <span class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('categoria2')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'col-md-12 mostrar-crear' : modalCrear==1}">
@@ -200,8 +200,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-2 float-right">
-                                        <button type="button" class="btn btn-primary" @click="crearExtras('categoria')"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('categoria')" title="Guardar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -209,15 +209,13 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Precio Venta</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="number" v-model="precio_venta" :min="1" @blur="(function(){
-                                            if(precio_venta<1) precio_venta=1;})" class="form-control" placeholder="">                                        
+                                        <input type="number" v-model="precio_venta" :min="1" @blur="function(){ if(precio_venta<1) precio_venta=1; }" class="form-control" placeholder="">                                        
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label v-if="tipo_articulo!=2" class="col-md-3 form-control-label float-left" for="text-input">Stock</label>
                                     <div v-if="tipo_articulo!=2" class="col-md-9 float-right">
-                                        <input type="number" v-model="stock" :min="1" @blur="(function(){
-                                            if(stock<1) stock=1;})" class="form-control" placeholder="">
+                                        <input type="number" v-model="stock" :min="1" @blur="function(){ if(stock<1) stock=1; }" class="form-control" placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +281,7 @@
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="id_und_medida in arrayUndMedida" :key="id_und_medida.id" :value="id_und_medida.id" v-text="id_und_medida.nombre"></option>
                                         </select> 
-                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('und_medida')"><i class="fa fa-plus-circle"></i></span>
+                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('und_medida')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
@@ -298,8 +296,8 @@
                                         <input type="text" class="form-control col-md-9 float-right" v-model="nombre_crear">
                                     </div>
                                     <div class="col-md-2 float-right">
-                                        <button type="button" class="btn btn-primary" @click="crearExtras('und_medida')"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('und_medida')" title="Guardar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==3}">
@@ -308,8 +306,8 @@
                                         <input type="text" class="col-md-9 form-control float-right" v-model="nombre_crear">
                                     </div>
                                     <div class="col-md-2 float-right">
-                                        <button type="button" class="btn btn-primary" @click="crearExtras('concentracion')"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('concentracion')" title="Guardar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +319,7 @@
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="id_presentacion in arrayPresentacion" :key="id_presentacion.id" :value="id_presentacion.id" v-text="id_presentacion.nombre"></option>
                                         </select> 
-                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')"><i class="fa fa-plus-circle"></i></span>
+                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                     </div>                   
                                 </div>
                                 <div class="form-group col-md-6">
@@ -345,8 +343,8 @@
                                         <input type="text" class="col-md-9 form-control-label float-right" v-model="nombre_crear">
                                     </div>
                                     <div class="col-md-2 float-right">
-                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')" titlte="Gaurdar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -403,7 +401,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModalStock"></h4>
                             <button type="button" class="close" @click="cerrarModalStock()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -488,7 +486,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal3"></h4>
                             <button type="button" class="close" @click="cerrarModalTarifario()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -534,7 +532,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal4"></h4>
                             <button type="button" class="close" @click="cerrarModal4()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -615,7 +613,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal5"></h4>
                             <button type="button" class="close" @click="cerrarModalCuentas()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -657,9 +655,9 @@
                     <div class="modal-content" style="width: 750px !important;">
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal6"></h4>
-                            <button v-if="tipoAccion6==0" @click="tipoAccion6=1" class="btn btn-default">Nuevo</button>
+                            <button v-if="tipoAccion6==0" @click="selectPresentacion(),tipoAccion6=1" class="btn btn-default">Nuevo</button>
                             <button type="button" class="close" @click="cerrarModal6()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -672,7 +670,8 @@
                                                 <option value="0" disabled>Seleccione</option>
                                                 <option v-for="id_presentacion in arrayPresentacion" :key="id_presentacion.id" :value="id_presentacion.id" v-text="id_presentacion.nombre"></option>
                                             </select> 
-                                            <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')"><i class="fa fa-plus-circle"></i></span>
+                                            <span v-if="modalCrear!=4" class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                            <span v-else class="btn btn-secondary col-md-2 float-right"  title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -682,18 +681,28 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==4}">
+                                <!--<div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==4}">
                                     <div class="col-md-10 float-left">
                                         <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
                                         <input type="text" class="col-md-9 form-control-label float-right" v-model="nombre_crear">
                                     </div>
                                     <div class="col-md-2 float-right">
-                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')" title="Guardar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
+                                    </div>
+                                </div>-->
+                                <div class="row pb-3" v-if="modalCrear==4">
+                                    <div class="col-md-10 float-left">
+                                        <span class="col-md-3 form-control-label float-left" v-text="tituloModalCrear"></span>
+                                        <input type="text" class="col-md-9 form-control-label float-right" v-model="nombre_crear">
+                                    </div>
+                                    <div class="col-md-2 float-right">
+                                        <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')" title="Guardar"><i class="fa fa-save"></i></button>
+                                        <button type="button" class="btn btn-danger" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
-                                <div class="form-group row">
-                                    <div class="col-md-12">
+                                <div class="row">
+                                    <div class="container">
                                         <table class="table table-bordered table-striped table-sm">
                                             <thead>
                                                 <tr>
@@ -1091,70 +1100,13 @@
                     console.log(error);
                 });
             },
-            listarPresentacionesAsociadas(id, id_presentacion){
+            listarPresentacionesAsociadas(id){
                 let me=this;
                 var url= this.ruta + '/productos_asociados/selectProductoAsociado?id_producto='+id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayPresentacionesAsociadas = respuesta.productos_asociados;
                     // me.pagination= respuesta.pagination;
-
-                    var indices = [];
-
-                    for(var i=0; i<me.arrayPresentacion.length; i++)
-                    {
-                        if(me.arrayPresentacion[i]['id']==id_presentacion)
-                        {
-                            indices.push({
-                                indice: i,
-                            });
-                        }
-
-                        me.arrayPresentacionesAsociadas.forEach(function(dato2){
-                            if(me.arrayPresentacion[i]['id']==dato2['id_presentacion'])
-                            {
-                                indices.push({
-                                    indice: i,
-                                });
-                            }
-                        });
-                    }
-
-                    indices.forEach(function(dato){
-                        me.arrayPresentacion.splice(dato['indice'],1);
-                    });
-                    console.log(me.arrayPresentacion);
-
-                    /*me.arrayPresentacion.forEach(function(dato, index){
-                        if(dato['id']==id_presentacion)
-                        {
-                            indices.push({
-                                indice: index,
-                            });
-                            me.arrayPresentacion.splice(dato);
-                        }
-
-                        me.arrayPresentacionesAsociadas.forEach(function(dato2){
-                            if(dato['id']==dato2['id_presentacion'])
-                            {
-                                indices.push({
-                                    indice: index,
-                                });
-                            }
-                        });
-                    });
-                    
-                    if(indices.length)
-                    {
-                        indices.forEach(function(indice){
-                            me.arrayPresentacion.splice(indice['indice']);
-                            console.log('splice: '+indice['indice']);
-                        });
-                    }
-                    else
-                    {
-                        console.log('nada');
-                    }*/
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1210,7 +1162,20 @@
             },
             selectPresentacion(){
                 let me=this;
-                var url= this.ruta + '/presentacion/selectPresentacion';
+                var concat = '';
+                if(me.idPresentacionAsociada!=0 && me.idPresentacionAsociada!='' && me.idPresentacionAsociada!=null)
+                {
+                    concat = concat+'idPresentacionAsociada='+me.idPresentacionAsociada;
+                }
+
+                if(me.idProductoPresentacionAsociada!=0 && me.idProductoPresentacionAsociada!='' && me.idProductoPresentacionAsociada!=null)
+                {
+                    if(concat!=''){ concat = concat+'&';}
+                    concat = concat+'idProductoPresentacionAsociada='+me.idProductoPresentacionAsociada;
+                }
+
+                if(concat!=''){concat = '?'+concat;}
+                var url= this.ruta + '/presentacion/selectPresentacion'+concat;
                 axios.get(url).then(function (response) {
                     //console.log(response);
                     var respuesta= response.data;
@@ -1679,6 +1644,8 @@
                 this.arrayIvaVenta = [];
                 this.arrayIvaDevolucionesCompra = [];
                 this.arrayIvaDevolucionesVenta = [];
+
+                this.cerrarModalCrear();
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
@@ -1692,8 +1659,8 @@
                                 this.idcategoria=0;
                                 this.codigo='';
                                 this.nombre= '';
-                                this.precio_venta=0;
-                                this.stock=0;
+                                this.precio_venta=1;
+                                this.stock=1;
                                 this.cod_invima='';
                                 this.lote='';
                                 this.fec_vence='';
@@ -1746,9 +1713,10 @@
                                 this.modal6 = 1;
                                 this.tituloModal6 = 'Presentación asociados';
                                 this.idProductoPresentacionAsociada = data['id'];
+                                this.idPresentacionAsociada = data['id_presentacion'];
                                 this.listarTarifarios('');
-                                this.selectPresentacion();
-                                this.listarPresentacionesAsociadas(data['id'],data['id_presentacion']);
+                                // this.selectPresentacion();
+                                this.listarPresentacionesAsociadas(data['id']);
                                 break;
                             }
                             case 'iva':
@@ -1814,7 +1782,7 @@
                     case "categoria2":
                     {   
                         this.modalCrear = 1;
-                        this.tituloModalCrear = 'Categoria';
+                        this.tituloModalCrear = 'Nombre';
                         this.nombre_crear= '';
                         this.descripcion_crear = '';
                         this.tipoAccionCrear = 1;
@@ -1841,7 +1809,7 @@
                     case "presentacion":
                     {   
                         this.modalCrear = 4;
-                        this.tituloModalCrear = 'Presentación';
+                        this.tituloModalCrear = 'Nueva presentación';
                         this.nombre_crear= '';
                         this.descripcion_crear = '';
                         this.tipoAccionCrear = 1;
@@ -1864,15 +1832,18 @@
                 this.idCuentaDonaciones = 0;
                 this.cuentaDonaciones = '';
                 this.codCuentaDonaciones = '';
+                this.cerrarModalCrear();
             },
             cerrarModal6(){
                 this.modal6 = 0;
                 this.tituloModal6 = 0;
+                this.tipoAccion6 = 0;
                 this.idProductoPresentacionAsociada = 0;
                 this.unidadesPresentacionAsociada = 0;
                 this.idPresentacionAsociada = 0;
                 this.arrayPresentacionesAsociadas = [];
                 this.arrayTarifarios = [];
+                this.cerrarModalCrear();
             },
             cerrarModal7(){
                 this.modal7 = 0;
@@ -1882,6 +1853,7 @@
                 this.ivaVenta = 0;
                 this.ivaDevCompra = 0;
                 this.ivaDevVenta = 0;
+                this.cerrarModalCrear();
             },
             cerrarModalCrear7(){
                 this.tipoAccion7=0;
@@ -1889,6 +1861,7 @@
                 this.ivaVenta=0;
                 this.ivaDevCompra=0;
                 this.ivaDevVenta=0;
+                this.cerrarModalCrear();
             },
             cerrarModalStock(){
                 this.modal2=0;

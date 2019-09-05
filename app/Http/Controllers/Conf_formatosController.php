@@ -24,7 +24,7 @@ class Conf_formatosController extends Controller
             $conf_formatos = conf_formatos::where('id_empresa','=',$id_empresa)->orderBy('nombre_formato', 'asc')->paginate(10);
         }
         else{
-            $conf_formatos = conf_formatos::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('codigo', 'asc')->paginate(10);
+            $conf_formatos = conf_formatos::where('id_empresa','=',$id_empresa)->where($criterio, 'like', '%'. $buscar . '%')->orderBy('nombre_formato', 'asc')->paginate(10);
         }
 
         return [

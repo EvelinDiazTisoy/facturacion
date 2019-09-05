@@ -11,41 +11,31 @@
                     <div class="card-header">
                         <div class="col-md-6 float-left">
                             <i class="fa fa-align-justify"></i> Informes
-                            <button v-if="permisosUser.crear && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
+                            <!--<button v-if="permisosUser.crear && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
                                 <i class="icon-plus"></i>&nbsp;Nuevo
                             </button>
                             <button v-else type="button" v-show="listado==1" class="btn btn-secondary">
                                 <i class="icon-plus"></i>&nbsp;Nuevo
-                            </button>
+                            </button>-->
 
-                            <button v-if="permisosUser.actualizar && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
+                            <!--<button v-if="permisosUser.actualizar && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
                                 <i class="icon-plus"></i>&nbsp;Cerrar caja
                             </button>
                             <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="mostrarDetalle('cierres_caja','registrar')">
                                 <i class="icon-plus"></i>&nbsp;Abrir caja
-                            </button>
+                            </button>-->
                         </div>
-                        <div class="col-md-6 float-right">
+                        <!--<div class="col-md-6 float-right">
                             <span v-if="nom_caja_cierre_facturacion!=''" v-text="'Usted esta en la caja: '+nom_caja_cierre_facturacion"></span>
                             <span v-else >No hay caja abierta</span>
-                        </div>
+                        </div>-->
                     </div>
                     <!-- Listado-->
                     <template v-if="listado==1">
                     <div class="card-body">
                         <div class="form-group">
-                            <div class="row">
-                                <!--
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                        <option value="tipo_comprobante">Tipo Comprobante</option>
-                                        <option value="num_comprobante">Número Comprobante</option>
-                                        <option value="fecha_hora">Fecha-Hora</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarFacturacion(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarFacturacion(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
-                                -->
+                            <!--FILTROS DEL  MODULO "FACTURACION"-->
+                            <!--<div class="row">
                                 <div class="form-group col-md-3">
                                     <label class="float-left">N° factura</label>
                                     <div class="col-md-8 float-right">
@@ -134,9 +124,62 @@
                                         <i class="fa fa-search"></i> Buscar
                                     </button>
                                 </div>
-                            </div>  
+                            </div>-->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="float-left">Caja</label>
+                                    <div class="float-right col-md-10">
+                                        <select class="form-control" v-model="idCajaInformes" @change="listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes)">
+                                            <option value="0">Seleccione</option>
+                                            <option v-for="(cajas,index) in arrayCajas" :value="cajas.id" v-text="cajas.nombre"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="" class="float-left">Cajero(*)</label>
+                                        <div class="form-inline float-right">
+                                            <input type="text" readonly style="max-width: 163px;" class="form-control" name="cuenta_fin" v-model="tercero">
+                                            <button @click="abrirModalT('terceros')" style="    min-width: 30px;" class="btn btn-primary form-control">...</button>
+                                            <button @click="quitar(3),listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes);" style="min-width: 30px;" class="btn btn-danger form-control">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="float-left">Saldo</label>
+                                    <div class="float-right col-md-10">
+                                        <select class="form-control" v-model="saldoInformes" @change="listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes)">
+                                            <option value="Ambos">Ambos</option>
+                                            <option value="Saldo">Saldo</option>
+                                            <option value="Sin Saldo">Sin Saldo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="float-left">Estado</label>
+                                    <div class="float-right col-md-10">
+                                        <select class="form-control" v-model="estadoInformes" @change="listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes)">
+                                            <option value="0">N/A</option>
+                                            <option value="1">Activa</option>
+                                            <option value="2">Registrada</option>
+                                            <!--<option value="3">Enviada</option>-->
+                                            <option value="4">Anulada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--<div class="col-md-3">
+                                    <button v-if="permisosUser.leer" type="submit" @click="listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes)" class="btn btn-primary">
+                                        <i class="fa fa-search"></i> Buscar
+                                    </button>
+                                    <button v-else type="submit" class="btn btn-secondary">
+                                        <i class="fa fa-search"></i> Buscar
+                                    </button>
+                                </div>-->
+                            </div>
                         </div>
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="overflow-y: auto;max-height: 26em !important;display: block;border: none;">
                             <table class="table table-bordered table-striped table-sm">
                                 <thead>
                                     <tr>
@@ -148,38 +191,41 @@
                                         <th>Descuento</th>
                                         <th>Lugar</th>
                                         <th>Iva</th>
+                                        <th>Saldo</th>
                                         <th>Total</th>
                                         <th>Estado</th>
-                                        <th>Opciones</th>
+                                        <!--<th>Opciones</th>-->
                                     </tr>
                                 </thead>
-                                <tbody v-if="permisosUser.leer">
+                                <tbody v-if="permisosUser.leer && arrayFacturacion.length">
                                     <tr v-for="facturacion in arrayFacturacion" :key="facturacion.id" style="text-align: right;">
                                         <td v-text="facturacion.id"></td>
-                                        <td v-text="facturacion.num_factura"></td>
+                                        <td v-if="facturacion.num_factura"><a v-text="facturacion.num_factura" href="#"  @click="excelFormato(facturacion.id)"></a></td>
+                                        <td v-else ><a href="#"  @click="excelFormato(facturacion.id)"><i class="icon-eye"></i></a></td>
                                         <td v-text="facturacion.nom_tercero"></td>
                                         <td v-text="facturacion.fecha"></td>
                                         <td v-text="facturacion.subtotal"></td>
                                         <td v-text="facturacion.descuento"></td>
                                         <td v-text="facturacion.nom_lugar"></td>
                                         <td v-text="facturacion.valor_iva"></td>
+                                        <td v-text="facturacion.saldo"></td>
                                         <td v-text="facturacion.total"></td>
                                         <td v-if="facturacion.estado==1"><span>Activa</span></td>
                                         <td v-else-if="facturacion.estado==2"><span>Registrada</span></td>
                                         <td v-else-if="facturacion.estado==3"><span>Enviada</span></td>
                                         <td v-else-if="facturacion.estado==4"><span>Anulada</span></td>
-                                        <td>
+                                        <!--<td>
                                             <button type="button" @click="verFacturacion(facturacion.id)" class="btn btn-success btn-sm">
                                                 <i class="icon-eye"></i>
-                                            </button>
-                                            <template>
+                                            </button>-->
+                                            <!--<template>
                                                 <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm" v-if="permisosUser.actualizar  && facturacion.estado==1">
                                                     <i class="icon-pencil"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-secondary btn-sm" v-else>
                                                     <i class="icon-pencil"></i>
                                                 </button>
-                                            </template>
+                                            </template>-->
                                             
                                             <!--<template>
                                                 <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
@@ -189,7 +235,7 @@
                                                     <i class="fa fa-registered"></i>
                                                 </button>
                                             </template>-->
-                                            <template>
+                                            <!--<template>
                                                 <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
@@ -201,7 +247,7 @@
                                                 <button type="button" v-else class="btn btn-secondary btn-sm">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
-                                            </template>
+                                            </template>-->
                                             <!--
                                             <template v-else-if="facturacion.estado==2">
                                                 <button type="button" class="btn btn-primary btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'enviar')">
@@ -214,7 +260,7 @@
                                                 </button>
                                             </template>
                                             -->
-                                            <template v-if="permisosUser.anular">
+                                            <!--<template v-if="permisosUser.anular">
                                                 <button type="button" class="btn btn-danger btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'anular')" v-if="facturacion.estado!=4 && facturacion.estado!=3">
                                                     <i class="icon-trash"></i>
                                                 </button>
@@ -229,8 +275,8 @@
                                                 <button type="button" class="btn btn-secondary btn-sm" v-else>
                                                     <i class="icon-trash"></i>
                                                 </button>
-                                            </template>
-                                        </td>
+                                            </template>-->
+                                        <!--</td>-->
                                     </tr>                                
                                 </tbody>
                                 <tbody v-else>
@@ -238,7 +284,13 @@
                                 </tbody>
                             </table>
                         </div>
-                        <nav>
+                        <div v-if="arrayFacturacion.length" class="row pt-2">
+                            <div class="col-md-8"></div>
+                            <div class="col-md-4 float-right">
+                                <label class="float-right">Total: <span class="float-right">{{totalizado = CalcularTotalizado}}</span></label>
+                            </div>
+                        </div>
+                        <!--<nav>
                             <ul class="pagination">
                                 <li class="page-item" v-if="pagination.current_page > 1">
                                     <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
@@ -250,7 +302,7 @@
                                     <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
                                 </li>
                             </ul>
-                        </nav>
+                        </nav>-->
                     </div>
                     </template>
                     <!--Fin Listado-->
@@ -779,7 +831,7 @@
                                                 <td v-if="tercero.nombre && !tercero.nombre1">{{ tercero.nombre }}  </td>
                                                 <td v-else>{{ tercero.nombre1 + ' ' + validarUnder(tercero.nombre2)+' '+tercero.apellido1+' '+validarUnder(tercero.apellido2) }} </td>
                                                 <td>
-                                                    <button type="button" style=" margin-right: -8px;" @click="cargarTercero(tercero)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                    <button type="button" style=" margin-right: -8px;" @click="cargarTercero(tercero),listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes)" class="btn btn-success btn-sm" title='Ver formato'>
                                                         <i class="icon-check"></i>
                                                     </button>
                                                 </td>
@@ -1138,6 +1190,14 @@
                 tituloModalCierre : '',
                 tipoAccionCierre : 0,
                 ban : 0,
+
+                // variables filtro de Informes
+                idCajaInformes : 0,
+                idCajeroInformes : 0,
+                saldoInformes : 'Ambos',
+                estadoInformes : 0,
+
+                totalizado : 0.0,
             }
         },
         components: {
@@ -1208,16 +1268,24 @@
                 
                 return resultado;
             },
+            CalcularTotalizado: function(){
+                var resultado=0.0;
+                for(var i=0;i<this.arrayFacturacion.length;i++){
+                    resultado=resultado+this.arrayFacturacion[i].total;
+                }
+                return resultado;
+            },
         },
         methods : {
-            listarFacturacion (page,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro){
+            listarFacturacion (page,idCajaInformes,idCajeroInformes,saldoInformes,estadoInformes){
                 let me=this;
 
-                var url= this.ruta +'/facturacion?page=' + page + '&numFacturaFiltro='+ numFacturaFiltro + '&estadoFiltro='+ estadoFiltro + '&idTerceroFiltro='+ idTerceroFiltro + '&ordenFiltro='+ ordenFiltro + '&desdeFiltro='+ desdeFiltro + '&hastaFiltro='+ hastaFiltro + '&idVendedorFiltro='+ idVendedorFiltro+'&id_cierre_caja='+me.id_cierre_caja_facturacion;
+                var url= this.ruta +'/facturacion?page=' + page + '&idCajaInformes='+ idCajaInformes + '&idCajeroInformes='+ idCajeroInformes + '&saldoInformes='+ saldoInformes+'&estadoInformes='+estadoInformes+'&filtroInformes='+1;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayFacturacion = respuesta.facturacion.data;
-                    me.pagination= respuesta.pagination;
+                    // me.arrayFacturacion = respuesta.facturacion.data;
+                    me.arrayFacturacion = respuesta.facturacion;
+                    // me.pagination= respuesta.pagination;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -1737,7 +1805,7 @@
                         'id': id_factura
                     }).then(function (response) {
                         me.ocultarDetalle();
-                        me.listarFacturacion(1,'','','','','','','');
+                        me.listarFacturacion(1,'','','');
                     }).catch(function (error) {
                         console.log(error);
                     });
@@ -1795,7 +1863,7 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarFacturacion(1,numFacturaFiltro,estadoFiltro,idTerceroFiltro,ordenFiltro,desdeFiltro,hastaFiltro,idVendedorFiltro);
+                me.listarFacturacion(1,idCajaInformes,id_tercero,saldoInformes,estadoInformes);
             },
             /*encuentra(id,presentacion){
                 var sw=0;
@@ -2000,7 +2068,7 @@
                     'sumatoria' : 0
                 }).then(function (response) {
                     me.ocultarDetalle();
-                    me.listarFacturacion(1,'','','','','','','');
+                    me.listarFacturacion(1,'','','');
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -2056,7 +2124,7 @@
                     'id' : me.facturacion_id
                 }).then(function (response) {
                     me.ocultarDetalle();
-                    me.listarFacturacion(1,'','','','','','','');
+                    me.listarFacturacion(1,'','','');
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -2118,7 +2186,7 @@
                                 me.arrayArticulo=[];
                                 me.arrayDetalle=[];
                                 me.arrayTerceros=[];
-                                me.listarFacturacion(1,'','','','','','','');
+                                me.listarFacturacion(1,'','','');
                                 break;
                             };
                             case 'actualizar':{
@@ -2377,7 +2445,7 @@
                     axios.put(this.ruta +'/ingreso/desactivar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarFacturacion(1,'','','','','','','');
+                        me.listarFacturacion(1,'','','');
                         Swal.fire(
                         'Anulado!',
                         'El ingreso ha sido anulado con éxito.',
@@ -2488,6 +2556,9 @@
             pdfFormato(id){
                 window.open(this.ruta +'/facturacion/pdfFacturacion/'+ id);
             },
+            excelFormato(id){
+                window.open(this.ruta +'/facturacion/excelFacturacion/'+ id);
+            },
         },
         mounted() {
             let me= this;
@@ -2512,9 +2583,10 @@
             me.fecha = d;
             me.fechaHoraActual = d+' '+h+':'+min+':'+sec;
 
-            me.listarCajas(1,'','');
+            // me.listarCajas(1,'','');
 
-            // me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+            me.selectCajas();
+            me.listarFacturacion(1,me.idCajaInformes,me.id_tercero,me.saldoInformes,me.estadoInformes);
         }
     }
 </script>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Presentacion;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PresentacionController extends Controller
 {
@@ -40,7 +41,32 @@ class PresentacionController extends Controller
     public function selectPresentacion(Request $request){
         if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
-        $presentacion = Presentacion::select('id','nombre')->where('id_empresa','=',$id_empresa)->orderBy('nombre', 'asc')->get();
+
+        if(isset($request->idProductoPresentacionAsociada))
+        {
+            $sql = "SELECT id_presentacion FROM productos_asociados WHERE id_producto=".$request->idProductoPresentacionAsociada;
+            $cons = DB::select($sql);
+            if(!empty($cons))
+            {
+                $presentacionesAsociadas = [];
+                foreach($cons as $c)
+                {
+                    $presentacionesAsociadas[] = $c->id_presentacion;
+                }
+            }
+        }
+
+        $presentacion = Presentacion::select('id','nombre')
+        ->where('id_empresa','=',$id_empresa);
+        if(isset($request->idPresentacionAsociada))
+        {
+            $presentacion = $presentacion->where('presentacion.id','!=',$request->idPresentacionAsociada);
+        }
+        if(isset($presentacionesAsociadas) && !empty($presentacionesAsociadas) && $presentacionesAsociadas!='')
+        {
+            $presentacion = $presentacion->whereNotIn('presentacion.id',$presentacionesAsociadas);
+        }
+        $presentacion = $presentacion->orderBy('nombre', 'asc')->get();
         
         return ['presentacion' => $presentacion];
     }

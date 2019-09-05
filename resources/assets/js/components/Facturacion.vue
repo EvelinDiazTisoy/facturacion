@@ -153,10 +153,11 @@
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="permisosUser.leer">
+                                <tbody v-if="permisosUser.leer && arrayFacturacion.length">
                                     <tr v-for="facturacion in arrayFacturacion" :key="facturacion.id" style="text-align: right;">
                                         <td v-text="facturacion.id"></td>
-                                        <td v-text="facturacion.num_factura"></td>
+                                        <td v-if="facturacion.num_factura" v-text="facturacion.num_factura"></td>
+                                        <td v-else ><i class="icon-eye"></i></td>
                                         <td v-text="facturacion.nom_tercero"></td>
                                         <td v-text="facturacion.fecha"></td>
                                         <td v-text="facturacion.subtotal"></td>
@@ -214,7 +215,7 @@
                                                 </button>
                                             </template>
                                             -->
-                                            <template v-if="permisosUser.anular">
+                                            <template v-if="permisosUser.anular && facturacion.estado==1">
                                                 <button type="button" class="btn btn-danger btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'anular')" v-if="facturacion.estado!=4 && facturacion.estado!=3">
                                                     <i class="icon-trash"></i>
                                                 </button>
@@ -383,7 +384,9 @@
                                                     <i class="icon-close"></i>
                                                 </button>
                                             </td>
-                                            <td v-text="detalle.articulo+' - '+detalle.nom_presentacion">
+                                            <td v-if="detalle.padre==null || detalle.padre==''" v-text="detalle.codigo+' - '+detalle.articulo+' - '+detalle.nom_presentacion">
+                                            </td>
+                                            <td v-else v-text="detalle.codigo+' - '+detalle.articulo+' - '+detalle.nom_presentacion+' (Presentación asociada)'">
                                             </td>
                                             <td style="text-align: right;">
                                                 $ {{detalle.precio}}
@@ -497,7 +500,7 @@
                                     <label v-text="'Tercero: '+tercero"></label>
                                 </div>
                                 <div class="col-md-2">
-                                    <label v-text="'Detalle: '+detalle" v-if="detalle!=''"></label>
+                                    <label v-text="'Detalle: '+detalle" v-if="detalle!='' && detalle!=null"></label>
                                     <label v-text="'Detalle: N/A'" v-else></label>
                                 </div>
                                 <div class="col-md-2">
@@ -527,7 +530,9 @@
                                     </thead>
                                     <tbody v-if="arrayDetalleT.length">
                                         <tr v-for="detalle in arrayDetalleT" :key="detalle.id">
-                                            <td v-text="detalle.articulo">
+                                            <td v-if="detalle.padre==null || detalle.padre==''" v-text="detalle.codigo+' - '+detalle.articulo+' - '+detalle.nom_presentacion">
+                                            </td>
+                                            <td v-else v-text="detalle.codigo+' - '+detalle.articulo+' - '+detalle.nom_presentacion+' (Presentación asociada)'">
                                             </td>
                                             <td style="text-align: right;">
                                                 $ {{detalle.precio}}
@@ -1619,7 +1624,6 @@
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayArticulo = respuesta.articulos;
-                    console.log(me.arrayArticulo);
 
                     if (me.arrayArticulo.length>0){
                         if (me.arrayArticulo[0]['productos_asociados'].length>0){
@@ -1636,7 +1640,8 @@
                             {
                                 p = ' - '+me.arrayArticulo[0]['nom_presentacion'];
                             }
-                            me.articulo=me.arrayArticulo[0]['codigo']+' - '+me.arrayArticulo[0]['nombre']+p;
+                            me.codigo=me.arrayArticulo[0]['codigo'];
+                            me.articulo= me.arrayArticulo[0]['nombre'];
                             me.idarticulo=me.arrayArticulo[0]['id'];
                             me.precio = me.arrayArticulo[0]['precio_venta'];
                             me.cantidad = 1;
@@ -1809,7 +1814,6 @@
             encuentra(id,id_asociado){
                 let me=this;
                 var sw=0;
-                console.log('id: '+id+' id_asociado: '+id_asociado);
                 for(var i=0;i<this.arrayDetalle.length;i++){
                     if(this.arrayDetalle[i].id==id)
                     {
@@ -1878,7 +1882,7 @@
                 }
                 else{
                     var p = '';
-                    if(data['padre']!='') {p = ' - (Presentacion asociada: '+data['nom_presentacion']+')';}
+                    if(data['padre']!='') {p = ' '+data['nom_presentacion']+' (Presentacion asociada)';}
                     else {p = ' - '+data['nom_presentacion'];}
 
                     var ivaVenta = 0;
@@ -1891,7 +1895,9 @@
 
                     me.arrayDetalle.push({
                         idarticulo: data['id'],
-                        articulo: data['codigo']+' - '+data['nombre']+p,
+                        id_asociado: data['id_asociado'],
+                        codigo: data['codigo'],
+                        articulo: data['nombre'],
                         porcentaje : ivaVenta,
                         cantidad: data['cant'],
                         precio: data['precio_venta'],
@@ -1918,7 +1924,7 @@
                 }
                 else{
                     var p = ''
-                    if(me.arrayInfoArticuloModalCantidad.padre!='') {p = ' - (Presentacion asociada: '+me.arrayInfoArticuloModalCantidad.padre+')';}
+                    if(me.arrayInfoArticuloModalCantidad.padre!='') {p = ' '+data['nom_presentacion']+' (Presentacion asociada)';}
                     else {p = ' - '+me.arrayInfoArticuloModalCantidad.padre;}
 
                     var ivaVenta = 0;
@@ -1928,7 +1934,8 @@
 
                     me.arrayDetalle.push({
                         idarticulo: me.arrayInfoArticuloModalCantidad.id,
-                        articulo: me.arrayInfoArticuloModalCantidad.codigo+' - '+me.arrayInfoArticuloModalCantidad.nombre+p,
+                        id_asociado: me.arrayInfoArticuloModalCantidad.id_asociado,
+                        articulo: me.arrayInfoArticuloModalCantidad.codigo+' - '+me.arrayInfoArticuloModalCantidad.nombre,
                         porcentaje : ivaVenta,
                         cantidad: me.cantidadArticulo,
                         precio: me.arrayInfoArticuloModalCantidad.precio_venta,
@@ -2304,20 +2311,18 @@
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     arrayFacturacionT = respuesta.facturacion;
-                    console.log(arrayFacturacionT[0]['abono2'])
 
                     me.fecha = arrayFacturacionT[0]['fecha'];
                     me.num_factura=arrayFacturacionT[0]['num_factura'];
                     me.tercero = arrayFacturacionT[0]['nom_tercero'];
                     me.detalle = arrayFacturacionT[0]['detalle'];
-                    me.lugar = arrayFacturacionT[0]['lugar'];
+                    me.lugar = arrayFacturacionT[0]['nom_lugar'];
                     me.estado = arrayFacturacionT[0]['estado'];
                     me.subtotal=arrayFacturacionT[0]['subtotal'];
                     me.valor_iva=arrayFacturacionT[0]['valor_iva'];
                     me.abono=arrayFacturacionT[0]['abono'];
                     me.saldo=arrayFacturacionT[0]['saldo'];
                     me.total=arrayFacturacionT[0]['total'];
-                    me.lugar=arrayFacturacionT[0]['lugar'];
                 })
                 .catch(function (error) {
                     console.log(error);

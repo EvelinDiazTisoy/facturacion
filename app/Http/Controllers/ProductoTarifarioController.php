@@ -41,7 +41,7 @@ class ProductoTarifarioController extends Controller
         ];
     }
 
-    public function selectProductoTarifario(Request $request){
+    /*public function selectProductoTarifario(Request $request){
         // if (!$request->ajax()) return redirect('/');
         $id_tarifario = $request->id_tarifario;
         $id_empresa = $request->session()->get('id_empresa');
@@ -80,6 +80,65 @@ class ProductoTarifarioController extends Controller
         ->get();
         
         return ['producto_tarifario' => $articulos];
+    }*/
+
+    public function selectProductoTarifario(Request $request){
+        // if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
+        $id_usuario = Auth::user()->id;
+
+        $cons1 = "SELECT articulos.id,articulos.id as id_articulo,articulos.id as id_producto,articulos.codigo,articulos.nombre as nom_articulo,articulos.id_presentacion,presentacion.nombre as nom_presentacion,0 as asociado, '' as idPresentacionAsociada,0 as valor FROM articulos,presentacion WHERE articulos.id_presentacion=presentacion.id";
+        $articulos = DB::select($cons1);
+
+        $total = [];
+        if(!empty($articulos))
+        {
+            foreach($articulos as $a)
+            {
+                $total[] = $a;
+                $cons2 = "SELECT productos_asociados.id, productos_asociados.id_presentacion, productos_asociados.unidades,productos_asociados.id_producto, presentacion.nombre as nom_presentacion FROM productos_asociados,presentacion WHERE id_producto=".$a->id." AND productos_asociados.id_presentacion=presentacion.id";
+                $articulos2 = DB::select($cons2);
+
+                if(!empty($articulos2))
+                {
+                    foreach($articulos2 as $a2)
+                    {
+                        $cons3 = "SELECT articulos.id,articulos.id as id_articulo,articulos.id as id_producto,articulos.codigo,articulos.nombre as nom_articulo FROM articulos WHERE articulos.id=".$a2->id_producto;
+                        $articulos3 = DB::select($cons3);
+
+                        if(!empty($articulos3))
+                        {
+                            $articulos3[0]->id_presentacion = $a2->id_presentacion;
+                            $articulos3[0]->nom_presentacion = $a2->nom_presentacion;
+                            $articulos3[0]->asociado = 1;
+                            $articulos3[0]->idPresentacionAsociada = $a2->id;
+                            $articulos3[0]->valor = 0;
+
+                            $total[] = $articulos3[0];
+                        }
+                    }
+                }
+            }
+        }
+
+        if(isset($request->id_tarifario) && $request->id_tarifario)
+        {
+            if(!empty($total))
+            {
+                foreach($total as $t)
+                {
+                    $cons4 = "SELECT valor FROM productos_tarifarios WHERE id_tarifario=".$request->id_tarifario." AND id_producto=".$t->id_articulo." AND asociado=".$t->asociado;
+                    $tarifarios = DB::select($cons4);
+
+                    if(!empty($tarifarios))
+                    {
+                        $t->valor = $tarifarios[0]->valor;
+                    }
+                }
+            }
+        }
+        
+        return ['productos_tarifario'=>$total];
     }
 
     public function store(Request $request)

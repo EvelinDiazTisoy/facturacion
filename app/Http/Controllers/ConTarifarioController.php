@@ -93,6 +93,8 @@ class ConTarifarioController extends Controller
             $productosTarifario->id_tarifario = $tarifario->id;
             $productosTarifario->id_producto = $PT['id_producto'];
             $productosTarifario->valor = $PT['valor'];
+            $productosTarifario->asociado = $PT['asociado'];
+            $productosTarifario->idPresentacionAsociada = $PT['idPresentacionAsociada'];
             $productosTarifario->save();
         }
     }

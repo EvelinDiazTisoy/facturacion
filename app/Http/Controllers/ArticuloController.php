@@ -120,7 +120,7 @@ class ArticuloController extends Controller
         $criterio = $request->criterio;
         $id_empresa = $request->session()->get('id_empresa');
 
-        if(isset($request->categoria))
+        if(isset($request->categoria) && $request->categoria!='' && $request->categoria!=0)
         {
             $cons_categoria = 'AND articulos.idcategoria2='.$request->categoria;
         }
@@ -129,7 +129,7 @@ class ArticuloController extends Controller
             $cons_categoria = '';
         }
 
-        if(isset($request->id_tarifario))
+        if(isset($request->id_tarifario) && $request->id_tarifario!='' && $request->id_tarifario!=0)
         {
             $cons_tarifario = 'AND productos_tarifarios.id_tarifario='.$request->id_tarifario;
         }
@@ -163,13 +163,16 @@ class ArticuloController extends Controller
 
                         $articulos3 = DB::select($cons3);
 
-                        foreach($articulos3 as $a3)
+                        if(!empty($articulos3))
                         {
-                            $consIvas2= "SELECT productos_iva.id_iva,productos_iva.tipo_iva,productos_iva.id_producto,iva.porcentaje FROM productos_iva,iva WHERE productos_iva.id_producto=".$a3->id." AND productos_iva.id_iva=iva.id";
-                            $a3->productos_iva = DB::select($consIvas2);
-                        }
+                            foreach($articulos3 as $a3)
+                            {
+                                $consIvas2= "SELECT productos_iva.id_iva,productos_iva.tipo_iva,productos_iva.id_producto,iva.porcentaje FROM productos_iva,iva WHERE productos_iva.id_producto=".$a3->id." AND productos_iva.id_iva=iva.id";
+                                $a3->productos_iva = DB::select($consIvas2);
+                            }
 
-                        $total[] = $articulos3[0];
+                            $total[] = $articulos3[0];
+                        }
 
                         // $a[] = $articulos3[0];
                     }
@@ -209,25 +212,10 @@ class ArticuloController extends Controller
     }
 
     public function buscarArticulo(Request $request){
-        // if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
 
         $filtro = $request->filtro;
-        // $articulos = Articulo::where('codigo','=', $filtro)
-        // ->join('modelo_contable','articulos.idcategoria','=','modelo_contable.id')
-        // ->leftJoin('productos_iva','articulos.id','=','productos_iva.id_producto')
-        // ->join('iva','productos_iva.id_iva','=','iva.id')
-        // ->select('articulos.id','articulos.id as id_articulo','articulos.idcategoria','articulos.idcategoria2','articulos.codigo','articulos.nombre','modelo_contable.nombre as nombre_categoria','articulos.precio_venta','articulos.stock','articulos.descripcion','articulos.cod_invima','articulos.lote','articulos.minimo','articulos.tipo_articulo','articulos.condicion','articulos.id_presentacion','articulos.talla','articulos.img','articulos.id_empresa','productos_iva.id_iva','iva.nombre as nombre_iva','iva.porcentaje','productos_iva.tipo_iva')
-        // ->where('articulos.id_empresa','=',$id_empresa);
-        // if($request->tipo_iva)
-        // { 
-        //     $articulos = $articulos->where('productos_iva.tipo_iva','=','Compra')
-        //     ->where('iva.tipo','=','compras');
-        // }
-        // // ->select('id','nombre','precio_venta','stock','iva')
-        // $articulos = $articulos->orderBy('articulos.nombre', 'asc')
-        // // ->take(1)
-        // ->get();
 
         
         $cons = "SELECT articulos.id,'' as id_asociado,articulos.idcategoria,articulos.idcategoria2,articulos.nombre,articulos.codigo,articulos.precio_venta,articulos.stock,articulos.descripcion,articulos.cod_invima,articulos.lote,articulos.fec_vence,articulos.minimo,articulos.tipo_articulo,articulos.iva,articulos.talla,articulos.id_und_medida,articulos.id_concentracion,articulos.id_presentacion,articulos.id_usuario,articulos.id_empresa,presentacion.nombre as nom_presentacion FROM articulos,presentacion WHERE articulos.id_presentacion=presentacion.id AND articulos.codigo=".$filtro." AND articulos.id_empresa=".$id_empresa;
@@ -270,23 +258,29 @@ class ArticuloController extends Controller
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
 
-        $carpetaEmpresa = $id_empresa .'_empresa'; 
-        $dirEmpresa = public_path("img_productos/$carpetaEmpresa");
-        if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
-
-        if(is_uploaded_file($_FILES['img']['tmp_name']))
-        {
-            $nombreImg = $_FILES['img']['name'];
-            if($_FILES['img']['type'] == "image/jpg" || $_FILES['img']['type'] == "image/jpeg" || $_FILES['img']['type'] == "image/png")
+        try{
+            $carpetaEmpresa = $id_empresa .'_empresa'; 
+            $dirEmpresa = public_path("img_productos/$carpetaEmpresa");
+            if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
+            
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('img'))
             {
-                copy($_FILES['img']['tmp_name'],$dirEmpresa.'/'.$_FILES['img']['name']);
+                if($request->file('img')->isValid())
+                {
+                    $nombreImg = $request->img->getClientOriginalName();
+                    if(in_array($request->img->extension(), $arrayExtensiones))
+                    {
+                        $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
+                    }
+                    else { return false; }
+                }
             }
-        }
-        else
-        {
-            $dirEmpresa = public_path("img_productos");
-            $nombreImg = 'default.png';
-        }
+            else
+            {
+                $dirEmpresa = public_path("img_productos");
+                $nombreImg = 'default.png';
+            }
 
             $archivo = [
                 'idcategoria' => $request->idcategoria,
@@ -326,6 +320,7 @@ class ArticuloController extends Controller
                 {
                     $nuevoTarifario->valor = $tarifarios[$i]->valor;
                 } else { $nuevoTarifario->valor = 0;}
+                $nuevoTarifario->asociado = 0;
 
                 $nuevoTarifario->save();
             }
@@ -369,6 +364,10 @@ class ArticuloController extends Controller
             $iva_producto->id_producto = $articulo->id;
             $iva_producto->usu_crea = $id_usuario;
             $iva_producto->save();
+        } catch (Exception $e){
+            report($e);
+            return false;
+        }
     }
 
     public function update(Request $request)
@@ -383,21 +382,38 @@ class ArticuloController extends Controller
         $dirEmpresa = public_path("img_productos/$carpetaEmpresa");
         if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
-        if($request->img != null){
+        /*if(isset($request->img) && $request->img != null){
             if(is_uploaded_file($_FILES['img']['tmp_name']))
             {
                 $nombreImg = $_FILES['img']['name'];
                 if($_FILES['img']['type'] == "image/jpg" || $_FILES['img']['type'] == "image/jpeg" || $_FILES['img']['type'] == "image/png")
                 {
-                    copy($_FILES['img']['tmp_name'],$dirEmpresa.'/'.$_FILES['img']['name']);
+                    // copy($_FILES['img']['tmp_name'],$dirEmpresa.'/'.$_FILES['img']['name']);
                 }
+            }else{ $nombreImg = $articulo->img; }
+        }
+        else
+        {
+            $nombreImg = $articulo->img;
+        }*/
+
+        $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+        if($request->hasFile('img'))
+        {
+            if($request->file('img')->isValid())
+            {
+                $nombreImg = $request->img->getClientOriginalName();
+                if(in_array($request->img->extension(), $arrayExtensiones))
+                {
+                    $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
+                }
+                else { return false; }
             }
         }
         else
         {
             $nombreImg = $articulo->img;
         }
-
 
         $archivo = [
             'idcategoria' => $request->idcategoria,
