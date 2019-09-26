@@ -9,7 +9,10 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Tarifario
-                        <button type="button" @click="abrirModal('tarifario','registrar')" class="btn btn-secondary">
+                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('tarifario','registrar')" class="btn btn-secondary">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>
+                        <button v-else type="button" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -17,11 +20,11 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select class="form-control col-md-3" v-model="criterio" @change="listarTarifario(1,buscar,criterio)">
                                       <option value="nombre">Nombre</option>>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarTarifario(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarTarifario(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <input type="text" v-model="buscar" @keyup="listarTarifario(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <!--<button type="submit" @click="listarTarifario(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -33,30 +36,41 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="permisosUser.leer && arrayTarifario.length">
                                 <tr v-for="tarifario in arrayTarifario" :key="tarifario.id">
                                     <td v-text="tarifario.nombre"></td>
                                     <td v-text="tarifario.descripcion"></td>
                                     <td>
-                                        <button v-if="tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar &&tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
-                                        <template v-if="tarifario.estado">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarTarifario(tarifario.id)">
+                                        <template v-if="permisosUser.actualizar">
+                                            <button type="button" v-if="tarifario.estado==1" class="btn btn-danger btn-sm" @click="desactivarTarifario(tarifario.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
+                                            </button>
+                                            
+                                            <button type="button" v-else class="btn btn-info btn-sm" @click="activarTarifario(tarifario.id)" title="Activar">
+                                                <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarTarifario(tarifario.id)">
+                                            <button type="button" v-if="tarifario.estado==1" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                            
+                                            <button type="button" v-else class="btn btn-secondary btn-sm"  title="Activar (Deshabilitado)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                     </td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr colspan="3">No hay registros para mostrar</tr>
                             </tbody>
                         </table>
                         <nav>
@@ -83,7 +97,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -113,9 +127,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarTarifario()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarTarifario()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarTarifario()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarTarifario()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -128,7 +142,7 @@
 
 <script>
     export default {
-        props : ['ruta'],
+        props : ['ruta', 'permisosUser'],
         data (){
             return {
                 tarifario_id: 0,
@@ -248,7 +262,7 @@
                 return this.errorTarifario;
             },
             desactivarTarifario(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este tarifario?',
                 type: 'warning',
                 showCancelButton: true,
@@ -268,7 +282,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarTarifario(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -280,14 +294,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarTarifario(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este tarifario?',
                 type: 'warning',
                 showCancelButton: true,
@@ -307,7 +321,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarTarifario(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -319,7 +333,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

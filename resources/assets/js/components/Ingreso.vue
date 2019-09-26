@@ -22,22 +22,19 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @change="listarIngreso(1,buscar,criterio)">
                                       <option value="tipo_comprobante">Tipo Comprobante</option>
                                       <option value="num_comprobante">Número Comprobante</option>
                                       <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                      <option value="tipo_comprobante">Tipo Comprobante</option>
-                                      <option value="num_comprobante">Número Comprobante</option>
-                                      <option value="fecha_hora">Fecha-Hora</option>
                                     </select>
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarIngreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarIngreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                     <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarIngreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -59,7 +56,7 @@
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="permisosUser.leer">
+                                <tbody v-if="permisosUser.leer && arrayIngreso.length">
                                     <tr v-for="ingreso in arrayIngreso" :key="ingreso.id">
                                         <td v-text="ingreso.usuario"></td>
                                         <td v-text="ingreso.nombre"></td>
@@ -73,33 +70,33 @@
                                         <!-- <td v-text="ingreso.impuesto"></td> -->
                                         <td v-text="ingreso.estado"></td>
                                         <td>
-                                            <button v-if="permisosUser.leer" type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm">
+                                            <button v-if="permisosUser.leer" type="button" @click="verIngreso(ingreso.id)" class="btn btn-success btn-sm" title="Ver ingreso">
                                             <i class="icon-eye"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Ver ingreso (Deshabilitado)">
                                             <i class="icon-eye"></i>
                                             </button> &nbsp;
 
-                                            <button v-if="permisosUser.actualizar && ingreso.estado=='Registrado'" type="button" @click="abrirModalActualizarIngreso(ingreso)" class="btn btn-warning btn-sm"><i class="icon-pencil"></i></button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm"><i class="icon-pencil"></i></button> &nbsp;
+                                            <button v-if="permisosUser.actualizar && ingreso.estado=='Registrado'" type="button" @click="abrirModalActualizarIngreso(ingreso)" class="btn btn-warning btn-sm" title="Actualizar"><i class="icon-pencil"></i></button>
+                                            <button v-else type="button" class="btn btn-secondary btn-sm"><i class="icon-pencil" title="Actualizar (Deshabilitado)"></i></button> &nbsp;
 
                                             <template>
-                                                <button v-if="permisosUser.anular && ingreso.estado=='Registrado'" type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(ingreso.id)">
+                                                <button v-if="permisosUser.anular && ingreso.estado=='Registrado'" type="button" class="btn btn-danger btn-sm" @click="desactivarIngreso(ingreso.id)" title="Anular">
                                                     <i class="icon-trash"></i>
                                                 </button>
-                                                <button v-else type="button" class="btn btn-secondary btn-sm">
+                                                <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular (Deshabilitado)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template> &nbsp;
 
-                                            <button type="button" @click="abrirModal3('ver',ingreso)" class="btn btn-info btn-sm">
+                                            <button type="button" @click="abrirModal3('ver',ingreso)" class="btn btn-info btn-sm" title="Evidencias">
                                                 <i class="fa fa-align-justify"></i>
                                             </button> &nbsp;
 
-                                            <button type="button" v-if="permisosUser.actualizar && ingreso.estado=='Registrado'" class="btn btn-danger btn-sm" @click="cerrarIngreso(ingreso)">
+                                            <button type="button" v-if="permisosUser.actualizar && ingreso.estado=='Registrado'" class="btn btn-danger btn-sm" @click="cerrarIngreso(ingreso)" title="Cerrar Egreso">
                                                 <i class="fa fa-window-close"></i>
                                             </button>
-                                            <button type="button" v-else class="btn btn-secondary btn-sm">
+                                            <button type="button" v-else class="btn btn-secondary btn-sm" title="Cerrar Egreso (Deshabilidado)">
                                                 <i class="fa fa-window-close"></i>
                                             </button> &nbsp;
                                         </td>
@@ -361,7 +358,7 @@
                                     </tbody>
                                     <tbody v-else>
                                         <tr>
-                                            <td colspan="6">
+                                            <td colspan="7">
                                                 NO hay artículos agregados
                                             </td>
                                         </tr>
@@ -515,7 +512,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -631,7 +628,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModalCantidadArticulo"></h4>
                             <button type="button" class="close" @click="cerrarModalCantidadArticulo()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -675,48 +672,45 @@
             </div>
 
             <!-- Modal busqueda tercero-->
-                <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                    <div class="modal-dialog modal-primary modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title" v-text="tituloModal2"></h4>
-                                <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
+            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal2}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-primary modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModal2"></h4>
+                            <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
+                                <span aria-hidden="true" title="Cerrar">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <div style="max-width: 120px !important;" class="col-md-2   ">
+                                    <label style='margin-top: 3px; '><b>Tercero</b></label>                                
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="cta_busq" v-model="terc_busq" @keyup="buscarTercero()">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                <div class="form-group row">
-                                    <div style="max-width: 120px !important;" class="col-md-2   ">
-                                        <label style='margin-top: 3px; '><b>Tercero</b></label>                                
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" name="cta_busq" v-model="terc_busq" @keyup="buscarTercero()">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-sm">
-                                        
-                                            <tr><th>Documento</th><th>Nombre</th><th style="    width: 35px;">-</th></tr>
-                                        
-                                            <tr v-for="tercero in arrayTerceros" :key="tercero.id">
-                                                <td v-text="tercero.num_documento"></td>
-                                                <td v-if="tercero.nombre && !tercero.nombre1">{{ tercero.nombre }}  </td>
-                                                <td v-else>{{ tercero.nombre1 + ' ' + validarUnder(tercero.nombre2)+' '+tercero.apellido1+' '+validarUnder(tercero.apellido2) }} </td>
-                                                <td>
-                                                    <button type="button" style=" margin-right: -8px;" @click="cargarTercero(tercero)" class="btn btn-success btn-sm" title='Ver formato'>
-                                                        <i class="icon-check"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        
-                                    </table>
-                                </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-sm">
+                                    <tr><th>Documento</th><th>Nombre</th><th style="    width: 35px;">-</th></tr>
+                                    <tr v-for="tercero in arrayTerceros" :key="tercero.id">
+                                        <td v-text="tercero.num_documento"></td>
+                                        <td v-if="tercero.nombre && !tercero.nombre1">{{ tercero.nombre }}  </td>
+                                        <td v-else>{{ tercero.nombre1 + ' ' + validarUnder(tercero.nombre2)+' '+tercero.apellido1+' '+validarUnder(tercero.apellido2) }} </td>
+                                        <td>
+                                            <button type="button" style=" margin-right: -8px;" @click="cargarTercero(tercero)" class="btn btn-success btn-sm" title='Ver formato'>
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             <!-- Fin Modal buscar proveedores -->
 
             <!-- Modal de evidencias -->
@@ -730,7 +724,7 @@
                             </button>
 
                             <button type="button" class="close" @click="cerrarModal3()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -1110,7 +1104,7 @@
             },
             listarEvidencias(page,id){
                 let me=this;
-                var url=  this.ruta +'/evidencias/listarEvidencias?page='+page+'&id='+id;
+                var url=  this.ruta +'/evidencias_ingresos/listarEvidencias?page='+page+'&id='+id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayEvidencias = respuesta.evidencias.data;
@@ -1714,7 +1708,7 @@
                 
                 let me = this;
 
-                axios.post( this.ruta +'/evidencias/registrar',{
+                axios.post( this.ruta +'/evidencias_ingresos/registrar',{
                     'id_ingreso' : this.ingreso_id,
                     'nombre': this.evidencia,
                     'observacion' : this.observacionEvidencia,
@@ -1729,7 +1723,7 @@
             eliminarEvidencia(id){
                 let me = this;
 
-                axios.put( this.ruta +'/evidencias/eliminarEvidencia',{
+                axios.put( this.ruta +'/evidencias_ingresos/eliminarEvidencia',{
                     'id': id,
                 }).then(function (response) {
                     me.listarEvidencias(1,me.ingreso_id);
@@ -1770,7 +1764,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1819,7 +1813,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

@@ -40,7 +40,7 @@ class EvidenciasEgresosController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
 
-        $evidencias = EvidenciasEgresos::where('id_ingreso','=', $request->id)->paginate(10);
+        $evidencias = EvidenciasEgresos::where('id_egreso','=', $request->id)->paginate(10);
 
         return [
             'pagination' => [
@@ -65,7 +65,7 @@ class EvidenciasEgresosController extends Controller
         $evidencias->nombre = $request->nombre;
         $evidencias->observacion = $request->observacion;
         $evidencias->link = $request->link;
-        $evidencias->id_ingreso = $request->id_ingreso;
+        $evidencias->id_egreso = $request->id_egreso;
         $evidencias->usu_crea = $id_usuario;
         $evidencias->id_empresa = $id_empresa;
 

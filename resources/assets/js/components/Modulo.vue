@@ -9,7 +9,7 @@
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Modulos
-                        <button type="button" @click="abrirModal('modulo','registrar')" class="btn btn-secondary">
+                        <button type="button" @click="abrirModal('modulo','registrar')" class="btn btn-primary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -40,7 +40,7 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="arrayModulo.length">
                                 <tr v-for="modulo in arrayModulo" :key="modulo.id">
                                     <!-- si tipo es igual a 1 -->
                                     <td v-if="modulo.tipo==1" v-text="modulo.nombre" style="background: #dae3e8;"></td>
@@ -62,20 +62,20 @@
                                     </td>
                                     <td v-if="modulo.tipo==1" style="background: #dae3e8;">
 
-                                        <button v-if="modulo.estado == 1" type="button" @click="abrirModal('modulo','actualizar',modulo)" class="btn btn-warning btn-sm">
+                                        <button v-if="modulo.estado == 1" type="button" @click="abrirModal('modulo','actualizar',modulo)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button>
 
                                         <template v-if="modulo.estado">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarModulo(modulo.id)">
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarModulo(modulo.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarModulo(modulo.id)">
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarModulo(modulo.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -104,19 +104,20 @@
                                           <i class="icon-pencil"></i>
                                         </button>
                                         <template v-if="modulo.estado">
-                                            <button type="button" class="btn btn-danger btn-sm"  @click="desactivarModulo(modulo.id)">
-                                                
+                                            <button type="button" class="btn btn-danger btn-sm"  @click="desactivarModulo(modulo.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarModulo(modulo.id)">
-                                                
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarModulo(modulo.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                     </td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr colspan="10">No hay registros para mostrar</tr>
                             </tbody>
                         </table>
                     </div>
@@ -130,7 +131,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -139,7 +140,7 @@
                                     <div class="form-group col-md-12">
                                         <label class="col-md-1 form-control-label float-left" for="text-input">Nombre (*)</label>
                                         <div class="col-md-11 float-right">
-                                            <input type="text" v-model="nombre" style="width: 96%;" class="form-control float-right" placeholder="Nombre del modulo">                                        
+                                            <input type="text" v-model="nombre" style="width: 96%;" class="form-control float-right" placeholder="Nombre del modulo">
                                         </div>
                                     </div>
                                 </div>
@@ -205,7 +206,6 @@
                                 <div v-show="errorModulo" class="form-group row div-error">
                                     <div class="text-center text-error">
                                         <div v-for="error in errorMostrarMsjModulo" :key="error" v-text="error">
-
                                         </div>
                                     </div>
                                 </div>
@@ -213,9 +213,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarModulo()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarModulo()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarModulo()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarModulo()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -429,7 +429,7 @@
                 }
             },
             desactivarModulo(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este modulo?',
                 type: 'warning',
                 showCancelButton: true,
@@ -451,7 +451,7 @@
                     }).then(function (response) {
                         me.desactivarHijos(id);
                         me.listarModulo('','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El modulo ha sido desactivado con éxito.',
                         'success'
@@ -463,7 +463,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -480,7 +480,7 @@
                 });
             },
             activarModulo(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este modulo?',
                 type: 'warning',
                 showCancelButton: true,
@@ -501,7 +501,7 @@
                     }).then(function (response) {
                         me.activarHijos(id);
                         me.listarModulo('','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El modulo ha sido activado con éxito.',
                         'success'
@@ -513,7 +513,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

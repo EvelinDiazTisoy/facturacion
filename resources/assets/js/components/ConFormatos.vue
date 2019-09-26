@@ -8,7 +8,7 @@
             <!-- Ejemplo de tabla Listado -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fa fa-align-justify"></i> Formatos
+                    <i class="fa fa-align-justify"></i> Conf. Formatos
                     <button v-if="permisosUser.crear" type="button" @click="abrirModal('conf_formatos','registrar')" class="btn btn-primary" title="Nuevo">
                         <i class="icon-plus"></i>&nbsp;Nuevo
                     </button>
@@ -20,20 +20,18 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @change="listarConf_formatos(1,buscar,criterio)">
                                     <option value="nombre_formato">Nombre</option>
                                     <option value="tipo">Tipo Comprobante</option>
                                 </select>
                                 <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    <option value="nombre_formato">Nombre</option>
-                                    <option value="tipo">Tipo Comprobante</option>
                                 </select>
 
-                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarConf_formatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarConf_formatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
                                 <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
 
-                                <button v-if="permisosUser.leer" type="submit" @click="listarConf_formatos(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
-                                <button v-else type="submit" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                <!--<button v-if="permisosUser.leer" type="submit" @click="listarConf_formatos(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                <button v-else type="submit" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>-->
                             </div>
                         </div>
                     </div>
@@ -46,7 +44,7 @@
                                 <th>Editar</th>
                             </tr>
                         </thead>
-                        <tbody v-if="permisosUser.leer">
+                        <tbody v-if="permisosUser.leer && arrayConf_formatos.length">
                             <tr v-for="conf_for in arrayConf_formatos" :key="conf_for.id">
                                 <td v-text="conf_for.tipo"></td>           
                                 <td v-text="conf_for.nombre_formato"></td>                                
@@ -60,12 +58,29 @@
                                     
                                 </td>
                                 <td>
-                                    <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('conf_formatos','actualizar',conf_for)" class="btn btn-warning btn-sm" title="Editar">
+                                    <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('conf_formatos','actualizar',conf_for)" class="btn btn-warning btn-sm" title="Actualizar">
                                         <i class="icon-pencil"></i>
                                     </button>
-                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
+                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                         <i class="icon-pencil"></i>
-                                    </button> &nbsp;                                        
+                                    </button> &nbsp;   
+
+                                    <template v-if="permisosUser.anular">
+                                        <button v-if="conf_for.condicion" type="button" @click="desactivarConfFormato(conf_for.id)" class="btn btn-danger btn-sm" title="Desactivar">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                        <button v-else type="button" @click="activarConfFormato(conf_for.id)" class="btn btn-info btn-sm" title="Activar">
+                                            <i class="icon-check"></i>
+                                        </button>
+                                    </template>
+                                    <template v-else>
+                                        <button v-if="conf_for.condicion" type="button" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Deshabilitado)">
+                                            <i class="icon-check"></i>
+                                        </button>
+                                    </template>
                                 </td>
                             </tr>                                
                         </tbody>
@@ -95,7 +110,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" >Detalles Formato</h4>
                         <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -159,9 +174,9 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarConf_formatos()">Guardar</button>
-                        <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarConf_formatos()">Actualizar</button>
+                        <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarConf_formatos()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarConf_formatos()">Actualizar</button>
                     </div>
                 </div>
             </div>
@@ -319,6 +334,84 @@
                 if (this.errorMostrarMsjConf_formatos.length) this.errorConf_formatos = 1;
 
                 return this.errorConf_formatos;
+            },
+            desactivarConfFormato(id){
+               Swal.fire({
+                title: 'Esta seguro de desactivar este formato?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/conf_formatos/desactivar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.listarConf_formatos(1,'','nombre_formato');
+                        Swal.fire(
+                        'Desactivado!',
+                        'El registro ha sido desactivado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
+            },
+            activarConfFormato(id){
+               Swal.fire({
+                title: 'Esta seguro de activar este formato?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+                }).then((result) => {
+                if (result.value) {
+                    let me = this;
+
+                    axios.put(this.ruta +'/conf_formatos/activar',{
+                        'id': id
+                    }).then(function (response) {
+                        me.listarConf_formatos(1,'','nombre_formato');
+                        Swal.fire(
+                        'Activado!',
+                        'El registro ha sido activado con éxito.',
+                        'success'
+                        )
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                    
+                    
+                } else if (
+                    // Read more about handling dismissals
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    
+                }
+                }) 
             },
             cerrarModal(){
                 this.modal=0;

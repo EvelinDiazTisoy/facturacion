@@ -22,22 +22,27 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @change="listarEgreso(1,buscar,criterio)">
                                     <option value="tipo_comprobante">Tipo Comprobante</option>
                                     <option value="num_comprobante">Número Comprobante</option>
                                     <option value="fecha_hora">Fecha-Hora</option>
                                 </select>
                                 <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    <option value="tipo_comprobante">Tipo Comprobante</option>
-                                    <option value="num_comprobante">Número Comprobante</option>
-                                    <option value="fecha_hora">Fecha-Hora</option>
+                                </select>-->
+
+                                <!--<input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarEgreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">-->
+
+                                <label class="col-md-3">Tipo Egreso</label>
+                                <select class="form-control col-md-4" v-model="tipo_egreso_filtro" @change="listarEgreso(1,tipo_egreso_filtro,'tipo_egreso')">
+                                    <option value=''>Seleccione</option>
+                                    <option value="Bajas">Bajas</option>
+                                    <option value="Ajuste inventario">Ajuste inventario</option>
+                                    <option value="Devoluciones">Devoluciones</option>
                                 </select>
 
-                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarEgreso(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
-
-                                <button v-if="permisosUser.leer" type="submit" @click="listarEgreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
+                                <!--<button v-if="permisosUser.leer" type="submit" @click="listarEgreso(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                             </div>
                         </div>
                     </div>
@@ -59,7 +64,7 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayEgreso.length">
                                 <tr v-for="egreso in arrayEgreso" :key="egreso.id">
                                     <td v-text="egreso.usuario"></td>
                                     <td v-text="egreso.nombre"></td>
@@ -73,33 +78,33 @@
                                     <!-- <td v-text="egreso.impuesto"></td> -->
                                     <td v-text="egreso.estado"></td>
                                     <td>
-                                        <button v-if="permisosUser.leer" type="button" @click="verEgreso(egreso.id)" class="btn btn-success btn-sm">
+                                        <button v-if="permisosUser.leer" type="button" @click="verEgreso(egreso.id)" class="btn btn-success btn-sm" title="Ver detalles">
                                         <i class="icon-eye"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Ver detalles">
                                         <i class="icon-eye"></i>
                                         </button> &nbsp;
 
-                                        <button v-if="permisosUser.actualizar && egreso.estado=='Registrado'" type="button" @click="abrirModalActualizarEgreso(egreso)" class="btn btn-warning btn-sm"><i class="icon-pencil"></i></button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm"><i class="icon-pencil"></i></button> &nbsp;
+                                        <button v-if="permisosUser.actualizar && egreso.estado=='Registrado'" type="button" @click="abrirModalActualizarEgreso(egreso)" class="btn btn-warning btn-sm" title="Actualizar"><i class="icon-pencil"></i></button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)"><i class="icon-pencil"></i></button> &nbsp;
 
                                         <template>
-                                            <button v-if="permisosUser.anular && egreso.estado=='Registrado'" type="button" class="btn btn-danger btn-sm" @click="desactivarEgreso(egreso.id)">
+                                            <button v-if="permisosUser.anular && egreso.estado=='Registrado'" type="button" class="btn btn-danger btn-sm" @click="desactivarEgreso(egreso.id)" title="Anular">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template> &nbsp;
 
-                                        <button type="button" @click="abrirModal3('ver',egreso)" class="btn btn-info btn-sm">
+                                        <button type="button" @click="abrirModal3('ver',egreso)" class="btn btn-info btn-sm" title="Ver evidencias">
                                             <i class="fa fa-align-justify"></i>
                                         </button> &nbsp;
 
-                                        <button type="button" v-if="permisosUser.actualizar && egreso.estado=='Registrado'" class="btn btn-danger btn-sm" @click="cerrarEgreso(egreso)">
+                                        <button type="button" v-if="permisosUser.actualizar && egreso.estado=='Registrado'" class="btn btn-danger btn-sm" @click="cerrarEgreso(egreso)" title="Cerrar Egreso">
                                             <i class="fa fa-window-close"></i>
                                         </button>
-                                        <button type="button" v-else class="btn btn-secondary btn-sm">
+                                        <button type="button" v-else class="btn btn-secondary btn-sm" title="Cerrar Egreso (Deshabilidado)">
                                             <i class="fa fa-window-close"></i>
                                         </button> &nbsp;
                                     </td>
@@ -288,7 +293,7 @@
                                         <th class="col-md-2">Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="arrayDetalle.length">
+                                <tbody v-if="arrayDetalle.length && arrayDetalle.length">
                                     <tr v-for="(detalle,index) in arrayDetalle" :key="detalle.id">
                                         <td>
                                             <button @click="eliminarDetalle(index)" type="button" class="btn btn-danger btn-sm">
@@ -358,7 +363,7 @@
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="6">
+                                        <td colspan="7">
                                             NO hay artículos agregados
                                         </td>
                                     </tr>
@@ -424,7 +429,7 @@
                                         <th class="col-md-2">Subtotal</th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="arrayDetalle.length">
+                                <tbody v-if="arrayDetalle.length && arrayDetalle.length">
                                     <tr v-for="detalle in arrayDetalle" :key="detalle.id">
                                         <td v-text="detalle.articulo">
                                         </td>
@@ -486,7 +491,7 @@
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="4">
+                                        <td colspan="6">
                                             NO hay artículos agregados
                                         </td>
                                     </tr>
@@ -513,7 +518,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModal"></h4>
                         <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -552,7 +557,7 @@
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody v-if="arrayArticulo.length">
                                     <tr v-for="(articulo, index) in arrayArticulo">
                                         <td v-if="articulo.padre==''" v-text="articulo.codigo"></td>
                                         <td v-else></td>
@@ -589,6 +594,9 @@
                                             </button>
                                         </td>
                                     </tr>                                
+                                </tbody>
+                                <tbody v-else>
+                                    <tr colspan="10">No hay registros para mostrar</tr>
                                 </tbody>
                             </table>
                         </div>
@@ -629,7 +637,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModalCantidadArticulo"></h4>
                         <button type="button" class="close" @click="cerrarModalCantidadArticulo()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -679,7 +687,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal2"></h4>
                             <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -728,7 +736,7 @@
                         </button>
 
                         <button type="button" class="close" @click="cerrarModal3()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -880,6 +888,8 @@
                 terc_busq : '',
                 tipo_egreso: '',
                 arrayTerceros : [],
+
+                tipo_egreso_filtro : 0,
 
                 cuenta_ini : '',
                 id_cuenta_ini : '',
@@ -1108,7 +1118,7 @@
             },
             listarEvidencias(page,id){
                 let me=this;
-                var url=  this.ruta +'/evidencias/listarEvidencias?page='+page+'&id='+id;
+                var url=  this.ruta +'/evidencias_egresos/listarEvidencias?page='+page+'&id='+id;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
                     me.arrayEvidencias = respuesta.evidencias.data;
@@ -1709,7 +1719,7 @@
                 
                 let me = this;
 
-                axios.post( this.ruta +'/evidencias/registrar',{
+                axios.post( this.ruta +'/evidencias_egresos/registrar',{
                     'id_egreso' : this.egreso_id,
                     'nombre': this.evidencia,
                     'observacion' : this.observacionEvidencia,
@@ -1724,7 +1734,7 @@
             eliminarEvidencia(id){
                 let me = this;
 
-                axios.put( this.ruta +'/evidencias/eliminarEvidencia',{
+                axios.put( this.ruta +'/evidencias_egresos/eliminarEvidencia',{
                     'id': id,
                 }).then(function (response) {
                     me.listarEvidencias(1,me.egreso_id);
@@ -1765,7 +1775,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -1814,7 +1824,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

@@ -254,13 +254,13 @@ class ArticuloController extends Controller
 
     public function store(Request $request)
     {
-        // if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
 
         try{
             $carpetaEmpresa = $id_empresa .'_empresa'; 
-            $dirEmpresa = public_path("img_productos/$carpetaEmpresa");
+            $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgProductos");
             if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
             
             $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
@@ -376,116 +376,123 @@ class ArticuloController extends Controller
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
 
-        $articulo = Articulo::findOrFail($request->id);
+        try{
+            $articulo = Articulo::findOrFail($request->id);
 
-        $carpetaEmpresa = $id_empresa .'_empresa'; 
-        $dirEmpresa = public_path("img_productos/$carpetaEmpresa");
-        if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
+            $carpetaEmpresa = $id_empresa .'_empresa'; 
+            $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgProductos");
+            if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
-        /*if(isset($request->img) && $request->img != null){
-            if(is_uploaded_file($_FILES['img']['tmp_name']))
-            {
-                $nombreImg = $_FILES['img']['name'];
-                if($_FILES['img']['type'] == "image/jpg" || $_FILES['img']['type'] == "image/jpeg" || $_FILES['img']['type'] == "image/png")
+            /*if(isset($request->img) && $request->img != null){
+                if(is_uploaded_file($_FILES['img']['tmp_name']))
                 {
-                    // copy($_FILES['img']['tmp_name'],$dirEmpresa.'/'.$_FILES['img']['name']);
-                }
-            }else{ $nombreImg = $articulo->img; }
-        }
-        else
-        {
-            $nombreImg = $articulo->img;
-        }*/
-
-        $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
-        if($request->hasFile('img'))
-        {
-            if($request->file('img')->isValid())
-            {
-                $nombreImg = $request->img->getClientOriginalName();
-                if(in_array($request->img->extension(), $arrayExtensiones))
-                {
-                    $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
-                }
-                else { return false; }
+                    $nombreImg = $_FILES['img']['name'];
+                    if($_FILES['img']['type'] == "image/jpg" || $_FILES['img']['type'] == "image/jpeg" || $_FILES['img']['type'] == "image/png")
+                    {
+                        // copy($_FILES['img']['tmp_name'],$dirEmpresa.'/'.$_FILES['img']['name']);
+                    }
+                }else{ $nombreImg = $articulo->img; }
             }
-        }
-        else
-        {
-            $nombreImg = $articulo->img;
-        }
-
-        $archivo = [
-            'idcategoria' => $request->idcategoria,
-            'idcategoria2' => $request->idcategoria2,
-            'codigo' => $request->codigo,
-            'nombre' => $request->nombre,
-            'precio_venta' => $request->precio_venta,
-            'stock' => $request->stock,
-            'descripcion' => $request->descripcion,
-            'cod_invima' => $request->cod_invima,
-            'lote' => $request->lote,
-            'fec_vence' => $request->fec_vence,
-            'minimo' => $request->minimo,
-            'tipo_articulo' => $request->tipo_articulo,
-            'iva' => $request->iva,
-            'talla' => $request->talla,
-            'id_und_medida' => $request->id_und_medida,
-            'id_concentracion' => $request->id_concentracion,
-            'id_presentacion' => $request->id_presentacion,
-            'img' => $nombreImg,
-            'condicion' => '1',
-        ];
-
-        $articulo->update($archivo);
-
-        $borrarTarifarios = ProductoTarifario::where('id_producto','=',$request->id)->delete();
-
-        $tarifarios = $request->arrayTarifarios;
-        $tarifarios = json_decode($tarifarios);
-
-        for($i=0; $i<count($tarifarios); $i++)
-        {
-            $nuevoTarifario = new ProductoTarifario();
-            $nuevoTarifario->id_tarifario = $tarifarios[$i]->id;
-            $nuevoTarifario->id_producto = $articulo->id;
-            if(isset($tarifarios[$i]->valor))
+            else
             {
-                $nuevoTarifario->valor = $tarifarios[$i]->valor;
-            } else { $nuevoTarifario->valor = 0;}
+                $nombreImg = $articulo->img;
+            }*/
 
-            $nuevoTarifario->save();
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('img'))
+            {
+                if($request->file('img')->isValid())
+                {
+                    $nombreImg = $request->img->getClientOriginalName();
+                    if(in_array($request->img->extension(), $arrayExtensiones))
+                    {
+                        $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
+                    }
+                    else { return false; }
+                }
+            }
+            else
+            {
+                $nombreImg = $articulo->img;
+            }
+
+            $archivo = [
+                'idcategoria' => $request->idcategoria,
+                'idcategoria2' => $request->idcategoria2,
+                'codigo' => $request->codigo,
+                'nombre' => $request->nombre,
+                'precio_venta' => $request->precio_venta,
+                'stock' => $request->stock,
+                'descripcion' => $request->descripcion,
+                'cod_invima' => $request->cod_invima,
+                'lote' => $request->lote,
+                'fec_vence' => $request->fec_vence,
+                'minimo' => $request->minimo,
+                'tipo_articulo' => $request->tipo_articulo,
+                'iva' => $request->iva,
+                'talla' => $request->talla,
+                'id_und_medida' => $request->id_und_medida,
+                'id_concentracion' => $request->id_concentracion,
+                'id_presentacion' => $request->id_presentacion,
+                'img' => $nombreImg,
+                'condicion' => '1',
+            ];
+
+            $articulo->update($archivo);
+
+            $borrarTarifarios = ProductoTarifario::where('id_producto','=',$request->id)->where('asociado','=',0)->delete();
+
+            $tarifarios = $request->arrayTarifarios;
+            $tarifarios = json_decode($tarifarios);
+
+            for($i=0; $i<count($tarifarios); $i++)
+            {
+                $nuevoTarifario = new ProductoTarifario();
+                $nuevoTarifario->id_tarifario = $tarifarios[$i]->id;
+                $nuevoTarifario->id_producto = $articulo->id;
+                if(isset($tarifarios[$i]->valor))
+                {
+                    $nuevoTarifario->valor = $tarifarios[$i]->valor;
+                } else { $nuevoTarifario->valor = 0;}
+                $nuevoTarifario->asociado = 0;
+                $nuevoTarifario->idPresentacionAsociada=null;
+
+                $nuevoTarifario->save();
+            }
+
+            $borrarIvas = IvaProducto::where('id_producto','=',$request->id)->delete();
+
+            $iva_compras = new IvaProducto();
+            $iva_compras->id_iva = $request->idIvaCompra;
+            $iva_compras->tipo_iva = 'Compra';
+            $iva_compras->id_producto = $articulo->id;
+            $iva_compras->usu_crea = $id_usuario;
+            $iva_compras->save();
+
+            $iva_ventas = new IvaProducto();
+            $iva_ventas->id_iva = $request->idIvaVenta;
+            $iva_ventas->tipo_iva = 'Venta';
+            $iva_ventas->id_producto = $articulo->id;
+            $iva_ventas->usu_crea = $id_usuario;
+            $iva_ventas->save();
+
+            $iva_dev_compras = new IvaProducto();
+            $iva_dev_compras->id_iva = $request->idIvaDevolucionCompra;
+            $iva_dev_compras->tipo_iva = 'Devoluciones compra';
+            $iva_dev_compras->id_producto = $articulo->id;
+            $iva_dev_compras->usu_crea = $id_usuario;
+            $iva_dev_compras->save();
+
+            $iva_dev_ventas = new IvaProducto();
+            $iva_dev_ventas->id_iva = $request->idIvaDevolucionVenta;
+            $iva_dev_ventas->tipo_iva = 'Devoluciones Venta';
+            $iva_dev_ventas->id_producto = $articulo->id;
+            $iva_dev_ventas->usu_crea = $id_usuario;
+            $iva_dev_ventas->save();
+        } catch (Exception $e){
+            report($e);
+            return false;
         }
-
-        $borrarIvas = IvaProducto::where('id_producto','=',$request->id)->delete();
-
-        $iva_compras = new IvaProducto();
-        $iva_compras->id_iva = $request->idIvaCompra;
-        $iva_compras->tipo_iva = 'Compra';
-        $iva_compras->id_producto = $articulo->id;
-        $iva_compras->usu_crea = $id_usuario;
-        $iva_compras->save();
-
-        $iva_ventas = new IvaProducto();
-        $iva_ventas->id_iva = $request->idIvaVenta;
-        $iva_ventas->tipo_iva = 'Venta';
-        $iva_ventas->id_producto = $articulo->id;
-        $iva_ventas->usu_crea = $id_usuario;
-        $iva_ventas->save();
-
-        $iva_dev_compras = new IvaProducto();
-        $iva_dev_compras->id_iva = $request->idIvaDevolucionCompra;
-        $iva_dev_compras->tipo_iva = 'Devoluciones compra';
-        $iva_dev_compras->id_producto = $articulo->id;
-        $iva_dev_compras->usu_crea = $id_usuario;
-        $iva_dev_compras->save();
-
-        $iva_dev_ventas = new IvaProducto();
-        $iva_dev_ventas->id_iva = $request->idIvaDevolucionVenta;
-        $iva_dev_ventas->tipo_iva = 'Devoluciones Venta';
-        $iva_dev_ventas->id_producto = $articulo->id;
-        $iva_dev_ventas->usu_crea = $id_usuario;
-        $iva_dev_ventas->save();
     }
 
     public function desactivar(Request $request)

@@ -21,7 +21,7 @@
                             <button v-if="permisosUser.actualizar && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
                                 <i class="icon-plus"></i>&nbsp;Cerrar caja
                             </button>
-                            <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="mostrarDetalle('cierres_caja','registrar')">
+                            <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="listarCajas()">
                                 <i class="icon-plus"></i>&nbsp;Abrir caja
                             </button>
                         </div>
@@ -170,14 +170,14 @@
                                         <td v-else-if="facturacion.estado==3"><span>Enviada</span></td>
                                         <td v-else-if="facturacion.estado==4"><span>Anulada</span></td>
                                         <td>
-                                            <button type="button" @click="verFacturacion(facturacion.id)" class="btn btn-success btn-sm">
+                                            <button type="button" @click="verFacturacion(facturacion.id)" class="btn btn-success btn-sm" title="Ver factura">
                                                 <i class="icon-eye"></i>
                                             </button>
                                             <template>
-                                                <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm" v-if="permisosUser.actualizar  && facturacion.estado==1">
+                                                <button type="button" @click="mostrarDetalle('facturacion','actualizar',facturacion)" class="btn btn-warning btn-sm" v-if="permisosUser.actualizar  && facturacion.estado==1" title="Actualizar">
                                                     <i class="icon-pencil"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-secondary btn-sm" v-else>
+                                                <button type="button" class="btn btn-secondary btn-sm" v-else title="Actualizar (Deshabilitado)">
                                                     <i class="icon-pencil"></i>
                                                 </button>
                                             </template>
@@ -191,15 +191,15 @@
                                                 </button>
                                             </template>-->
                                             <template>
-                                                <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')">
+                                                <button type="button" v-if="permisosUser.actualizar && facturacion.estado==1" class="btn btn-warning btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'registrar')" title="Registrar">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
 
-                                                <button type="button" v-else-if="permisosUser.actualizar && facturacion.estado==2" @click="pdfFormato(facturacion.id)" class="btn btn-info btn-sm">
+                                                <button type="button" v-else-if="permisosUser.actualizar && facturacion.estado==2" @click="pdfFormato(facturacion.id)" class="btn btn-info btn-sm" title="PDF">
                                                     <i class="icon-doc"></i>
                                                 </button>
 
-                                                <button type="button" v-else class="btn btn-secondary btn-sm">
+                                                <button type="button" v-else class="btn btn-secondary btn-sm" title="Registrar (Deshabilitado)">
                                                     <i class="fa fa-registered"></i>
                                                 </button>
                                             </template>
@@ -216,18 +216,15 @@
                                             </template>
                                             -->
                                             <template v-if="permisosUser.anular && facturacion.estado==1">
-                                                <button type="button" class="btn btn-danger btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'anular')" v-if="facturacion.estado!=4 && facturacion.estado!=3">
+                                                <button type="button" class="btn btn-danger btn-sm" @click="cambiarEstadoFacturacion(facturacion.id,'anular')" v-if="facturacion.estado!=4 && facturacion.estado!=3" title="Anular">
                                                     <i class="icon-trash"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-secondary btn-sm" v-else>
+                                                <button type="button" class="btn btn-secondary btn-sm" v-else title="Anular (Deshabilitado)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
                                             <template v-else>
-                                                <button type="button" class="btn btn-secondary btn-sm" v-if="facturacion.estado!=4 && facturacion.estado!=3">
-                                                    <i class="icon-trash"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-secondary btn-sm" v-else>
+                                                <button type="button" class="btn btn-secondary btn-sm" title="Anular (Deshabilitado)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
@@ -598,7 +595,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -636,7 +633,7 @@
                                             <th>Opciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody v-if="arrayArticulo.length">
                                         <tr v-for="(articulo, index) in arrayArticulo">
                                             <td v-if="articulo.padre==''" v-text="articulo.codigo"></td>
                                             <td v-else></td>
@@ -672,6 +669,9 @@
                                                 </button>
                                             </td>
                                         </tr>                                
+                                    </tbody>
+                                    <tbody v-else>
+                                        <tr colspan="10">No hay registros para mostrar</tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -713,7 +713,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModalCantidadArticulo"></h4>
                             <button type="button" class="close" @click="cerrarModalCantidadArticulo()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -760,7 +760,7 @@
                             <div class="modal-header">
                                 <h4 class="modal-title" v-text="tituloModal2"></h4>
                                 <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
+                                    <span aria-hidden="true" title="Cerrar">×</span>
                                 </button>
                             </div>
                             <div class="modal-body">
@@ -789,7 +789,6 @@
                                                     </button>
                                                 </td>
                                             </tr>
-                                        
                                     </table>
                                 </div>
                             </div>
@@ -805,7 +804,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModalCierre"></h4>
                             <button type="button" class="close" @click="cerrarModalCierreCaja()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div v-if="tipoAccionCierre!=3 && tipoAccionCierre!=4" class="modal-body">
@@ -1278,7 +1277,7 @@
                     console.log(error);
                 });
             },
-            listarCajas(page,buscar,criterio){
+            /*listarCajas(page,buscar,criterio){
                 let me=this;
                 var ban1 = 0;
                 var ban2 = 0;
@@ -1374,6 +1373,59 @@
                 .catch(function (error) {
                     console.log(error);
                 });
+            },*/
+            listarCajas(){
+                let me=this;
+                var url= this.ruta +'/cierres_caja/validarCierreCaja';
+                axios.get(url).then(function (response) {
+                    var respuesta= response.data;
+                    var ban = respuesta.ban;
+                    me.arrayCierresXCajas = respuesta.cierres_cajas;
+                    
+                    /*if(ban == 1 && me.arrayCierresXCajas.length)
+                    {
+                        me.id_cierre_caja_facturacion = me.arrayCierresXCajas[0]['id'];
+                        me.nom_caja_cierre_facturacion = me.arrayCierresXCajas[0]['nombre'];
+                        me.cierre_caja_id = me.arrayCierresXCajas[0]['id'];
+                        me.id_caja_cierre = me.arrayCierresXCajas[0]['id_caja'];
+                        me.nom_caja_cierre = me.arrayCierresXCajas[0]['nombre'];
+                        me.vr_inicial_cierre = me.arrayCierresXCajas[0]['vr_inicial'];
+                        me.obs_inicial_cierre = me.arrayCierresXCajas[0]['obs_inicial'];
+                        
+                        me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+                    }
+                    else if(ban == 0 && me.arrayCierresXCajas.length)
+                    {
+                        me.mostrarDetalle('cierres_caja','listar_cierres',me.arrayCierresXCajas[0]);
+                    }*/
+
+                    if(ban==0)
+                    {
+                        me.mostrarDetalle('cierres_caja','registrar');
+                    }
+                    else
+                    {
+                        if(ban==1)
+                        {
+                            me.id_cierre_caja_facturacion = me.arrayCierresXCajas[0]['id'];
+                            me.nom_caja_cierre_facturacion = me.arrayCierresXCajas[0]['nombre'];
+                            me.cierre_caja_id = me.arrayCierresXCajas[0]['id'];
+                            me.id_caja_cierre = me.arrayCierresXCajas[0]['id_caja'];
+                            me.nom_caja_cierre = me.arrayCierresXCajas[0]['nombre'];
+                            me.vr_inicial_cierre = me.arrayCierresXCajas[0]['vr_inicial'];
+                            me.obs_inicial_cierre = me.arrayCierresXCajas[0]['obs_inicial'];
+                            
+                            me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
+                        }
+                        else
+                        {
+                            me.mostrarDetalle('cierres_caja','listar_cierres',me.arrayCierresXCajas[0]);
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             },
             SelectCierreXCaja(id){
                 let me=this;
@@ -1437,7 +1489,7 @@
                     'vr_final': this.vr_final_cierre,
                 }).then(function (response) {
                     me.modalCierreCaja = 0;
-                    me.listarCajas(1,'','nombre');
+                    me.listarCajas();
                 }).catch(function (error) {
                     console.log(error);
                 });
@@ -1459,7 +1511,7 @@
                     'id': this.cierre_caja_id
                 }).then(function (response) {
                     me.cerrarModal();
-                    me.listarCajas(1,'','nombre');
+                    me.listarCajas();
                 }).catch(function (error) {
                     console.log(error);
                 }); 
@@ -1485,7 +1537,7 @@
                         'id': id
                     }).then(function (response) {
                         me.cerrarModalCierreCaja();
-                        me.listarCajas(1,'','nombre');
+                        me.listarCajas();
                         Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
@@ -1524,7 +1576,7 @@
                     axios.put(this.ruta +'/concentracion/activar',{
                         'id': id
                     }).then(function (response) {
-                        me.listarCajas(1,'','nombre');
+                        me.listarCajas();
                         Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
@@ -1574,7 +1626,7 @@
                                 me.id_caja_facturacion = 0;
                                 me.nom_caja_cierre_facturacion = '';
                                 me.cerrarModalCierreCaja();
-                                me.listarCajas(1,'','');
+                                me.listarCajas();
                                 Swal.fire(
                                 'Desactivado!',
                             'El registro ha sido cerrado con éxito.',
@@ -2517,7 +2569,7 @@
             me.fecha = d;
             me.fechaHoraActual = d+' '+h+':'+min+':'+sec;
 
-            me.listarCajas(1,'','');
+            me.listarCajas();
 
             // me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
         }

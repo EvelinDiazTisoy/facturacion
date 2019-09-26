@@ -66,10 +66,10 @@
                                     <td v-else-if="retencion.tipo_mov==0">Ambos</td>
                                     <td>
                                         <template>
-                                            <button v-if="permisosUser.actualizar && retencion.estado==1" type="button" @click="abrirModal('retenciones','actualizar',retencion)" class="btn btn-warning btn-sm" title="Editar">
+                                            <button v-if="permisosUser.actualizar && retencion.estado==1" type="button" @click="abrirModal('retenciones','actualizar',retencion)" class="btn btn-warning btn-sm" title="Actualizar">
                                                 <i class="icon-pencil"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm"  title="Editar (Desabilitado)">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm"  title="Actualizar (Desabilitado)">
                                                 <i class="icon-pencil"></i>
                                             </button>
                                         </template>
@@ -78,7 +78,7 @@
                                             <button v-if="permisosUser.anular" type="button" class="btn btn-danger btn-sm" @click="desactivarRetencion(retencion.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Desactivar">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Desactivar (Desabilitado)">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
@@ -86,7 +86,7 @@
                                             <button v-if="permisosUser.anular" type="button" class="btn btn-info btn-sm" @click="activarRetencion(retencion.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Desabilitado)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -227,7 +227,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal2"></h4>
                             <button type="button" class="close" @click="cerrarModal('cuentas')" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -258,6 +258,9 @@
                                     
                                 </table>
                             </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModal('cuentas')">Cerrar</button>
                         </div>
                     </div>
                 </div>

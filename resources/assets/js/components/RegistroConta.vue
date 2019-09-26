@@ -120,7 +120,7 @@
                                         
                                     </tr>
                                 </thead>
-                                <tbody v-if="permisosUser.leer">
+                                <tbody v-if="permisosUser.leer && arrayRegistros.length">
                                     <tr v-for="registro in arrayRegistros" :key="registro.id">
                                         <td v-text="registro.fecha"></td>
                                         <td v-text="registro.nombre_formato"></td>
@@ -156,21 +156,21 @@
                                             <button v-if="permisosUser.leer" type="button" style=" margin-right: -8px;" @click="verFormato(registro.id)" class="btn btn-success btn-sm" title='Ver formato'>
                                                 <i class="icon-eye"></i>
                                             </button>
-                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Ver formato'>
+                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Ver formato (Deshabilitado)'>
                                                 <i class="icon-eye"></i>
                                             </button> &nbsp;
 
                                             <button v-if="registro.condicion ==1 && permisosUser.actualizar" type="button" style=" margin-right: -8px;" @click="editarFormato(registro.id)" class="btn btn-success btn-sm" title='Editar formato'>
                                                 <i class="icon-pencil"></i>
                                             </button>
-                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Editar formato'>
+                                            <button v-else type="button" style=" margin-right: -8px;" class="btn btn-secondary btn-sm" title='Editar formato (Deshabilitado)'>
                                                 <i class="icon-pencil"></i>
                                             </button> &nbsp;
 
                                             <button v-if="permisosUser.imprimir" type="button" @click="pdfFormato(registro.id)" class="btn btn-info btn-sm" title="PDF">
                                             <i class="icon-doc"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="PDF">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="PDF (Deshabilitado)">
                                             <i class="icon-doc"></i>
                                             </button>
 
@@ -178,7 +178,7 @@
                                                 <button v-if="permisosUser.actualizar" type="button" @click="cerrarFormato(registro.id)" class="btn btn-warning  btn-sm" title='Cerrar formato'>
                                                     <i class="icon-lock"></i>
                                                 </button>
-                                                <button v-else type="button" class="btn btn-secondary btn-sm" title='Cerrar formato'>
+                                                <button v-else type="button" class="btn btn-secondary btn-sm" title='Cerrar formato (Deshabilitado)'>
                                                     <i class="icon-lock"></i>
                                                 </button>
                                             </template>
@@ -186,7 +186,7 @@
                                                 <button v-if="permisosUser.anular" type="button" class="btn btn-danger btn-sm" @click="anularFormato(registro.id)" title="Anular Formato">
                                                     <i class="icon-trash"></i>
                                                 </button>
-                                                <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular Formato">
+                                                <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular Formato (Deshabilitado)">
                                                     <i class="icon-trash"></i>
                                                 </button>
                                             </template>
@@ -435,7 +435,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModal"></h4>
                         <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -463,9 +463,11 @@
                                             </button>
                                         </td>
                                     </tr>
-                                
                             </table>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -478,7 +480,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModal"></h4>
                         <button type="button" class="close" @click="cerrarModal2()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -528,6 +530,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal2()">Cerrar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -539,7 +544,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="titulomodalTerceros"></h4>
                             <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -572,6 +577,9 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="cerrarModalT()">Cerrar</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -584,10 +592,10 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModalRetenciones"></h4>
                         <button v-if="tipoAccionRetenciones==1" type="button" class="close" @click="cerrarModalRetenciones('listar')" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                         <button v-else-if="tipoAccionRetenciones==2" type="button" class="close" @click="cerrarModalRetenciones('editar')" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div v-if="tipoAccionRetenciones == 1" class="modal-body">

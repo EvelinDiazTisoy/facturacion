@@ -36,8 +36,9 @@
                     <table v-if="tipoAccion!=3" class="table table-bordered table-striped table-sm">
                         <thead>
                             <tr>
-                                <th class="col-md-10">Nombre</th>
-                                <th class="col-md-1">Created_at</th>
+                                <th class="col-md-19">Nombre</th>
+                                <th class="col-md-1">Fecha</th>
+                                <th class="col-md-1">Cajero</th>
                                 <th class="col-md-1">Opciones</th>
                             </tr>
                         </thead>
@@ -45,11 +46,12 @@
                             <tr v-for="cierre_caja in arrayCierresXCajas" :key="cierre_caja.id">
                                 <td v-text="cierre_caja.nombre"></td>
                                 <td v-text="cierre_caja.created_at"></td>
+                                <td v-text="cierre_caja.nom_cajero"></td>
                                 <td>
-                                    <button v-if="permisosUser.leer" type="button" @click="abrirModal('cierres_caja','ver',cierre_caja)" class="btn btn-info btn-sm">
+                                    <button v-if="permisosUser.leer" type="button" @click="abrirModal('cierres_caja','ver',cierre_caja)" class="btn btn-info btn-sm" title="Detalle caja">
                                         <i class="icon-eye"></i>
                                     </button>
-                                    <button v-else type="button" class="btn btn-secondary btn-sm">
+                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Detalle caja">
                                         <i class="icon-eye"></i>
                                     </button>
 
@@ -61,29 +63,29 @@
                                     </button> &nbsp;-->
 
                                     <template v-if="permisosUser.actualizar">
-                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-warning btn-sm" @click="abrirModal('cierres_caja','actualizar',cierre_caja)">
+                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-warning btn-sm" @click="abrirModal('cierres_caja','actualizar',cierre_caja)" title="Cerrar caja">
                                             <i class="fa fa-window-close"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Cerrar caja (Deshabilitado)">
                                             <i class="fa fa-window-close"></i>
                                         </button>
                                     </template>
                                     <template v-else>
-                                        <button type="button" class="btn btn-secondary btn-sm">
+                                        <button type="button" class="btn btn-secondary btn-sm" title="Cerrar caja (Deshabilitado)">
                                             <i class="fa fa-window-close"></i>
                                         </button>
                                     </template>
 
                                     <template v-if="permisosUser.anular">
-                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-danger btn-sm" @click="desactivarCierreXCaja(cierre_caja.id)">
+                                        <button v-if="cierre_caja.estado==1" type="button" class="btn btn-danger btn-sm" @click="desactivarCierreXCaja(cierre_caja.id)" title="Anular">
                                             <i class="icon-trash"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Anular (Deshabilitado)">
                                             <i class="icon-trash"></i>
                                         </button>
                                     </template>
                                     <template v-else>
-                                        <button type="button" class="btn btn-secondary btn-sm">
+                                        <button type="button" class="btn btn-secondary btn-sm" title="Anular (Deshabilitado)">
                                             <i class="icon-trash"></i>
                                         </button>
                                     </template>
@@ -91,7 +93,7 @@
                             </tr>                                
                         </tbody>
                         <tbody v-else>
-                            <tr><td colspan="2">No hay registros para mostrar</td></tr>
+                            <tr><td colspan="3">No hay registros para mostrar</td></tr>
                         </tbody>
                     </table>
                     <div v-else>
@@ -125,9 +127,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="row">
                                     <label class="col-md-12 float-left" v-text="'Valor final: '+vr_final"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <label class="col-md-12 float-left" v-text="'Cajero: '+nom_cajero"></label>
                                 </div>
                             </div>
                         </div>
@@ -250,6 +257,7 @@
                 obs_gastos : '',
                 vr_software : 0,
                 vr_final : 0,
+                nom_cajero : '',
                 arrayCierresXCajas : [],
                 arrayCajas: [],
                 modal : 0,
@@ -580,6 +588,7 @@
                                 this.obs_gastos = data['obs_gastos'];
                                 this.vr_software = data['vr_software'];
                                 this.vr_final = data['vr_final'];
+                                this.nom_cajero = data['nom_cajero'];
                                 break;
                             }
                         }

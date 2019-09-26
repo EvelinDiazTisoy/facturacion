@@ -21,20 +21,18 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @change="listarPlanCuentas(1,buscar,criterio)">
                                       <option value="codigo">Codigo</option>
                                       <option value="nombre">Nombre</option>
                                     </select>
 
                                     <select v-else disabled class="form-control col-md-3" v-model="criterio" title="Tipo">
-                                      <option value="codigo">Codigo</option>
-                                      <option value="nombre">Nombre</option>
                                     </select>
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarPlanCuentas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
+                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarPlanCuentas(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
                                     <input v-else type="text" disabled v-model="buscar" class="form-control" placeholder="Texto a buscar" title="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarPlanCuentas(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="button" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button v-if="permisosUser.leer" type="submit" @click="listarPlanCuentas(1,buscar,criterio)" class="btn btn-primary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>
+                                    <button v-else type="button" class="btn btn-secondary" title="Buscar"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -47,9 +45,8 @@
                                     <th>Editar</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayPlanCuentas.length">
                                 <tr v-for="cuenta in arrayPlanCuentas" :key="cuenta.id">
-                                    
                                     <td v-text="cuenta.codigo"></td>
                                     <td v-text="cuenta.nombre"></td>
                                     <td>
@@ -62,11 +59,11 @@
                                         
                                     </td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('planCuentas','actualizar',cuenta)" class="btn btn-warning btn-sm" title="Editar">
+                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('planCuentas','actualizar',cuenta)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
                                         
-                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;                                        
                                     </td>
@@ -100,7 +97,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" >Detalles Cuenta</h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -244,9 +241,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPlanCuentas()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPlanCuentas()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarPlanCuentas()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarPlanCuentas()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -262,7 +259,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal2"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -290,7 +287,6 @@
                                                 </button>
                                             </td>
                                         </tr>
-                                    
                                 </table>
                             </div>
                         </div>
@@ -306,7 +302,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="titulomodalTerceros"></h4>
                             <button type="button" class="close" @click="cerrarModalT()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -335,7 +331,6 @@
                                                 </button>
                                             </td>
                                         </tr>
-                                    
                                 </table>
                             </div>
                         </div>

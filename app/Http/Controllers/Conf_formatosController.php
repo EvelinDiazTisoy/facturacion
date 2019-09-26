@@ -81,6 +81,22 @@ class Conf_formatosController extends Controller
         $conf_formatos->condicion = $request->condicion;
         $conf_formatos->save();
     }
+
+    public function desactivar(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $conf_formatos = conf_formatos::findOrFail($request->id);
+        $conf_formatos->condicion = '0';
+        $conf_formatos->save();
+    }
+
+    public function activar(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $conf_formatos = conf_formatos::findOrFail($request->id);
+        $conf_formatos->condicion = '1';
+        $conf_formatos->save();
+    }
     
     public function get_tipos_formatos(Request $request)
     {

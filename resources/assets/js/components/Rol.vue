@@ -17,13 +17,13 @@
                         <div class="form-group row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
+                                    <select class="form-control col-md-3" v-model="criterio" @change="listarRol(1,buscar,criterio)">
                                       <option value="nombre">Nombre</option>
                                     </select>
 
-                                    <input type="text" v-model="buscar" @keyup.enter="listarRol(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <input type="text" v-model="buscar" @keyup="listarRol(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
 
-                                    <button type="submit" @click="listarRol(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <!--<button type="submit" @click="listarRol(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>-->
                                 </div>
                             </div>
                         </div>
@@ -35,7 +35,7 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="arrayRol.length">
                                 <tr v-for="rol in arrayRol" :key="rol.nombre">
                                     <td v-text="rol.nombre"></td>
                                     <td>
@@ -47,24 +47,27 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <button  v-if="rol.estado" type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm">
+                                        <button  v-if="rol.estado" type="button" @click="abrirModal('roles','actualizar',rol)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
 
-                                        <button  v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button  v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button>
 
                                         <template>
-                                            <button v-if="rol.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.id)">
+                                            <button v-if="rol.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarRol(rol.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarRol(rol.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarRol(rol.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                     </td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr colspan="3">No hay registros para mostrar</tr>
                             </tbody>
                         </table>
                         <nav>
@@ -91,7 +94,7 @@
                             <div class="modal-header">
                                 <h4 class="modal-title" v-text="tituloModal"></h4>
                                 <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                                 </button>
                             </div>
                             <div class="modal-body">
@@ -114,7 +117,7 @@
                                                     <th style="width: 5% !important;">Imprimir</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody v-if="arrayPermisos.length">
                                                 <tr v-for="permisos in arrayPermisos" :key="permisos.id">
                                                     <td v-if="permisos.tipo==1" v-text="permisos.nombre" style="background: #dae3e8;"></td>
                                                     <td v-else v-text="permisos.nombre" style="background: #ffffff; padding-left: 1em;"></td>
@@ -149,6 +152,9 @@
                                                     <td><input type="checkbox" v-model="permisos.imprimir" value=""></td>
                                                 </tr>-->
                                             </tbody>
+                                            <tbody v-else>
+                                                <tr colspan="6">No hay registros para mostrar</tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </form>
@@ -156,14 +162,13 @@
                             <div v-show="errorRol" class="form-group row div-error">
                                 <div class="text-center text-error">
                                     <div v-for="error in errorMostrarMsjRol" :key="error" v-text="error">
-
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                                <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarRol()">Guardar</button>
-                                <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarRol()">Actualizar</button>
+                                <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                                <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarRol()">Guardar</button>
+                                <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarRol()">Actualizar</button>
                             </div>
                         </div>
                         <!-- /.modal-content -->
@@ -360,7 +365,7 @@
                 return me.errorRol;
             },
             desactivarRol(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar este rol?',
                 type: 'warning',
                 showCancelButton: true,
@@ -380,7 +385,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarRol(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El rol ha sido desactivado con éxito.',
                         'success'
@@ -392,14 +397,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarRol(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar este rol?',
                 type: 'warning',
                 showCancelButton: true,
@@ -419,7 +424,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarRol(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El rol ha sido activado con éxito.',
                         'success'
@@ -431,7 +436,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

@@ -1,168 +1,168 @@
 <template>
-            <main class="main">
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
-            </ol>
-            <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Clientes
-                        <button v-if="permisosUser.crear" type="button" @click="abrirModal('persona','registrar')" class="btn btn-primary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                        <button v-else type="button" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
-                                      <option value="nombre">Nombre</option>
-                                      <option value="num_documento">Documento</option>
-                                      <option value="email">Email</option>
-                                      <option value="telefono">Teléfono</option>
-                                    </select>
-                                    <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                    </select>
+    <main class="main">
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+        </ol>
+        <div class="container-fluid">
+            <!-- Ejemplo de tabla Listado -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Clientes
+                    <button v-if="permisosUser.crear" type="button" @click="abrirModal('persona','registrar')" class="btn btn-primary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                    <button v-else type="button" class="btn btn-secondary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @click="listarPersona(1,buscar,criterio)">
+                                    <option value="nombre">Nombre</option>
+                                    <option value="num_documento">Documento</option>
+                                    <option value="email">Email</option>
+                                    <option value="telefono">Teléfono</option>
+                                </select>
+                                <select v-else disabled class="form-control col-md-3" v-model="criterio">
+                                </select>
 
-                                    <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup.enter="listarPersona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <input v-else disabled type="text" v-model="buscar"  class="form-control" placeholder="Texto a buscar">
+                                <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarPersona(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                <input v-else disabled type="text" v-model="buscar"  class="form-control" placeholder="Texto a buscar">
 
-                                    <button v-if="permisosUser.leer" type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
-                                    <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>
-                                </div>
+                                <!--<button v-if="permisosUser.leer" type="submit" @click="listarPersona(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                <button v-else type="submit" class="btn btn-secondary"><i class="fa fa-search"></i> Buscar</button>-->
                             </div>
                         </div>
-                        <table class="table table-bordered table-striped table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Tipo Documento</th>
-                                    <th>Número</th>
-                                    <th>Dirección</th>
-                                    <th>Teléfono</th>
-                                    <th>Email</th>
-                                    <th>Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody v-if="permisosUser.leer">
-                                <tr v-for="persona in arrayPersona" :key="persona.id">
-                                    <td v-text="persona.nombre"></td>
-                                    <td v-text="persona.tipo_documento"></td>
-                                    <td v-text="persona.num_documento"></td>
-                                    <td v-text="persona.direccion"></td>
-                                    <td v-text="persona.telefono"></td>
-                                    <td v-text="persona.email"></td>
-                                    <td>
-                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm">
-                                          <i class="icon-pencil"></i>
-                                        </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
-                                          <i class="icon-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>                                
-                            </tbody>
-                            <tbody v-else>
-                                <tr><td colspan="7">No hay resultados para mostrar</td></tr>
-                            </tbody>
-                        </table>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
+                    </div>
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo Documento</th>
+                                <th>Número</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="permisosUser.leer">
+                            <tr v-for="persona in arrayPersona" :key="persona.id">
+                                <td v-text="persona.nombre"></td>
+                                <td v-text="persona.tipo_documento"></td>
+                                <td v-text="persona.num_documento"></td>
+                                <td v-text="persona.direccion"></td>
+                                <td v-text="persona.telefono"></td>
+                                <td v-text="persona.email"></td>
+                                <td>
+                                    <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('persona','actualizar',persona)" class="btn btn-warning btn-sm" title="Actualizar">
+                                        <i class="icon-pencil"></i>
+                                    </button>
+                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
+                                        <i class="icon-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>                                
+                        </tbody>
+                        <tbody v-else>
+                            <tr><td colspan="7">No hay resultados para mostrar</td></tr>
+                        </tbody>
+                    </table>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" v-if="pagination.current_page > 1">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
+                            </li>
+                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
+                            </li>
+                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- Fin ejemplo de tabla Listado -->
+        </div>
+        <!--Inicio del modal agregar/actualizar-->
+        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModal"></h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true" title="Cerrar">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona" v-bind:class="{ 'is-invalid' : hasError.nombre==1 }">                                        
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
+                                <div class="col-md-9">
+                                    <select v-model="tipo_documento" class="form-control"  v-bind:class="{ 'is-invalid' : hasError.tipo_documento==1 }">
+                                        <option value="CC">Cedula de Ciudadania</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="CE">Cedula de Extrangeria</option>
+                                        <option value="NA">Otro</option>
+                                    </select>                                    
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Número</label>
+                                <div class="col-md-9">
+                                    <input type="number" v-model="num_documento" class="form-control" placeholder="Número de documento"  v-bind:class="{ 'is-invalid' : hasError.num_documento==1 }" :min="1" @blur="function(){if(num_documento<=0) num_documento=1;}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="direccion" class="form-control" placeholder="Dirección"  v-bind:class="{ 'is-invalid' : hasError.direccion==1 }">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="telefono" class="form-control" placeholder="Teléfono"  v-bind:class="{ 'is-invalid' : hasError.telefono==1 }" :min="1" @blur="function(){if(telefono<=0) telefono=1;}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Email</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="email" class="form-control" placeholder="Email"  v-bind:class="{ 'is-invalid' : hasError.email==1 }">
+                                </div>
+                            </div>
+                            <div v-show="errorPersona" class="form-group row div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPersona()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPersona()">Actualizar</button>
                     </div>
                 </div>
-                <!-- Fin ejemplo de tabla Listado -->
+                <!-- /.modal-content -->
             </div>
-            <!--Inicio del modal agregar/actualizar-->
-            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
-                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre (*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Tipo Documento</label>
-                                    <div class="col-md-9">
-                                        <select v-model="tipo_documento" class="form-control">
-                                            <option value="CC">Cedula de Ciudadania</option>
-                                            <option value="NIT">NIT</option>
-                                            <option value="CE">Cedula de Extrangeria</option>
-                                            <option value="NA">Otro</option>
-                                        </select>                                    
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Número</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="num_documento" class="form-control" placeholder="Número de documento">                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="direccion" class="form-control" placeholder="Dirección">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="telefono" class="form-control" placeholder="Teléfono">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Email</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div v-show="errorPersona" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarPersona()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarPersona()">Actualizar</button>
-                        </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-            <!--Fin del modal-->
-        </main>
+            <!-- /.modal-dialog -->
+        </div>
+        <!--Fin del modal-->
+    </main>
 </template>
 
 <script>
@@ -193,7 +193,15 @@
                 },
                 offset : 3,
                 criterio : 'nombre',
-                buscar : ''
+                buscar : '',
+                hasError: {
+                    nombre : 0,
+                    tipo_documento : 0,
+                    num_documento : 0,
+                    direccion : 0,
+                    telefono : 0,
+                    email : 0,
+                }
             }
         },
         computed:{
@@ -289,12 +297,24 @@
                 }); 
             },            
             validarPersona(){
+                this.hasError['nombre'] = 0;
+                this.hasError['tipo_documento'] = 0;
+                this.hasError['num_documento'] = 0;
+                this.hasError['direccion'] = 0;
+                this.hasError['telefono'] = 0;
+                this.hasError['email'] = 0;
+
                 this.errorPersona=0;
                 this.errorMostrarMsjPersona =[];
 
-                if (!this.nombre) this.errorMostrarMsjPersona.push("El nombre de la persona no puede estar vacío.");
+                if (!this.nombre) { this.errorPersona=1; this.hasError['nombre']=1;}
+                if (!this.tipo_documento || this.tipo_documento=='' || this.tipo_documento==0) { this.errorPersona=1; this.hasError['tipo_documento']=1;}
+                if (!this.num_documento || this.num_documento<=0 || this.num_documento==null || this.num_documento=='') { this.errorPersona=1; this.hasError['num_documento']=1;}
+                if (!this.direccion || this.direccion<=0 || this.direccion==null || this.direccion=='') { this.errorPersona=1; this.hasError['direccion']=1;}
+                if (!this.telefono || this.telefono<=0 || this.telefono==null || this.telefono=='') { this.errorPersona=1; this.hasError['telefono']=1;}
+                if (!this.email || this.email<=0 || this.email==null || this.email=='') { this.errorPersona=1; this.hasError['email']=1;}
 
-                if (this.errorMostrarMsjPersona.length) this.errorPersona = 1;
+                // if (this.errorMostrarMsjPersona.length) this.errorPersona = 1;
 
                 return this.errorPersona;
             },

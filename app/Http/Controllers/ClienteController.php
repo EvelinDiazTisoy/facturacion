@@ -74,122 +74,210 @@ class ClienteController extends Controller
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
 
-        $persona = new Persona();
-        if(!$request->nombre)  $persona->nombre = ''; else    $persona->nombre = $request->nombre;
-        $persona->nombre = $request->nombre;
-        $persona->tipo_documento = $request->tipo_documento;
-        $persona->num_documento = $request->num_documento;
-        $persona->direccion = $request->direccion;
-        $persona->telefono1 = $request->telefono1;
-        $persona->telefono2 = $request->telefono2;
-        $persona->celular = $request->celular;
-        $persona->sexo = $request->sexo;
-        $persona->regimen = $request->regimen;
-        $persona->fec_nac = $request->fec_nac;
-        $persona->reside = $request->reside;
-        $persona->representante = $request->representante;
-        $persona->email = $request->email;
-        $persona->email2 = $request->email2;
-        $persona->tipo_persona = $request->tipo_persona;
-        $persona->entidad = $request->entidad;       
-        if(!$request->nombre1)  $persona->nombre1 = ''; else    $persona->nombre1 = $request->nombre1;
-        if(!$request->nombre2)  $persona->nombre2 = ''; else    $persona->nombre2 = $request->nombre2;
-        if(!$request->apellido1)  $persona->apellido1 = ''; else    $persona->apellido1 = $request->apellido1;
-        if(!$request->apellido2)  $persona->apellido2 = ''; else    $persona->apellido2 = $request->apellido2;
-        if($request->digito_verif) {
-            $persona->digito_verif = "1";  
-            $persona->num_verif = $request->num_verif;  
+        try{
+            $carpetaEmpresa = $id_empresa .'_empresa'; 
+            $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgPerfil");
+            if (!file_exists($dirEmpresa)) mkdir("Empresas/$carpetaEmpresa", 0777);
+            if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
+            
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('img'))
+            {
+                if($request->file('img')->isValid())
+                {
+                    $nombreImg = $request->img->getClientOriginalName();
+                    if(in_array($request->img->extension(), $arrayExtensiones))
+                    {
+                        $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
+                    }
+                    else { return false; }
+                }
+            }
+            else
+            {
+                $dirEmpresa = public_path("img_productos");
+                $nombreImg = 'default.png';
+            }
+
+            if(!$request->nombre)  $nombre = ''; else    $nombre = $request->nombre;
+            if(!$request->nombre1)  $nombre1 = ''; else    $nombre1 = $request->nombre1;
+            if(!$request->nombre2)  $nombre2 = ''; else    $nombre2 = $request->nombre2;
+            if(!$request->apellido1)  $apellido1 = ''; else    $apellido1 = $request->apellido1;
+            if(!$request->apellido2)  $apellido2 = ''; else    $apellido2 = $request->apellido2;
+            if($request->digito_verif) {
+                $digito_verif = "1";  
+                $num_verif = $request->num_verif;  
+            }
+            else{
+                $digito_verif = "0";  
+                $num_verif = "";  
+            } 
+
+            $digito_verif = json_decode($request->digito_verif);
+            $cliente = json_decode($request->cliente);
+            $proveedor = json_decode($request->proveedor);
+
+            $archivo = [
+                'nombre' => $nombre,
+                'tipo_documento' => $request->tipo_documento,
+                'num_documento' => $request->num_documento,
+                'direccion' => $request->direccion,
+                'telefono1' => $request->telefono1,
+                'telefono2' => $request->telefono2,
+                'celular' => $request->celular,
+                'sexo' => $request->sexo,
+                'regimen' => $request->regimen,
+                'fec_nac' => $request->fec_nac,
+                'reside' => $request->reside,
+                'representante' => $request->representante,
+                'email' => $request->email,
+                'email2' => $request->email2,
+                'tipo_persona' => $request->tipo_persona,
+                'entidad' => $request->entidad,
+                'nombre1' => $nombre1,
+                'nombre2' => $nombre2,
+                'apellido1' => $apellido1,
+                'apellido2' => $apellido2,
+                'digito_verif' => $digito_verif,
+                'num_verif' => $num_verif,
+                'autoretenedor' => $request->autoretenedor,
+                'declarante' => $request->declarante,
+                'cliente' => $cliente,
+                'proveedor' => $proveedor,
+                'id_vendedor' => $request->id_vendedor,
+                'id_zona' => $request->id_zona,
+                'plazo_pago' => $request->plazo_pago,
+                'bloquear' => $request->bloquear,
+                'cupo_credito' => $request->cupo_credito,
+                'vr_cupo_credito' => $request->vr_cupo_credito,
+                'retenedor_fuente' => $request->retenedor_fuente,
+                'retenedor_iva' => $request->retenedor_iva,
+                'excluido_iva' => $request->excluido_iva,
+                'autoretefuente' => $request->autoretefuente,
+                'autoreteiva' => $request->autoreteiva,
+                'autoreteica' => $request->autoreteica,
+                'id_banco' => $request->id_banco,
+                'num_cuenta_banco' => $request->num_cuenta_banco,
+                'tipo_cuenta' => $request->tipo_cuenta,
+                'representante_cuenta' => $request->representante_cuenta,
+                'tipo_nacionalidad' => $request->tipo_nacionalidad,
+                'departamento' => $request->departamento,
+                'municipio' => $request->municipio,
+                'img' => $nombreImg,
+                'id_empresa' => $id_empresa,
+            ];
+
+            Persona::create($archivo);
+        } catch (Exception $e) {
+            report ($e);
+            return false;
         }
-        else{
-            $persona->digito_verif = "0";  
-            $persona->num_verif = "";  
-        } 
-
-        $persona->autoretenedor = $request->autoretenedor;
-        $persona->declarante = $request->declarante;
-        $persona->cliente = $request->cliente;
-        $persona->proveedor = $request->proveedor;
-        $persona->id_vendedor = $request->id_vendedor;
-        $persona->id_zona = $request->id_zona;
-        $persona->plazo_pago = $request->plazo_pago;
-        $persona->bloquear = $request->bloquear;
-        $persona->cupo_credito = $request->cupo_credito;
-        $persona->retenedor_fuente = $request->retenedor_fuente;
-        $persona->retenedor_iva = $request->retenedor_iva;
-        $persona->excluido_iva = $request->excluido_iva;
-        $persona->autoretefuente = $request->autoretefuente;
-        $persona->autoreteiva = $request->autoreteiva;
-        $persona->autoreteica = $request->autoreteica;
-        $persona->id_banco = $request->id_banco;
-        $persona->num_cuenta_banco = $request->num_cuenta_banco;
-        $persona->tipo_cuenta = $request->tipo_cuenta;
-        $persona->representante_cuenta = $request->representante_cuenta;
-        $persona->tipo_nacionalidad = $request->tipo_nacionalidad;
-        $persona->departamento = $request->departamento;
-        $persona->municipio = $request->municipio;
-        $persona->id_empresa = $id_empresa;
-        
-
-        $persona->save();
     }
 
     public function update(Request $request)
     {
         if (!$request->ajax()) return redirect('/');
-        $persona = Persona::findOrFail($request->id);
-        $persona->nombre = $request->nombre;
-        $persona->tipo_documento = $request->tipo_documento;
-        $persona->num_documento = $request->num_documento;
-        $persona->direccion = $request->direccion;
-        $persona->telefono1 = $request->telefono1;
-        $persona->telefono2 = $request->telefono2;
-        $persona->celular = $request->celular;
-        $persona->email = $request->email;
-        $persona->email2 = $request->email2;
-        $persona->sexo = $request->sexo;
-        $persona->regimen = $request->regimen;
-        $persona->fec_nac = $request->fec_nac;
-        $persona->reside = $request->reside;
-        $persona->representante = $request->representante;
-        $persona->tipo_persona = $request->tipo_persona;
-        $persona->nombre1 = $request->nombre1;
-        $persona->nombre2 = $request->nombre2;
-        $persona->apellido1 = $request->apellido1;
-        $persona->apellido2 = $request->apellido2;
-        $persona->entidad = $request->entidad;
-        //echo "dito=".$request->digito_verif; exit;
-        if($request->digito_verif) {
-            $persona->digito_verif = "1";  
-            $persona->num_verif = $request->num_verif;  
-        }
-        else{
-            $persona->digito_verif = "0";  
-            $persona->num_verif = "";  
-        } 
+        $id_usuario = Auth::user()->id;
+        $id_empresa = $request->session()->get('id_empresa');
 
-        $persona->autoretenedor = $request->autoretenedor;
-        $persona->declarante = $request->declarante;
-        $persona->cliente = $request->cliente;
-        $persona->proveedor = $request->proveedor;
-        $persona->id_vendedor = $request->id_vendedor;
-        $persona->id_zona = $request->id_zona;
-        $persona->plazo_pago = $request->plazo_pago;
-        $persona->bloquear = $request->bloquear;
-        $persona->cupo_credito = $request->cupo_credito;
-        $persona->retenedor_fuente = $request->retenedor_fuente;
-        $persona->retenedor_iva = $request->retenedor_iva;
-        $persona->excluido_iva = $request->excluido_iva;
-        $persona->autoretefuente = $request->autoretefuente;
-        $persona->autoreteiva = $request->autoreteiva;
-        $persona->autoreteica = $request->autoreteica;
-        $persona->id_banco = $request->id_banco;
-        $persona->num_cuenta_banco = $request->num_cuenta_banco;
-        $persona->tipo_cuenta = $request->tipo_cuenta;
-        $persona->representante_cuenta = $request->representante_cuenta;
-        $persona->tipo_nacionalidad = $request->tipo_nacionalidad;
-        $persona->departamento = $request->departamento;
-        $persona->municipio = $request->municipio;
-        
-        $persona->save(); 
+        $persona = Persona::findOrFail($request->id);
+
+        try{
+            $carpetaEmpresa = $id_empresa .'_empresa'; 
+            $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgPerfil");
+            if (!file_exists($dirEmpresa)) mkdir("Empresas/$carpetaEmpresa", 0777);
+            if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
+            
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('img'))
+            {
+                if($request->file('img')->isValid())
+                {
+                    $nombreImg = $request->img->getClientOriginalName();
+                    if(in_array($request->img->extension(), $arrayExtensiones))
+                    {
+                        $request->img->move($dirEmpresa,$request->img->getClientOriginalName());
+                    }
+                    else { return false; }
+                }
+            }
+            else
+            {
+                $nombreImg = $persona->img;
+            }
+
+            if(!$request->nombre)  $nombre = ''; else    $nombre = $request->nombre;
+            if(!$request->nombre1)  $nombre1 = ''; else    $nombre1 = $request->nombre1;
+            if(!$request->nombre2)  $nombre2 = ''; else    $nombre2 = $request->nombre2;
+            if(!$request->apellido1)  $apellido1 = ''; else    $apellido1 = $request->apellido1;
+            if(!$request->apellido2)  $apellido2 = ''; else    $apellido2 = $request->apellido2;
+            if($request->digito_verif) {
+                $digito_verif = "1";  
+                $num_verif = $request->num_verif;  
+            }
+            else{
+                $digito_verif = "0";  
+                $num_verif = "";  
+            } 
+            
+            $digito_verif = json_decode($request->digito_verif);
+            $cliente = json_decode($request->cliente);
+            $proveedor = json_decode($request->proveedor);
+
+            $archivo = [
+                'nombre' => $nombre,
+                'tipo_documento' => $request->tipo_documento,
+                'num_documento' => $request->num_documento,
+                'direccion' => $request->direccion,
+                'telefono1' => $request->telefono1,
+                'telefono2' => $request->telefono2,
+                'celular' => $request->celular,
+                'sexo' => $request->sexo,
+                'regimen' => $request->regimen,
+                'fec_nac' => $request->fec_nac,
+                'reside' => $request->reside,
+                'representante' => $request->representante,
+                'email' => $request->email,
+                'email2' => $request->email2,
+                'tipo_persona' => $request->tipo_persona,
+                'entidad' => $request->entidad,
+                'nombre1' => $nombre1,
+                'nombre2' => $nombre2,
+                'apellido1' => $apellido1,
+                'apellido2' => $apellido2,
+                'digito_verif' => $digito_verif,
+                'num_verif' => $num_verif,
+                'autoretenedor' => $request->autoretenedor,
+                'declarante' => $request->declarante,
+                'cliente' => $cliente,
+                'proveedor' => $proveedor,
+                'id_vendedor' => $request->id_vendedor,
+                'id_zona' => $request->id_zona,
+                'plazo_pago' => $request->plazo_pago,
+                'bloquear' => $request->bloquear,
+                'cupo_credito' => $request->cupo_credito,
+                'vr_cupo_credito' => $request->vr_cupo_credito,
+                'retenedor_fuente' => $request->retenedor_fuente,
+                'retenedor_iva' => $request->retenedor_iva,
+                'excluido_iva' => $request->excluido_iva,
+                'autoretefuente' => $request->autoretefuente,
+                'autoreteiva' => $request->autoreteiva,
+                'autoreteica' => $request->autoreteica,
+                'id_banco' => $request->id_banco,
+                'num_cuenta_banco' => $request->num_cuenta_banco,
+                'tipo_cuenta' => $request->tipo_cuenta,
+                'representante_cuenta' => $request->representante_cuenta,
+                'tipo_nacionalidad' => $request->tipo_nacionalidad,
+                'departamento' => $request->departamento,
+                'municipio' => $request->municipio,
+                'img' => $nombreImg,
+                'id_empresa' => $id_empresa,
+            ];
+
+            $persona->update($archivo);
+        } catch (Exception $e) {
+            report ($e);
+            return false;
+        }
     }
 }

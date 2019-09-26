@@ -46,9 +46,9 @@
                             <tbody v-if="permisosUser.leer">
                                 <tr v-for="articulo in arrayArticulo" :key="articulo.id">
                                     <td>
-                                        <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" height="40" width="40">
+                                        <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/Empresas/${articulo.id_empresa}_empresa/ImgProductos/${articulo.img}`" height="40" width="40">
 
-                                        <img v-else :src="`${ruta}/img_productos/${articulo.img}`" height="40" width="40">
+                                        <img v-else :src="`${ruta}/Empresas/${articulo.img}`" height="40" width="40">
                                     </td>
                                     <td v-text="articulo.codigo"></td>
                                     <!--<td v-text="articulo.nombre"></td>-->
@@ -84,19 +84,19 @@
                                     </td>
                                     <td>
                                         <template>
-                                            <button v-if="permisosUser.actualizar && articulo.condicion" type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm" title="Editar">
+                                            <button v-if="permisosUser.actualizar && articulo.condicion" type="button" @click="abrirModal('articulo','actualizar',articulo)" class="btn btn-warning btn-sm" title="Actualizar">
                                                 <i class="icon-pencil"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar">
                                                 <i class="icon-pencil"></i>
                                             </button>
                                         </template>
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="articulo.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarArticulo(articulo.id)">
+                                            <button v-if="articulo.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarArticulo(articulo.id)" title="Anular">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarArticulo(articulo.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarArticulo(articulo.id)" title="Anular">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -163,7 +163,7 @@
                                 <div class="form-group col-md-12">
                                     <label class="col-md-1 form-control-label float-left" for="text-input">Nombre</label>
                                     <div class="col-md-11 float-right">
-                                        <input type="text" v-model="nombre" class="form-control float-right" placeholder="Nombre de artículo" style="width: 95.7% !important;">
+                                        <input type="text" v-model="nombre" v-bind:class="{ 'is-invalid': hasError.nombre==1 }" class="form-control float-right" placeholder="Nombre de artículo" style="width: 95.7% !important;">
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
                                 <div class="col-md-6">
                                     <label class="form-control-label col-md-3 float-left" for="text-input">Modelo contable</label>
                                     <div class="col-md-9 float-right form-inline">
-                                        <select class="form-control col-md-10 float-left custom-select" v-model="idcategoria">
+                                        <select class="form-control col-md-10 float-left custom-select" v-model="idcategoria" v-bind:class="{ 'is-invalid': hasError.idcategoria==1 }">
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="categoria in arrayCategoria" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
                                         </select>
@@ -181,11 +181,13 @@
                                 <div class="form-group col-md-6">
                                     <label class="form-control-label col-md-3 float-left" for="text-input">Centro de costos</label>
                                     <div class="col-md-9 float-right form-inline">
-                                        <select class="form-control col-md-10 float-left custom-select" v-model="idcategoria2">
+                                        <select class="form-control col-md-10 float-left custom-select" v-model="idcategoria2" v-bind:class="{ 'is-invalid': hasError.idcategoria2==1 }">
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="categoria in arrayCategoria2" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
                                         </select>
-                                        <span class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('categoria2')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                        <span v-if="modalCrear==0" class="btn btn-primary form-control col-md-2 float-right" @click="abrirModalCrear('categoria2')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+
+                                        <span v-if="modalCrear==1" class="btn btn-secondary form-control col-md-2 float-right" title="Nuevo (Deshabilidado)"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'col-md-12 mostrar-crear' : modalCrear==1}">
@@ -201,7 +203,7 @@
                                     </div>
                                     <div class="col-md-2 float-right">
                                         <button type="button" class="btn btn-primary" @click="crearExtras('categoria')" title="Guardar"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-danger" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -209,13 +211,13 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Precio Venta</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="number" v-model="precio_venta" :min="1" @blur="function(){ if(precio_venta<1) precio_venta=1; }" class="form-control" placeholder="">                                        
+                                        <input type="number" v-model="precio_venta" :min="1" @blur="function(){ if(precio_venta<1) precio_venta=1; }" class="form-control" placeholder="" v-bind:class="{ 'is-invalid': hasError.precio_venta==1 }">                                        
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label v-if="tipo_articulo!=2" class="col-md-3 form-control-label float-left" for="text-input">Stock</label>
                                     <div v-if="tipo_articulo!=2" class="col-md-9 float-right">
-                                        <input type="number" v-model="stock" :min="1" @blur="function(){ if(stock<1) stock=1; }" class="form-control" placeholder="">
+                                        <input type="number" v-model="stock" :min="1" @blur="function(){ if(stock<1) stock=1; }" class="form-control" placeholder="" v-bind:class="{ 'is-invalid': hasError.stock==1 }">
                                     </div>
                                 </div>
                             </div>
@@ -223,13 +225,13 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Cod. invima</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="cod_invima" class="form-control" placeholder="Código invima">
+                                        <input type="text" v-model="cod_invima" class="form-control" placeholder="Código invima" v-bind:class="{ 'is-invalid': hasError.cod_invima==1 }">
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6" v-if="tipo_articulo==1 || tipo_articulo==3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Lote</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="lote" class="form-control" placeholder="">
+                                        <input type="text" v-model="lote" class="form-control" placeholder="" v-bind:class="{ 'is-invalid': hasError.lote==1 }">
                                     </div>
                                 </div>
                             </div>
@@ -237,7 +239,7 @@
                                 <div class="form-group col-md-6" v-if="tipo_articulo!=2 && tipo_articulo!=3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Fec. vence</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="date" v-model="fec_vence" class="form-control" placeholder="">                                        
+                                        <input type="date" v-model="fec_vence" class="form-control" placeholder="" v-bind:class="{ 'is-invalid': hasError.fec_vence==1 }">                                        
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6" v-else>
@@ -246,7 +248,7 @@
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Cant. minima</label>
                                     <div class="col-md-9 float-right">
                                         <input type="number" v-model="minimo" :min="1" @blur="(function(){
-                                            if(minimo<1) minimo=1;})" class="form-control" placeholder="">
+                                            if(minimo<1) minimo=1;})" class="form-control" placeholder="" v-bind:class="{ 'is-invalid': hasError.minimo==1 }">
                                     </div>
                                 </div>
                                 <div v-else class="form-group col-md-6">
@@ -256,7 +258,7 @@
                                 <div class="form-group col-md-6">
                                     <label class="form-control-label col-md-3 float-left" for="text-input">Tipo artículo</label>
                                     <div class="col-md-9 float-right">
-                                        <select class="form-control custom-select" v-model="tipo_articulo">
+                                        <select class="form-control custom-select" v-model="tipo_articulo" v-bind:class="{ 'is-invalid': hasError.tipo_articulo==1 }">
                                             <option value="0" disabled>Seleccione</option>
                                             <option value="1">Suministro</option>
                                             <option value="2">Servicio</option>
@@ -267,7 +269,7 @@
                                 <div class="form-group col-md-6" v-if="tipo_articulo!=2">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Talla</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="talla" class="form-control" placeholder="Talla del producto"> 
+                                        <input type="text" v-model="talla" class="form-control" placeholder="Talla del producto" v-bind:class="{ 'is-invalid': hasError.talla==1 }"> 
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6" v-else>
@@ -277,11 +279,12 @@
                                 <div class="form-group col-md-6" v-if="tipo_articulo==1 || tipo_articulo==3">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Und. medida</label>
                                     <div class="col-md-9 float-right form-inline">
-                                        <select class="form-control col-md-10 float-left custom-select" v-model="id_und_medida">
+                                        <select class="form-control col-md-10 float-left custom-select" v-model="id_und_medida" v-bind:class="{ 'is-invalid': hasError.id_und_medida==1 }">
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="id_und_medida in arrayUndMedida" :key="id_und_medida.id" :value="id_und_medida.id" v-text="id_und_medida.nombre"></option>
                                         </select> 
-                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('und_medida')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                        <span v-if="modalCrear==0" class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('und_medida')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                        <span v-if="modalCrear==2" class="btn btn-secondary col-md-2 float-right" @click="abrirModalCrear('und_medida')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
@@ -297,7 +300,7 @@
                                     </div>
                                     <div class="col-md-2 float-right">
                                         <button type="button" class="btn btn-primary" @click="crearExtras('und_medida')" title="Guardar"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-danger" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                                 <div style="display:none;" :class="{'form-group col-md-12 mostrar-crear' : modalCrear==3}">
@@ -307,7 +310,7 @@
                                     </div>
                                     <div class="col-md-2 float-right">
                                         <button type="button" class="btn btn-primary" @click="crearExtras('concentracion')" title="Guardar"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-danger" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -315,17 +318,18 @@
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Presentación</label>
                                     <div class="col-md-9 float-right form-inline">
-                                        <select class="form-control col-md-10 float-left custom-select" v-model="id_presentacion">
+                                        <select class="form-control col-md-10 float-left custom-select" v-model="id_presentacion" v-bind:class="{ 'is-invalid': hasError.id_presentacion==1 }">
                                             <option value="0" disabled>Seleccione</option>
                                             <option v-for="id_presentacion in arrayPresentacion" :key="id_presentacion.id" :value="id_presentacion.id" v-text="id_presentacion.nombre"></option>
                                         </select> 
-                                        <span class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                        <span v-if="modalCrear==0" class="btn btn-primary col-md-2 float-right" @click="abrirModalCrear('presentacion')" title="Nuevo"><i class="fa fa-plus-circle"></i></span>
+                                        <span v-if="modalCrear==4" class="btn btn-secondary col-md-2 float-right" title="Nuevo (Deshabilitar)"><i class="fa fa-plus-circle"></i></span>
                                     </div>                   
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label class="col-md-3 form-control-label float-left" for="text-input">Código</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="text" v-model="codigo" class="form-control" placeholder="Código de barras"> 
+                                        <input type="text" v-model="codigo" class="form-control" placeholder="Código de barras" v-bind:class="{ 'is-invalid': hasError.codigo==1 }"> 
                                     </div>
 
                                     <!--<label class="col-md-3 form-control-label float-left" for="text-input">Concentración</label>
@@ -344,7 +348,7 @@
                                     </div>
                                     <div class="col-md-2 float-right">
                                         <button type="button" class="btn btn-primary" @click="crearExtras('presentacion')" titlte="Gaurdar"><i class="fa fa-save"></i></button>
-                                        <button type="button" class="btn btn-secondary" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
+                                        <button type="button" class="btn btn-danger" @click="cerrarModalCrear()" title="Cancelar"><i class="fa fa-times-circle"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -352,7 +356,7 @@
                                 <div class="col-md-6">
                                     <label class="col-md-3 form-control-label float-left">Imagen</label>
                                     <div class="col-md-9 float-right">
-                                        <input type="file" id="img" name="img" ref="inputFileImg"  @change="cargarImg" class="form-control">
+                                        <input type="file" id="img" name="img" ref="inputFileImg"  @change="cargarImg" class="form-control" v-bind:class="{ 'is-invalid': hasError.img==1 }">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -500,7 +504,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(tarifario, index) in arrayTarifarios" :key="tarifario.index">
+                                            <tr v-for="(tarifario, index) in arrayTarifarios">
                                                 <td v-text="tarifario.nombre"></td>
                                                 <td style="text-align: right;">
                                                     <input type="number" v-if="tipoAccionModal3==2" style="text-align: right;" v-model="tarifario.valor" :min="1" @blur="(function(){if(tarifario.valor<1) tarifario.valor=1;})">
@@ -711,7 +715,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="tarifario in arrayTarifarios" :key="tarifario.id">
+                                                <tr v-for="(tarifario, index) in arrayTarifarios">
                                                     <td v-text="tarifario.nombre"></td>
                                                     <td style="text-align: right;"><input type="number" style="text-align: right;" v-model="tarifario.valor"></td>
                                                 </tr>
@@ -721,7 +725,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-secondary" @click="tipoAccion6=0">Cerrar</button>
+                                        <button type="button" class="btn btn-secondary" @click="tipoAccion6=0">Cancelar</button>
                                         <button type="button" class="btn btn-primary" @click="registrarProductosAsociados()">Guardar</button>
                                     </div>
                                 </div>
@@ -741,7 +745,10 @@
                                             <th>Código</th>
                                             <th>Nombre</th>
                                             <th>Presentación</th>
+                                            <th>Tarifario</th>
+                                            <th>Valor</th>
                                             <th class="col-md-3">Unidades</th>
+                                            <th>Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -749,7 +756,13 @@
                                             <td v-text="presentacionAsociada.codigo_articulo"></td>
                                             <td v-text="presentacionAsociada.nom_articulo"></td>
                                             <td v-text="presentacionAsociada.nom_presentacion"></td>
+                                            <td v-text="presentacionAsociada.nom_tarifario"></td>
+                                            <td v-text="presentacionAsociada.valor"></td>
                                             <td v-text="presentacionAsociada.unidades"></td>
+                                            <td>
+                                                <button type="button" v-if="presentacionAsociada.estado" class="btn btn-danger btn-sm" @click="desactivarPresentacionAsociada(presentacionAsociada.id)"><i class="icon-trash"></i></button>
+                                                <button type="button" v-else class="btn btn-secondary btn-sm"><i class="icon-trash"></i></button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -1002,6 +1015,25 @@
                 arrayIvaDevolucionesCompra : [],
                 arrayIvaDevolucionesVenta : [],
                 errorIva : 0,
+
+                active : false,
+                hasError : {
+                    nombre : 0,
+                    idcategoria : 0,
+                    idcategoria2 : 0,
+                    precio_venta : 0,
+                    stock : 0,
+                    cod_invima : 0,
+                    lote : 0,
+                    fec_vence : 0,
+                    minimo : 0,
+                    tipo_articulo : 0,
+                    talla : 0,
+                    id_und_medida : 0,
+                    id_presentacion : 0,
+                    codigo : 0,
+                    img : 0,
+                }
             }
         },
         components: {
@@ -1059,6 +1091,14 @@
                 }
                 return pagesArrayStock;             
 
+            },
+            comprobar: function() {
+                let me=this;
+                if(me.active)
+                {
+                    if(!me.nombre || me.nombre==''){me.hasError['nombre']=1;}
+                    if(!me.idcategoria || me.idcategoria==0){me.hasError['idcategoria']=1;}
+                }
             }
         },
         methods : {
@@ -1337,6 +1377,7 @@
                 });
             },*/
             registrarArticulo(){
+                this.active=true;
                 if (this.validarArticulo()){
                     return;
                 }
@@ -1421,9 +1462,9 @@
                 });
             },
             actualizarArticulo(){
-                // if (this.validarConcentracion()){
-                //     return;
-                // }
+                if (this.validarArticulo()){
+                    return;
+                }
 
                 let me = this;
                 
@@ -1484,7 +1525,7 @@
                             'id': id
                         }).then(function (response) {
                             me.listarArticulo(1,'','nombre');
-                            swal(
+                            Swal.fire(
                             'Desactivado!',
                             'El registro ha sido desactivado con éxito.',
                             'success'
@@ -1519,7 +1560,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarArticulo(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -1538,42 +1579,59 @@
                 }) 
             },
             validarArticulo(){
+                this.hasError['nombre'] = 0;
+                this.hasError['idcategoria'] = 0;
+                this.hasError['idcategoria2'] = 0;
+                this.hasError['precio_venta'] = 0;
+                this.hasError['stock'] = 0;
+                this.hasError['cod_invima'] = 0;
+                this.hasError['lote'] = 0;
+                this.hasError['fec_vence'] = 0;
+                this.hasError['minimo'] = 0;
+                this.hasError['tipo_articulo'] = 0;
+                this.hasError['talla'] = 0;
+                this.hasError['id_und_medida'] = 0;
+                this.hasError['id_presentacion'] = 0;
+                this.hasError['codigo'] = 0;
+                this.hasError['img'] = 0;
+                
                 this.errorArticulo=0;
                 this.errorMostrarMsjArticulo =[];
+                var error = 0;
 
-                if (!this.nombre) this.errorMostrarMsjArticulo.push("El nombre del artículo no puede estar vacío.");
-                if (this.idcategoria==0) this.errorMostrarMsjArticulo.push("Seleccione un modelo contable.");
-                if (this.idcategoria2==0) this.errorMostrarMsjArticulo.push("Seleccione una categoría.");
-                if (!this.precio_venta || this.precio_venta<=0) this.errorMostrarMsjArticulo.push("El precio de venta debe ser mayor a '0'.");
+                if (!this.nombre) {error=1; this.hasError['nombre']=1;}
+                if (this.idcategoria==0) {error=1; this.hasError['idcategoria']=1;}
+                if (this.idcategoria2==0) {error=1; this.hasError['idcategoria2']=1;}
+                if (!this.precio_venta || this.precio_venta<=0) {error=1; this.hasError['precio_venta']=1;}
                 
-                if(!this.tipo_articulo) this.errorMostrarMsjArticulo.push('Seleccione el tipo de producto');
+                if(!this.tipo_articulo) {error=1; this.hasError['tipo_articulo']=1;}
 
                 if(this.tipo_articulo==1){
-                    if (!this.stock || this.stock<=0) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser mayor a '0'.");
-                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
-                    if(!this.lote) this.errorMostrarMsjArticulo.push('Ingrese el lote del producto');
-                    if(!this.fec_vence) this.errorMostrarMsjArticulo.push('Ingrese la fecha de vencimiento');
-                    if(this.minimo<=0) this.errorMostrarMsjArticulo.push("La cantidad minima debe ser mayor a '0'.");
-                    if(!this.talla) this.errorMostrarMsjArticulo.push('Ingrese la talla del producto');
-                    if(this.und_medida==0) this.errorMostrarMsjArticulo.push('Seleccione la unidad de medida del producto');
+                    if (!this.stock || this.stock<=0) {error=1; this.hasError['stock']=1;}
+                    if(!this.cod_invima) {error=1; this.hasError['cod_invima']=1;}
+                    if(!this.lote) {error=1; this.hasError['lote']=1;}
+                    if(!this.fec_vence) {error=1; this.hasError['fec_vence']=1;}
+                    if(this.minimo<=0) {error=1; this.hasError['minimo']=1;}
+                    if(!this.talla) {error=1; this.hasError['']=1;}
+                    if(this.id_und_medida==0) {error=1; this.hasError['id_und_medida']=1;}
                 }
 
                 if(this.tipo_articulo==2){
-                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
+                    if(!this.cod_invima) {error=1; this.hasError['cod_invima']=1;}
                 }
 
                 if(this.tipo_articulo==3){
-                    if (!this.stock || this.stock<=0) this.errorMostrarMsjArticulo.push("El stock del artículo debe ser mayor a '0'.");
-                    if(!this.cod_invima) this.errorMostrarMsjArticulo.push('Ingrese el codigo invima');
-                    if(!this.lote) this.errorMostrarMsjArticulo.push('Ingrese el lote del producto');
-                    if(this.minimo<=0) this.errorMostrarMsjArticulo.push("La cantidad minima debe ser mayor a '0'.");
-                    if(!this.talla) this.errorMostrarMsjArticulo.push('Ingrese la talla del producto');
-                    if(this.und_medida==0) this.errorMostrarMsjArticulo.push('Seleccione la unidad de medida del producto');
+                    if (!this.stock || this.stock<=0) {error=1; this.hasError['stock']=1;}
+                    if(!this.cod_invima) {error=1; this.hasError['cod_invima']=1;}
+                    if(!this.lote) {error=1; this.hasError['lote']=1;}
+                    if(this.minimo<=0) {error=1; this.hasError['minimo']=1;}
+                    if(!this.talla) {error=1; this.hasError['talla']=1;}
+                    if(this.id_und_medida==0) {error=1; this.hasError['id_und_medida']=1;}
                 }
 
-                if(!this.id_presentacion) this.errorMostrarMsjArticulo.push('Seleccione la presentacion del producto');
-                if(!this.codigo) this.errorMostrarMsjArticulo.push('Ingrese el codigo de barras del producto');
-                if(this.tipoAccion==1 && this.$refs.inputFileImg.value=='') this.errorMostrarMsjArticulo.push('Seleccione una imagen para el producto');
+                if(!this.id_presentacion) {error=1; this.hasError['id_presentacion']=1;}
+                if(!this.codigo) {error=1; this.hasError['codigo']=1;}
+                if(this.tipoAccion==1 && this.$refs.inputFileImg.value=='') {error=1; this.hasError['img']=1;}
 
                 this.errorTarifario = 0;
                 for(var i=0; i<this.arrayTarifarios.length; i++)
@@ -1588,7 +1646,7 @@
 
                 if(this.idIvaCompra==0 || this.idIvaVenta==0 || this.idIvaDevolucionCompra==0 || this.idIvaDevolucionVenta==0) this.errorMostrarMsjArticulo.push('Debe asignar valores a todos los Ivas del producto');
 
-                if (this.errorMostrarMsjArticulo.length) this.errorArticulo = 1;
+                if (this.errorMostrarMsjArticulo.length || error==1) this.errorArticulo = 1;
 
                 return this.errorArticulo;
             },
@@ -1646,6 +1704,7 @@
                 this.arrayIvaDevolucionesVenta = [];
 
                 this.cerrarModalCrear();
+                this.active=false;
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
@@ -2007,11 +2066,55 @@
                     'arrayTarifarios': this.arrayTarifarios,
                 }).then(function (response) {
                     me.tipoAccion6=0;
+                    me.idPresentacionAsociada = 0;
+                    me.unidadesPresentacionAsociada = 0;
+                    me.arrayTarifarios = [];
                     me.selectPresentacion();
                     me.listarPresentacionesAsociadas(me.idProductoPresentacionAsociada);
                 }).catch(function (error) {
                     console.log(error);
                 });
+            },
+            desactivarPresentacionAsociada(id){
+                Swal.fire({
+                    title: 'Esta seguro de anular esta presentación?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar!',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    buttonsStyling: false,
+                    reverseButtons: true
+                }).then((result) => 
+                {
+                    if (result.value) {
+                        let me = this;
+
+                        axios.put( this.ruta + '/productos_asociados/desactivar',{
+                            'id': id
+                        }).then(function (response) {
+                            me.tipoAccion6=0;
+                            me.idPresentacionAsociada = 0;
+                            me.unidadesPresentacionAsociada = 0;
+                            me.arrayTarifarios = [];
+                            me.selectPresentacion();
+                            me.listarPresentacionesAsociadas(me.idProductoPresentacionAsociada);
+                            Swal.fire(
+                            'Desactivado!',
+                            'El registro ha sido desactivado con éxito.',
+                            'success'
+                            )
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                        
+                        
+                    } else if ( result.dismiss === swal.DismissReason.cancel) 
+                    { }
+                }) 
             },
         },
         mounted() {

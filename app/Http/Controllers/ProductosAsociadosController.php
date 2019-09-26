@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ProductosAsociados;
 use App\ProductoTarifario;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductosAsociadosController extends Controller
 {
@@ -54,7 +55,9 @@ class ProductosAsociadosController extends Controller
 
         $productos_asociados = ProductosAsociados::leftJoin('presentacion','productos_asociados.id_presentacion','=','presentacion.id')
         ->leftJoin('articulos','productos_asociados.id_producto','articulos.id')
-        ->select('productos_asociados.id','productos_asociados.id_presentacion','productos_asociados.unidades','productos_asociados.id_producto','productos_asociados.estado','presentacion.nombre as nom_presentacion','articulos.codigo as codigo_articulo','articulos.nombre as nom_articulo')
+        ->leftJoin('productos_tarifarios','productos_asociados.id','=','productos_tarifarios.idPresentacionAsociada')
+        ->leftJoin('con_tarifarios','productos_tarifarios.id_tarifario','con_tarifarios.id')
+        ->select('productos_asociados.id','productos_asociados.id_presentacion','productos_asociados.unidades','productos_asociados.id_producto','productos_asociados.estado','presentacion.nombre as nom_presentacion','articulos.codigo as codigo_articulo','articulos.nombre as nom_articulo','productos_tarifarios.id_tarifario','productos_tarifarios.idPresentacionAsociada','con_tarifarios.nombre as nom_tarifario','productos_tarifarios.valor')
         ->where('productos_asociados.id_producto','=',$id_producto)
         ->where('productos_asociados.id_empresa','=',$id_empresa)
         ->orderBy('id', 'desc')
@@ -85,14 +88,23 @@ class ProductosAsociadosController extends Controller
             $productosTarifario->id_tarifario = $Tari['id'];
             $productosTarifario->id_producto = $productos_asociados->id_producto;
             
-            if(isset($Tari['valor'])){
-                $productos_asociados->valor = $Tari['valor'];
+            if($Tari['valor']!=null){
+                $productosTarifario->valor = $Tari['valor'];
             }else{
-                $productos_asociados->valor = 0;
+                $productosTarifario->valor = 0;
             }
             $productosTarifario->asociado = 1;
             $productosTarifario->idPresentacionAsociada = $productos_asociados->id;
             $productosTarifario->save();
+        }
+
+        $sql = "SELECT stock FROM articulos WHERE id=".$request->id_producto;
+        $articulos = DB::select($sql);
+
+        foreach($articulos as $a){
+            $sum = (int)$a->stock+$request->unidades;
+            $sql2 = "UPDATE articulos SET stock=".$sum." WHERE id=".$request->id_producto;
+            $articulos2=DB::update($sql2);
         }
     }
 
@@ -110,6 +122,15 @@ class ProductosAsociadosController extends Controller
         $productos_asociados = ProductosAsociados::findOrFail($request->id);
         $productos_asociados->estado = '0';
         $productos_asociados->save();
+
+        $sql = "SELECT stock FROM articulos WHERE id=".$productos_asociados->id_producto;
+        $articulos = DB::select($sql);
+
+        foreach($articulos as $a){
+            $sum = (int)$a->stock-$productos_asociados->unidades;
+            $sql2 = "UPDATE articulos SET stock=".$sum." WHERE id=".$productos_asociados->id_producto;
+            $articulos2=DB::update($sql2);
+        }
     }
 
     public function activar(Request $request)

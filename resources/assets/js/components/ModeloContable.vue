@@ -44,7 +44,7 @@
                                     <th class="col-md-1">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayModeloContable.length">
                                 <tr v-for="modelo_contable in arrayModeloContable" :key="modelo_contable.id">
                                     <td v-text="modelo_contable.nombre"></td>
                                     <td v-text="modelo_contable.descripcion"></td>
@@ -57,26 +57,26 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && modelo_contable.condicion" type="button" @click="abrirModal('modelo_contable','actualizar',modelo_contable)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && modelo_contable.condicion" type="button" @click="abrirModal('modelo_contable','actualizar',modelo_contable)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="modelo_contable.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarModeloContable(modelo_contable.id)">
+                                            <button v-if="modelo_contable.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarModeloContable(modelo_contable.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarModeloContable(modelo_contable.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarModeloContable(modelo_contable.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="modelo_contable.condicion" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="modelo_contable.condicion" type="button" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Deshabilitado)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -111,7 +111,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -137,21 +137,21 @@
                                         <label class="col-md-3 form-control-label float-left">Cuenta compra <span style="color:red;" v-show="idCuentaProductos==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaProductos">
-                                            <button type="button" @click="abrirModalCuentas('productos')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('productos')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label class="col-md-3 form-control-label float-left">Cuenta Salida <span style="color:red;" v-show="idCuentaSalidaProductos==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaSalidaProductos">
-                                            <button type="button" @click="abrirModalCuentas('salida_productos')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('salida_productos')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label class="col-md-3 form-control-label float-left">Saldos iniciales <span style="color:red;" v-show="idCuentaSaldosIniciales==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaSaldosIniciales">
-                                            <button type="button" @click="abrirModalCuentas('saldos_iniciales')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('saldos_iniciales')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                 </div>
@@ -160,21 +160,21 @@
                                         <label class="col-md-3 form-control-label float-left">Cuenta Donaciones <span style="color:red;" v-show="idCuentaDonaciones==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaDonaciones">
-                                            <button type="button" @click="abrirModalCuentas('donaciones')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('donaciones')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label class="col-md-3 form-control-label float-left">Cuenta devoluciones ventas <span style="color:red;" v-show="idCuentaDevolucionesVentas==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaDevolucionesVentas">
-                                            <button type="button" @click="abrirModalCuentas('devoluciones_ventas')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('devoluciones_ventas')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label class="col-md-3 form-control-label float-left">Cuenta devoluciones compras <span style="color:red;" v-show="idCuentaDevolucionesCompras==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaDevolucionesCompras">
-                                            <button type="button" @click="abrirModalCuentas('devoluciones_compras')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('devoluciones_compras')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +183,7 @@
                                         <label class="col-md-3 form-control-label float-left">Cuenta impuesto al consumo en ventas <span style="color:red;" v-show="idCuentaImpuestoConsumoVentas==''">(*)</span></label>
                                         <div class="form-inline col-md-9 float-right">
                                             <input type="text" readonly class="form-control" style="width: 85%;" v-model="cuentaImpuestoConsumoVentas">
-                                            <button type="button" @click="abrirModalCuentas('impuesto_consumo_ventas')" class="btn btn-primary">...</button>
+                                            <button type="button" @click="abrirModalCuentas('impuesto_consumo_ventas')" title="Agragar cuenta" class="btn btn-primary">...</button>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-8">
@@ -218,7 +218,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal2"></h4>
                             <button type="button" class="close" @click="cerrarModalCuentas()" aria-label="Close">
-                                <span aria-hidden="true">×</span>
+                                <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -226,9 +226,9 @@
                                 <div style="max-width: 120px !important;" class="col-md-2   ">
                                     <label style='margin-top: 3px; '><b>Cuenta</b></label>                                
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-5">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" name="cta_busq" v-model="cta_busq" @keyup="buscarCuentaB()">
+                                        <input type="text" class="form-control" name="cta_busq" v-model="cta_busq" @keyup="buscarCuentaB()" placeholder="Ingrese el nombre o el código de la cuenta">
                                     </div>
                                 </div>
                             </div>
@@ -450,7 +450,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -489,7 +489,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

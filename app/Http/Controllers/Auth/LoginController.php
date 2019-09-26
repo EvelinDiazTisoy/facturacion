@@ -47,13 +47,13 @@ class LoginController extends Controller
             $id_usuario = Auth::user()->id;
             $resultado=array();
             //$modulosPadre = self::obtenerModulos(1, $empresas_id);
-            $cons="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND tipo=1 ";
+            $cons="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND tipo=1 AND modulos.estado=1";
             $respuesta = DB::select($cons);
             foreach($respuesta as $res){
                 
                 $hijos = array();
                 
-                $cons2="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND padre =  ".$res->id;
+                $cons2="SELECT * FROM modulos_empresas_usuarios,modulos_empresas,modulos WHERE usuarios_id=$id_usuario and modulos_empresas.empresas_id=$empresas_id and modulos_empresas_id = modulos_empresas.id and modulos_id=modulos.id AND padre =  ".$res->id." AND modulos.estado=1";
                 $respuesta2 = DB::select($cons2);
 
                 foreach($respuesta2 as $res2){

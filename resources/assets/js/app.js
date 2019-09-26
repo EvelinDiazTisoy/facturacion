@@ -52,6 +52,8 @@ Vue.component('formato_procesos', require('./components/FormatoProceso.vue'));
 Vue.component('cajas', require('./components/Cajas.vue'));
 Vue.component('cierrescaja', require('./components/CierresXCaja.vue'));
 Vue.component('informes', require('./components/Informes.vue'));
+Vue.component('cuentasxcobrar', require('./components/CuentasxCobrar.vue'));
+Vue.component('cuentasxpagar', require('./components/CuentasxPagar.vue'));
 Vue.component('multiselect', Multiselect);
 
 const app = new Vue({

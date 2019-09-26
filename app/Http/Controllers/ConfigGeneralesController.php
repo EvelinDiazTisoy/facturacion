@@ -44,32 +44,47 @@ class ConfigGeneralesController extends Controller
         $id_empresa = $request->session()->get('id_empresa');
 
         $carpetaEmpresa = $id_empresa .'_empresa'; 
-        $dirEmpresa = public_path("logos/$carpetaEmpresa");
+        $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgLogos");
         if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
-        if(is_uploaded_file($_FILES['logo']['tmp_name']))
-        {
-            $nombreLogo = $_FILES['logo']['name'];
-            if($_FILES['logo']['type'] == "image/jpg" || $_FILES['logo']['type'] == "image/jpeg" || $_FILES['logo']['type'] == "image/png")
+        try{
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('logo'))
             {
-                copy($_FILES['logo']['tmp_name'],$dirEmpresa.'/'.$_FILES['logo']['name']);
-
-                $archivo = [
-                    'nombre' => $request->nombre,
-                    'logo' => $nombreLogo,
-                    'repre_legal' => $request->repre_legal,
-                    'nit' => $request->nit,
-                    'nombre' => $request->nombre,
-                    'res_fact_elect' => $request->res_fact_elect,
-                    'res_fact_pos' => $request->res_fact_pos,
-                    'correo' => $request->correo,
-                    'celular' => $request->celular,
-                    'telefono' => $request->telefono,
-                    'usu_crea' => $id_usuario,
-                ];
-
-                ConfigGenerales::create($archivo);
+                if($request->file('logo')->isValid())
+                {
+                    $nombreLogo = $request->logo->getClientOriginalName();
+                    if(in_array($request->logo->extension(), $arrayExtensiones))
+                    {
+                        $request->logo->move($dirEmpresa,$request->logo->getClientOriginalName());
+                    }
+                    else { return false; }
+                }
             }
+            else
+            {
+                $dirEmpresa = public_path("logos");
+                $nombreLogo = 'default.png';
+            }
+
+            $archivo = [
+                'nombre' => $request->nombre,
+                'logo' => $nombreLogo,
+                'repre_legal' => $request->repre_legal,
+                'nit' => $request->nit,
+                'nombre' => $request->nombre,
+                'res_fact_elect' => $request->res_fact_elect,
+                'res_fact_pos' => $request->res_fact_pos,
+                'correo' => $request->correo,
+                'celular' => $request->celular,
+                'telefono' => $request->telefono,
+                'usu_crea' => $id_usuario,
+            ];
+
+            ConfigGenerales::create($archivo);
+        } catch (Exception $e) {
+            report ($e);
+            return false;
         }
     }
 
@@ -82,7 +97,7 @@ class ConfigGeneralesController extends Controller
         $config = ConfigGenerales::findOrFail($request->id);
 
         $carpetaEmpresa = $id_empresa .'_empresa'; 
-        $dirEmpresa = public_path("logos/$carpetaEmpresa");
+        $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgLogos");
         if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
         if(isset($request->logo)){
@@ -121,44 +136,49 @@ class ConfigGeneralesController extends Controller
         // if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
         $id_empresa = $request->session()->get('id_empresa');
-        
-        $config = ConfigGenerales::findOrFail($request->id);
 
         $carpetaEmpresa = $id_empresa .'_empresa'; 
-        $dirEmpresa = public_path("logos/$carpetaEmpresa");
+        $dirEmpresa = public_path("Empresas/$carpetaEmpresa/ImgLogos");
         if (!file_exists($dirEmpresa)) mkdir($dirEmpresa, 0777);
 
-        return $request;
-
-        if(isset($request->logo) && $request->logo!=null){
-            if(is_uploaded_file($_FILES['logo']['name']))
+        try{
+            $config = ConfigGenerales::findOrFail($request->id);
+            
+            $arrayExtensiones = array('image/jpg','image/jpeg','image/png','jpg','jpeg','png');
+            if($request->hasFile('logo'))
             {
-                $nombreImg = $_FILES['logo']['name'];
-                if($_FILES['logo']['type'] == "image/jpg" || $_FILES['logo']['type'] == "image/jpeg" || $_FILES['logo']['type'] == "image/png")
+                if($request->file('logo')->isValid())
                 {
-                    copy($_FILES['logo']['name'],$dirEmpresa.'/'.$_FILES['logo']['name']);
+                    $nombreLogo = $request->logo->getClientOriginalName();
+                    if(in_array($request->logo->extension(), $arrayExtensiones))
+                    {
+                        $request->logo->move($dirEmpresa,$request->logo->getClientOriginalName());
+                    }
+                    else { return false; }
                 }
             }
-        }
-        else
-        {
-            $nombreImg = $config->logo;
-        }
-        
-        $archivo = [
-            'nombre' => $request->nombre,
-            'logo' => $nombreImg,
-            'repre_legal' => $request->repre_legal,
-            'nit' => $request->nit,
-            'nombre' => $request->nombre,
-            'res_fact_elect' => $request->res_fact_elect,
-            'res_fact_pos' => $request->res_fact_pos,
-            'correo' => $request->correo,
-            'celular' => $request->celular,
-            'telefono' => $request->telefono,
-        ];
+            else
+            {
+                $nombreLogo = $config->logo;
+            }
 
-        // $config->update($archivo);
+            $archivo = [
+                'nombre' => $request->nombre,
+                'logo' => $nombreLogo,
+                'repre_legal' => $request->repre_legal,
+                'nit' => $request->nit,
+                'res_fact_elect' => $request->res_fact_elect,
+                'res_fact_pos' => $request->res_fact_pos,
+                'correo' => $request->correo,
+                'celular' => $request->celular,
+                'telefono' => $request->telefono,
+            ];
+
+            $config->update($archivo);
+        } catch (Exception $e) {
+            report ($e);
+            return false;
+        }
     }
 
     public function desactivar(Request $request)

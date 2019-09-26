@@ -47,18 +47,18 @@
                                     <td v-text="tarifario.nombre"></td>
                                     <td v-text="tarifario.descripcion"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm" title="Editar">
-                                          <i class="icon-pencil"></i>
-                                        </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
-                                          <i class="icon-pencil"></i>
-                                        </button>
-
                                         <button v-if="permisosUser.leer" type="button" @click="abrirModal('tarifario','ver',tarifario)" class="btn btn-success btn-sm" title="Ver">
                                           <i class="icon-eye"></i>
                                         </button>
                                         <button v-else type="button" class="btn btn-secondary btn-sm" title="Ver">
                                           <i class="icon-eye"></i>
+                                        </button>
+                                        
+                                        <button v-if="permisosUser.actualizar && tarifario.estado" type="button" @click="abrirModal('tarifario','actualizar',tarifario)" class="btn btn-warning btn-sm" title="Actualizar">
+                                          <i class="icon-pencil"></i>
+                                        </button>
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
+                                          <i class="icon-pencil"></i>
                                         </button>
 
                                         <template v-if="permisosUser.anular">

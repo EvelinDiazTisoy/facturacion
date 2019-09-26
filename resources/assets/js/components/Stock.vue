@@ -34,10 +34,9 @@
                                     <th>Fec. crea</th>
                                     <th>Cantidad</th>
                                     <th>Sumatoria</th>
-                                    <th>Estado</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayStock.length">
                                 <tr v-for="stock in arrayStock" :key="stock.id">
                                     <!-- <td>
                                         <button type="button" @click="abrirModal('categoria','actualizar',stock)" class="btn btn-warning btn-sm">
@@ -58,18 +57,10 @@
                                     <td v-text="stock.fec_crea"></td>
                                     <td v-text="stock.cantidad"></td>
                                     <td v-text="stock.sumatoria"></td>
-                                    <td>
-                                        <div v-if="stock.condicion">
-                                            <span class="badge badge-success">Activo</span>
-                                        </div>
-                                        <div v-else>
-                                            <span class="badge badge-danger">Desactivado</span>
-                                        </div>
-                                    </td>
                                 </tr>                                
                             </tbody>
                             <tbody v-else>
-                                <tr><td colspan="5">No hay registros para mostrar</td></tr>
+                                <tr><td colspan="4">No hay registros para mostrar</td></tr>
                             </tbody>
                         </table>
                         <nav>
@@ -96,7 +87,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -125,9 +116,9 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarCategoria()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarCategoria()">Actualizar</button>
+                            <button type="button" class="btn btn-primary" @click="cerrarModal()">Cerrar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-success" @click="registrarCategoria()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-success" @click="actualizarCategoria()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -259,7 +250,7 @@
                 }); 
             },
             desactivarCategoria(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de desactivar esta categoría?',
                 type: 'warning',
                 showCancelButton: true,
@@ -279,7 +270,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarStock(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Desactivado!',
                         'El registro ha sido desactivado con éxito.',
                         'success'
@@ -291,14 +282,14 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
                 }) 
             },
             activarCategoria(id){
-               swal({
+               Swal.fire({
                 title: 'Esta seguro de activar esta categoría?',
                 type: 'warning',
                 showCancelButton: true,
@@ -318,7 +309,7 @@
                         'id': id
                     }).then(function (response) {
                         me.listarStock(1,'','nombre');
-                        swal(
+                        Swal.fire(
                         'Activado!',
                         'El registro ha sido activado con éxito.',
                         'success'
@@ -330,7 +321,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === swal.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

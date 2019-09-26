@@ -286,6 +286,7 @@ class FacturacionController extends Controller
     {
         if (!$request->ajax()) return redirect('/');
         $id_usuario = Auth::user()->id;
+        $id_empresa = $request->session()->get('id_empresa');
 
         $facturacion = Facturacion::findOrFail($request->id);
         $facturacion->estado = $request->estado;
@@ -344,7 +345,7 @@ class FacturacionController extends Controller
         {
             if($facturacion->saldo>0)
             {
-                $cons= "INSERT INTO cuentas_x_cobrar (id_tercero,id_factura,valor_deuda,abono,fecha) VALUES (".$facturacion->id_tercero.",".$facturacion->id.",".$facturacion->total.",".$facturacion->abono.",".$facturacion->fecha.")";
+                $cons= "INSERT INTO cuentas_x_cobrar (id_tercero,id_factura,valor_deuda,abono,saldo,fecha_cobro,estado_cobro,id_empresa,usu_crea) VALUES (".$facturacion->id_tercero.",".$facturacion->id.",".$facturacion->total.",".$facturacion->abono.",".$facturacion->saldo.",".$facturacion->fecha.",1,".$id_empresa.",".$id_usuario.")";
 
                 $cuentaXCobrar = DB::insert($cons);
             }
@@ -439,7 +440,7 @@ class FacturacionController extends Controller
         $lugar = DB::select($cons6); 
         $lugar = $lugar[0];
 
-        return view('pdf.FacturaExcel', ['facturacion'=>$factura, 'tercero'=>$tercero,'detalles'=>$detalles,'user'=>$user,'caja'=>$caja,'lugar'=>$lugar,],);
-        // return Excel::download(new FacturacionExport($id), 'pdf.facturaExcel-'.$factura->num_factura.'.xlsx');
+        // return view('pdf.FacturaExcel', ['facturacion'=>$factura, 'tercero'=>$tercero,'detalles'=>$detalles,'user'=>$user,'caja'=>$caja,'lugar'=>$lugar,],);
+        return Excel::download(new FacturacionExport($id), 'pdf.facturaExcel-'.$factura->num_factura.'.xlsx');
     }
 }

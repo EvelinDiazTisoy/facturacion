@@ -6,7 +6,7 @@
             </ol>
             <div class="container-fluid">
                 <!-- Ejemplo de tabla Listado -->
-                <div class="card">
+                <div class="card" v-if="superAdmin==1">
                     <div class="card-header">
                         <i class="fa fa-align-justify"></i> Configuraciones generales
                         <button v-if="permisosUser.crear && !arrayConfigGenerales.length" type="button" @click="abrirModal('configgenerales','registrar')" class="btn btn-primary" title="Nuevo">
@@ -51,13 +51,13 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody v-if="permisosUser.leer && arrayConfigGenerales.length">
                                 <tr v-for="configgenerales in arrayConfigGenerales" :key="configgenerales.id">
                                     <td v-text="configgenerales.nombre"></td>
                                     <td>
-                                        <img v-if="`${configgenerales.logo}`!='default.png'" :src="`${ruta}/logos/${configgenerales.id}_empresa/${configgenerales.logo}`" height="40" width="40">
+                                        <img v-if="`${configgenerales.logo}`!='default.png'" :src="`${ruta}/Empresas/${configgenerales.id}_empresa/ImgLogos/${configgenerales.logo}`" height="40" width="40">
 
-                                        <img v-else :src="`${ruta}/logos/${configgenerales.logo}`" height="40" width="40">
+                                        <img v-else :src="`${ruta}/Empresas/${configgenerales.logo}`" height="40" width="40">
                                     </td>
                                     <td v-text="configgenerales.repre_legal"></td>
                                     <td v-text="configgenerales.nit"></td>
@@ -68,14 +68,17 @@
                                     <td v-text="configgenerales.celular"></td>
                                     <td v-text="configgenerales.telefono"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('configgenerales','actualizar',configgenerales)" class="btn btn-warning btn-sm" title="Editar">
+                                        <button v-if="permisosUser.actualizar" type="button" @click="abrirModal('configgenerales','actualizar',configgenerales)" class="btn btn-warning btn-sm" title="Actualiar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualiar">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
                                     </td>
                                 </tr>                                
+                            </tbody>
+                            <tbody v-else>
+                                <tr colspan="11">No hay registros para mostrar</tr>
                             </tbody>
                         </table>
                         <!--<nav>
@@ -94,6 +97,45 @@
                     </div>
                 </div>
                 <!-- Fin ejemplo de tabla Listado -->
+                <div class="card" v-if="superAdmin==0">
+                    <div class="card-header">
+                        <i class="fa fa-align-justify"></i> Configuraciones generales
+                        <!--<button v-if="permisosUser.crear && !arrayConfigGenerales.length" type="button" @click="abrirModal('configgenerales','registrar')" class="btn btn-primary" title="Nuevo">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>
+                        <button v-else type="button" class="btn btn-secondary" title="Nuevo">
+                            <i class="icon-plus"></i>&nbsp;Nuevo
+                        </button>-->
+                    </div>
+                    <div class="card-body">
+                        <div class="container" v-for="(configgenerales, index) in arrayConfigGenerales">
+                            <div class="row">
+                                <div class="col-md-8 float-left">
+                                    <div class="col-md-12 mb-2"><h4 v-text="configgenerales.nombre"></h4></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'NIT : '+configgenerales.nit"></span></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'DIRECCIÓN : '+configgenerales.direccion"></span></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'RESOLUCIÓN FACTURA ELECTRONICA : '+configgenerales.res_fact_elect"></span></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'RESOLUCIÓN FACTURA POS : '+configgenerales.res_fact_pos"></span></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'CORREO : '+configgenerales.correo"></span></div>
+                                    <div class="col-md-12 mb-2"><span v-text="'CELULAR : '+configgenerales.celular"></span></div>
+                                    <div class="col-md-12 mb-4"><span v-text="'TELÉFONO : '+configgenerales.telefono"></span></div>
+                                    <div class="col-md-12">
+                                        <button type="button" class="btn btn-warning btn-sm" @click="abrirModal('configgenerales','actualizar',configgenerales)" title="Actualizar">
+                                            Actualizar <i class="icon-pencil"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 float-right">
+                                    <div class="col-md-12">
+                                        <img v-if="`${configgenerales.logo}`!='default.png'" :src="`${ruta}/Empresas/${configgenerales.id}_empresa/ImgLogos/${configgenerales.logo}`" width="100%" class="img-responsive img-thumbnail">
+
+                                        <img v-else :src="`${ruta}/Empresas/${configgenerales.logo}`" width="100%" class="img-responsive img-thumbnail">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!--Inicio del modal agregar/actualizar-->
             <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
@@ -248,7 +290,9 @@
                 },
                 offset : 10,
                 criterio : 'nombre',
-                buscar : ''
+                buscar : '',
+
+                superAdmin : 0,
             }
         },
         computed:{
@@ -295,8 +339,7 @@
             },
             cargarLogo(event){
                 let me=this;
-                // me.arrayLogo = event.target.files[0];
-                me.arrayLogo = this.$refs.inputFileImg.files[0];
+                me.arrayLogo = event.target.files[0];
             },
             cambiarPagina(page,buscar,criterio){
                 let me = this;

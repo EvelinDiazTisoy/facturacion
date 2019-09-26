@@ -8,7 +8,7 @@
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Concentracion
+                        <i class="fa fa-align-justify"></i> Concentraciones
                         <button v-if="permisosUser.crear" type="button" @click="abrirModal('concentracion','registrar')" class="btn btn-primary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
@@ -41,30 +41,30 @@
                                     <th>Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody v-if="permisosUser.leer">
+                            <tbody v-if="permisosUser.leer && arrayConcentracion.length">
                                 <tr v-for="concentracion in arrayConcentracion" :key="concentracion.id">
                                     <td v-text="concentracion.nombre"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && concentracion.estado" type="button" @click="abrirModal('concentracion','actualizar',concentracion)" class="btn btn-warning btn-sm">
+                                        <button v-if="permisosUser.actualizar && concentracion.estado" type="button" @click="abrirModal('concentracion','actualizar',concentracion)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
                                         <template v-if="permisosUser.anular">
-                                            <button v-if="concentracion.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarConcentracion(concentracion.id)">
+                                            <button v-if="concentracion.estado" type="button" class="btn btn-danger btn-sm" @click="desactivarConcentracion(concentracion.id)" title="Desactivar">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarConcentracion(concentracion.id)">
+                                            <button v-else type="button" class="btn btn-info btn-sm" @click="activarConcentracion(concentracion.id)" title="Activar">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="concentracion.estado" type="button" class="btn btn-secondary btn-sm">
+                                            <button v-if="concentracion.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Deshabilitado)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
@@ -99,7 +99,7 @@
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
                             <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
+                              <span aria-hidden="true" title="Cerrar">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -247,7 +247,7 @@
                 this.errorConcentracion=0;
                 this.errorMostrarMsjConcentracion =[];
 
-                if (!this.nombre) this.errorMostrarMsjConcentracion.push("El nombre de la presentación no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjConcentracion.push("Ingrese el nombre de la concentración.");
 
                 if (this.errorMostrarMsjConcentracion.length) this.errorConcentracion = 1;
 
@@ -286,7 +286,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -325,7 +325,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }

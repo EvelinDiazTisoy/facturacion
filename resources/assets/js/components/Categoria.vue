@@ -20,12 +20,12 @@
                     <div class="form-group row">
                         <div class="col-md-6">
                             <div class="input-group">
-                                <!--<select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio">
+                                <select v-if="permisosUser.leer" class="form-control col-md-3" v-model="criterio" @click="listarCategoria(1,buscar,criterio)">
                                     <option value="nombre">Nombre</option>
                                     <option value="descripcion">Descripción</option>
                                 </select>
                                 <select v-else disabled class="form-control col-md-3" v-model="criterio">
-                                </select>-->
+                                </select>
 
                                 <input v-if="permisosUser.leer" type="text" v-model="buscar" @keyup="listarCategoria(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
                                 <input v-else disabled type="text" v-model="buscar" class="form-control" placeholder="Texto a buscar">
@@ -44,7 +44,7 @@
                                 <th class="col-md-1">Opciones</th>
                             </tr>
                         </thead>
-                        <tbody v-if="permisosUser.leer">
+                        <tbody v-if="permisosUser.leer && arrayCategoria.length">
                             <tr v-for="categoria in arrayCategoria" :key="categoria.id">
                                 <td v-text="categoria.nombre"></td>
                                 <td v-text="categoria.descripcion"></td>
@@ -57,26 +57,26 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <button v-if="permisosUser.actualizar && categoria.condicion" type="button" @click="abrirModal('categoria','actualizar',categoria)" class="btn btn-warning btn-sm">
+                                    <button v-if="permisosUser.actualizar && categoria.condicion" type="button" @click="abrirModal('categoria','actualizar',categoria)" class="btn btn-warning btn-sm" title="Actualizar">
                                         <i class="icon-pencil"></i>
                                     </button>
-                                    <button v-else type="button" class="btn btn-secondary btn-sm">
+                                    <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                         <i class="icon-pencil"></i>
                                     </button> &nbsp;
 
                                     <template v-if="permisosUser.anular">
-                                        <button v-if="categoria.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarCategoria(categoria.id)">
+                                        <button v-if="categoria.condicion" type="button" class="btn btn-danger btn-sm" @click="desactivarCategoria(categoria.id)" title="Desactivar">
                                             <i class="icon-trash"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-info btn-sm" @click="activarCategoria(categoria.id)">
+                                        <button v-else type="button" class="btn btn-info btn-sm" @click="activarCategoria(categoria.id)" title="Activar">
                                             <i class="icon-check"></i>
                                         </button>
                                     </template>
                                     <template v-else>
-                                        <button v-if="categoria.condicion" type="button" class="btn btn-secondary btn-sm">
+                                        <button v-if="categoria.condicion" type="button" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
                                             <i class="icon-trash"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Deshabilitado)">
                                             <i class="icon-check"></i>
                                         </button>
                                     </template>
@@ -111,7 +111,7 @@
                     <div class="modal-header">
                         <h4 class="modal-title" v-text="tituloModal"></h4>
                         <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <span aria-hidden="true" title="Cerrar">×</span>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -297,7 +297,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -336,7 +336,7 @@
                     
                 } else if (
                     // Read more about handling dismissals
-                    result.dismiss === Swal.fire.DismissReason.cancel
+                    result.dismiss === Swal.DismissReason.cancel
                 ) {
                     
                 }
@@ -346,7 +346,7 @@
                 this.errorCategoria=0;
                 this.errorMostrarMsjCategoria =[];
 
-                if (!this.nombre) this.errorMostrarMsjCategoria.push("El nombre de la categoría no puede estar vacío.");
+                if (!this.nombre) this.errorMostrarMsjCategoria.push("Ingrese el nombre de la categoria");
 
                 if (this.errorMostrarMsjCategoria.length) this.errorCategoria = 1;
 

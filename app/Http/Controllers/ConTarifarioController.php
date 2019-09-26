@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\ConTarifario;
 use App\ProductoTarifario;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ConTarifarioController extends Controller
 {
@@ -40,21 +41,24 @@ class ConTarifarioController extends Controller
     }
 
     public function selectConTarifario(Request $request){
-        if (!$request->ajax()) return redirect('/');
+        // if (!$request->ajax()) return redirect('/');
         $id_empresa = $request->session()->get('id_empresa');
 
         if($request->id_producto)
         {
-            $tarifario = ConTarifario::leftJoin('productos_tarifarios','con_tarifarios.id','=','productos_tarifarios.id_tarifario')
-            ->select('con_tarifarios.id','con_tarifarios.nombre','productos_tarifarios.valor','productos_tarifarios.asociado')
-            ->where('productos_tarifarios.id_producto','=',$request->id_producto)
-            ->where('con_tarifarios.id_empresa','=',$id_empresa)
-            ->orderBy('nombre', 'asc')
-            ->get();
+            $preAsociada = '';
+            if(isset($request->idPresentacionAsociada)) {$preAsociada = 'AND productos_tarifarios.idPresentacionAsociada='.$request->idPresentacionAsociada;}
+            else {$preAsociada = 'AND productos_tarifarios.idPresentacionAsociada IS NULL';}
+
+            $cons = " SELECT con_tarifarios.id,con_tarifarios.nombre,productos_tarifarios.valor,productos_tarifarios.asociado, productos_tarifarios.valor FROM con_tarifarios, productos_tarifarios WHERE con_tarifarios.id=productos_tarifarios.id_tarifario AND productos_tarifarios.id_producto=".$request->id_producto." ".$preAsociada." AND con_tarifarios.id_empresa=".$id_empresa." ORDER BY con_tarifarios.nombre ASC";
+            $tarifario = DB::select($cons);
         }
         else
         {
-            $tarifario = ConTarifario::where('id_empresa','=',$id_empresa)->orderBy('nombre', 'asc')->get();
+            // $tarifario = ConTarifario::where('id_empresa','=',$id_empresa)->orderBy('nombre', 'asc')->get();
+
+            $cons = " SELECT con_tarifarios.id,con_tarifarios.nombre, '0' as valor FROM con_tarifarios WHERE con_tarifarios.id_empresa=".$id_empresa." ORDER BY con_tarifarios.nombre ASC";
+            $tarifario = DB::select($cons);
         }
         
         return ['tarifario' => $tarifario];
@@ -118,6 +122,7 @@ class ConTarifarioController extends Controller
             $productosTarifario->id_producto = $PT['id_producto'];
             $productosTarifario->valor = $PT['valor'];
             $productosTarifario->asociado = $PT['asociado'];
+            $productosTarifario->idPresentacionAsociada = $PT['idPresentacionAsociada'];
             $productosTarifario->save();
         }
     }

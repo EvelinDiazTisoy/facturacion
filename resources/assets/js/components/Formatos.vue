@@ -1,22 +1,138 @@
 <template>
-            <main class="main">
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
-            </ol>
-            <div class="container-fluid">
-                <!-- Ejemplo de tabla Listado -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Registro de Cuentas
-                        <button type="button" @click="abrirModal('formatos','registrar')" class="btn btn-secondary">
-                            <i class="icon-plus"></i>&nbsp;Nuevo
+    <main class="main">
+        <!-- Breadcrumb -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+        </ol>
+        <div class="container-fluid">
+            <!-- Ejemplo de tabla Listado -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-align-justify"></i> Registro de Cuentas
+                    <button type="button" @click="abrirModal('formatos','registrar')" class="btn btn-secondary">
+                        <i class="icon-plus"></i>&nbsp;Nuevo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <div class="col-md-4">
+                            <label class="col-md-3 form-control-label" for="email-input">Tipo Formato</label>
+                            <div class="col-md-9">
+                                <select v-model="tipo_documento" class="form-control">
+                                    <option value="DNI">DNI</option>
+                                    <option value="RUC">RUC</option>
+                                    <option value="CEDULA">CEDULA</option>
+                                    <option value="PASS">PASS</option>
+                                </select>                                        
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <select class="form-control col-md-3" v-model="criterio">
+                                    <option value="">Numero</option>
+                                    <option value="num_documento">Documento</option>
+                                    <option value="email">Email</option>
+                                    <option value="telefono">Teléfono</option>
+                                </select>
+                                <input type="text" v-model="buscar" @keyup.enter="listarFormatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                <button type="submit" @click="listarFormatos(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tipo Formato</th>
+                                    <th>Numero</th>                                        
+                                    <th>Fecha</th>
+                                    <th>Id. Tercero</th>
+                                    <th>Nombre</th>
+                                    <th>Detalle</th>
+                                    <th>Debe</th>
+                                    <th>Haber</th>
+                                    <th>Cerrado</th>
+                                    <th>Estado</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>                                
+                                <tr v-for="format in arrayFormatos" :key="format.id" v-if="incrementCounter(format.id)">
+                                    <td>{{ counter }}</td>
+                                    <td v-text="format.nombre_formato"></td>
+                                    <td v-text="format.numero"></td>
+                                    <td v-text="format.tipo"></td>
+                                    <td v-text="format.fecha"></td>
+                                    <td v-text="format.num_documento"></td>
+                                    <td v-text="format.nombre"></td>
+                                    <td v-text="format.detalle"></td>
+                                    <td v-text="format.debes"></td>
+                                    <td v-text="format.haberes"></td>
+                                    <td v-text="format.cerrado"></td>
+                                    <td>
+                                        
+                                        <template v-if="format.condicion">
+                                            <button type="button" @click="abrirModal('formatos','actualizar',formatos)" class="btn btn-warning btn-sm">
+                                                <i class="icon-pencil"></i>
+                                            </button> &nbsp;
+                                            <button type="button" class="btn btn-success btn-sm">
+                                                <i class="icon-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarFormatos(format.id)">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                            
+                                        </template>
+                                        <template v-else>
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarFormatos(format.id)">
+                                                <i class="icon-check"></i>
+                                            </button>
+                                        </template>
+
+                                        
+                                    </td>
+                                </tr>                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item" v-if="pagination.current_page > 1">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
+                            </li>
+                            <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
+                            </li>
+                            <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- Fin ejemplo de tabla Listado -->
+        </div>
+        <!--Inicio del modal agregar/actualizar-->
+        <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-primary modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" v-text="tituloModal"></h4>
+                        <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <div class="col-md-4">
-                                <label class="col-md-3 form-control-label" for="email-input">Tipo Formato</label>
+                    <div class="modal-body">
+                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
+                        <!--    <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Nombre(*)</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="text-input">Tipo documento</label>
                                 <div class="col-md-9">
                                     <select v-model="tipo_documento" class="form-control">
                                         <option value="DNI">DNI</option>
@@ -26,189 +142,73 @@
                                     </select>                                        
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
-                                    <select class="form-control col-md-3" v-model="criterio">
-                                      <option value="">Numero</option>
-                                      <option value="num_documento">Documento</option>
-                                      <option value="email">Email</option>
-                                      <option value="telefono">Teléfono</option>
-                                    </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarFormatos(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarFormatos(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Número documento</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="num_documento" class="form-control" placeholder="Número de documento">
                                 </div>
                             </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Tipo Formato</th>
-                                        <th>Numero</th>                                        
-                                        <th>Fecha</th>
-                                        <th>Id. Tercero</th>
-                                        <th>Nombre</th>
-                                        <th>Detalle</th>
-                                        <th>Debe</th>
-                                        <th>Haber</th>
-                                        <th>Cerrado</th>
-                                        <th>Estado</th>
-                                        <th>Opciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>                                
-                                    <tr v-for="format in arrayFormatos" :key="format.id" v-if="incrementCounter(format.id)">
-                                        <td>{{ counter }}</td>
-                                        <td v-text="format.nombre_formato"></td>
-                                        <td v-text="format.numero"></td>
-                                        <td v-text="format.tipo"></td>
-                                        <td v-text="format.fecha"></td>
-                                        <td v-text="format.num_documento"></td>
-                                        <td v-text="format.nombre"></td>
-                                        <td v-text="format.detalle"></td>
-                                        <td v-text="format.debes"></td>
-                                        <td v-text="format.haberes"></td>
-                                        <td v-text="format.cerrado"></td>
-                                        <td>
-                                            
-                                            <template v-if="format.condicion">
-                                                <button type="button" @click="abrirModal('formatos','actualizar',formatos)" class="btn btn-warning btn-sm">
-                                                    <i class="icon-pencil"></i>
-                                                </button> &nbsp;
-                                                <button type="button" class="btn btn-success btn-sm">
-                                                    <i class="icon-eye"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm" @click="desactivarFormatos(format.id)">
-                                                    <i class="icon-trash"></i>
-                                                </button>
-                                                
-                                            </template>
-                                            <template v-else>
-                                                <button type="button" class="btn btn-info btn-sm" @click="activarFormatos(format.id)">
-                                                    <i class="icon-check"></i>
-                                                </button>
-                                            </template>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="direccion" class="form-control" placeholder="Dirección">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="telefono" class="form-control" placeholder="Teléfono">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Email</label>
+                                <div class="col-md-9">
+                                    <input type="email" v-model="email" class="form-control" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Role</label>
+                                <div class="col-md-9">
+                                    <select v-model="idrol" class="form-control">
+                                        <option value="0" disabled>Seleccione</option>
+                                        <option v-for="role in arrayRol" :key="role.id" :value="role.id" v-text="role.nombre"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">Usuario</label>
+                                <div class="col-md-9">
+                                    <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 form-control-label" for="email-input">password</label>
+                                <div class="col-md-9">
+                                    <input type="password" v-model="password" class="form-control" placeholder="password del usuario">
+                                </div>
+                            </div>
+                            <div v-show="errorPersona" class="form-group row div-error">
+                                <div class="text-center text-error">
+                                    <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
 
-                                            
-                                        </td>
-                                    </tr>                                
-                                </tbody>
-                            </table>
-                        </div>
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item" v-if="pagination.current_page > 1">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1,buscar,criterio)">Ant</a>
-                                </li>
-                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page,buscar,criterio)" v-text="page"></a>
-                                </li>
-                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
-                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1,buscar,criterio)">Sig</a>
-                                </li>
-                            </ul>
-                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+
+                        --></form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
+                        <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarFormato()">Guardar</button>
+                        <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarFormato()">Actualizar</button>
                     </div>
                 </div>
-                <!-- Fin ejemplo de tabla Listado -->
+                <!-- /.modal-content -->
             </div>
-            <!--Inicio del modal agregar/actualizar-->
-            <div class="modal fade" tabindex="-1" :class="{'mostrar' : modal}" role="dialog" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-primary modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
-                            <button type="button" class="close" @click="cerrarModal()" aria-label="Close">
-                              <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-                            <!--    <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Nombre(*)</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de la persona">                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Tipo documento</label>
-                                    <div class="col-md-9">
-                                        <select v-model="tipo_documento" class="form-control">
-                                            <option value="DNI">DNI</option>
-                                            <option value="RUC">RUC</option>
-                                            <option value="CEDULA">CEDULA</option>
-                                            <option value="PASS">PASS</option>
-                                        </select>                                        
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Número documento</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="num_documento" class="form-control" placeholder="Número de documento">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Dirección</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="direccion" class="form-control" placeholder="Dirección">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Teléfono</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="telefono" class="form-control" placeholder="Teléfono">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Email</label>
-                                    <div class="col-md-9">
-                                        <input type="email" v-model="email" class="form-control" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Role</label>
-                                    <div class="col-md-9">
-                                        <select v-model="idrol" class="form-control">
-                                            <option value="0" disabled>Seleccione</option>
-                                            <option v-for="role in arrayRol" :key="role.id" :value="role.id" v-text="role.nombre"></option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">Usuario</label>
-                                    <div class="col-md-9">
-                                        <input type="text" v-model="usuario" class="form-control" placeholder="Nombre del usuario">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="email-input">password</label>
-                                    <div class="col-md-9">
-                                        <input type="password" v-model="password" class="form-control" placeholder="password del usuario">
-                                    </div>
-                                </div>
-                                <div v-show="errorPersona" class="form-group row div-error">
-                                    <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjPersona" :key="error" v-text="error">
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            --></form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarFormato()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarFormato()">Actualizar</button>
-                        </div>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
-            <!--Fin del modal-->
-        </main>
+            <!-- /.modal-dialog -->
+        </div>
+        <!--Fin del modal-->
+    </main>
 </template>
 
 <script>

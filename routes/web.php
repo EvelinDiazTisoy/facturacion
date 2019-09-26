@@ -120,7 +120,7 @@ Route::group(['middleware'=>['auth']],function(){
 
         Route::get('/cliente', 'ClienteController@index');
         Route::post('/cliente/registrar', 'ClienteController@store');
-        Route::put('/cliente/actualizar', 'ClienteController@update');
+        Route::post('/cliente/actualizar', 'ClienteController@update');
         Route::get('/cliente/selectCliente', 'ClienteController@selectCliente');
         
         Route::get('/user', 'UserController@index');
@@ -159,6 +159,8 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/conf_formatos', 'Conf_formatosController@index');
         Route::post('/conf_formatos/registrar', 'Conf_formatosController@store');
         Route::put('/conf_formatos/actualizar', 'Conf_formatosController@update');
+        Route::put('/conf_formatos/desactivar', 'Conf_formatosController@desactivar');
+        Route::put('/conf_formatos/activar', 'Conf_formatosController@activar');
         Route::get('/conf_formatos/get_tipos_formatos', 'Conf_formatosController@get_tipos_formatos');
         Route::get('/conf_formatos/get_filt_tipo', 'Conf_formatosController@get_filt_tipo');
 
@@ -197,10 +199,15 @@ Route::group(['middleware'=>['auth']],function(){
         Route::get('/novedades/listarNovedades', 'NovedadesController@listarNovedades');
         Route::put('/novedades/eliminarNovedad', 'NovedadesController@eliminarNovedad');
 
-        Route::get('/evidencias', 'EvidenciasController@index');
-        Route::post('/evidencias/registrar', 'EvidenciasController@store');
-        Route::get('/evidencias/listarEvidencias', 'EvidenciasController@listarEvidencias');
-        Route::put('/evidencias/eliminarEvidencia', 'EvidenciasController@eliminarEvidencia');
+        Route::get('/evidencias_ingresos', 'EvidenciasController@index');
+        Route::post('/evidencias_ingresos/registrar', 'EvidenciasController@store');
+        Route::get('/evidencias_ingresos/listarEvidencias', 'EvidenciasController@listarEvidencias');
+        Route::put('/evidencias_ingresos/eliminarEvidencia', 'EvidenciasController@eliminarEvidencia');
+
+        Route::get('/evidencias_egresos', 'EvidenciasEgresosController@index');
+        Route::post('/evidencias_egresos/registrar', 'EvidenciasEgresosController@store');
+        Route::get('/evidencias_egresos/listarEvidencias', 'EvidenciasEgresosController@listarEvidencias');
+        Route::put('/evidencias_egresos/eliminarEvidencia', 'EvidenciasEgresosController@eliminarEvidencia');
 
         Route::get('/modelo_contable', 'ModeloContableController@index');
         Route::post('/modelo_contable/registrar', 'ModeloContableController@store');
@@ -371,6 +378,27 @@ Route::group(['middleware'=>['auth']],function(){
         Route::put('/cierres_caja/activar', 'CierresXCajaController@activar');
         Route::put('/cierres_caja/cerrar', 'CierresXCajaController@cerrar');
         Route::get('/cierres_caja/selectValorInicialCaja', 'CierresXCajaController@selectValorInicialCaja');
+        Route::get('/cierres_caja/validarCierreCaja', 'CierresXCajaController@ValidarCierreCaja');
+
+        Route::get('/cuentasxcobrar', 'CuentasxCobrarController@index');
+        Route::post('/cuentasxcobrar/registrar', 'CuentasxCobrarController@store');
+        Route::get('/terceronombre', 'CuentasxCobrarController@terceroNombre');
+        Route::put('/cuentasxcobrar/actualizar', 'CuentasxCobrarController@update');
+        Route::put('/cuentasxcobrar/registrarAbono', 'CuentasxCobrarController@abono');
+        Route::put('/cuentasxcobrar/activar', 'CuentasxCobrarController@activar');
+        Route::put('/cuentasxcobrar/desactivar', 'CuentasxCobrarController@desactivar');
+        Route::put('/cuentasxcobrar/desactivarAbono', 'CuentasxCobrarController@desactivarAbono');
+        Route::get('/cuentasxcobrar/saldo', 'CuentasxCobrarController@saldo');
+
+        Route::get('/cuentasxpagar', 'CuentasxPagarController@index');
+        Route::post('/cuentasxpagar/registrar', 'CuentasxPagarController@store');
+        Route::put('/cuentasxpagar/actualizar', 'CuentasxPagarController@update');
+        Route::put('/cuentasxpagar/registrarAbono', 'CuentasxPagarController@abono');
+        Route::put('/cuentasxpagar/activar', 'CuentasxPagarController@activar');
+        Route::put('/cuentasxpagar/desactivar', 'CuentasxPagarController@desactivar');
+        Route::put('/cuentasxpagar/activarAbono', 'CuentasxPagarController@activarAbono');
+        Route::put('/cuentasxpagar/desactivarAbono', 'CuentasxPagarController@desactivarAbono');
+        Route::get('/cuentasxpagar/saldo', 'CuentasxPagarController@saldo');
     });
 
 });

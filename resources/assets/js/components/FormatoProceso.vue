@@ -15,7 +15,7 @@
                             <div class="col-md-4">
                                 <label class="col-md-4 float-left">Compras</label>
                                 <div class="col-md-8 float-right">
-                                    <select class="form-control"  @click="registrarFormatoContrato()" v-model="idFormatoCompras">
+                                    <select class="form-control"  @change="registrarFormatoContrato()" v-model="idFormatoCompras">
                                         <option v-for="conf_formato in arrayConf_formatos" :key="conf_formato.id" :value="conf_formato.id" v-text="conf_formato.nombre_formato"></option>
                                     </select>
                                 </div>
@@ -23,7 +23,7 @@
                             <div class="col-md-4">
                                 <label class="col-md-4 float-left">Ventas</label>
                                 <div class="col-md-8 float-right">
-                                    <select class="form-control" @click="registrarFormatoContrato()" v-model="idFormatoVentas">
+                                    <select class="form-control" @change="registrarFormatoContrato()" v-model="idFormatoVentas">
                                         <option v-for="conf_formato in arrayConf_formatos" :key="conf_formato.id" :value="conf_formato.id" v-text="conf_formato.nombre_formato"></option>
                                     </select>
                                 </div>
@@ -31,7 +31,7 @@
                             <div class="col-md-4">
                                 <label class="col-md-4 float-left">Salidas</label>
                                 <div class="col-md-8 float-right">
-                                    <select class="form-control" @click="registrarFormatoContrato()" v-model="idFormatoSalidas">
+                                    <select class="form-control" @change="registrarFormatoContrato()" v-model="idFormatoSalidas">
                                         <option v-for="conf_formato in arrayConf_formatos" :key="conf_formato.id" :value="conf_formato.id" v-text="conf_formato.nombre_formato"></option>
                                     </select>
                                 </div>
@@ -190,8 +190,18 @@
                     'idFormatoVentas': this.idFormatoVentas,
                     'idFormatoSalidas': this.idFormatoSalidas,
                 }).then(function (response) {
-                    me.cerrarModal();
-                    me.listarFormatoProcesos(1,'','nombre');
+                    Swal.fire({
+                        // toast: true,
+                        // position: 'top-end',
+                        type: 'success',
+                        title: 'Registro Guardado',
+                        position: 'center',
+                        showConfirmButton: false,
+                        timer: 1700
+                    })
+
+                    // me.cerrarModal();
+                    // me.listarFormatoProcesos(1,'','nombre');
                 }).catch(function (error) {
                     console.log(error);
                 });

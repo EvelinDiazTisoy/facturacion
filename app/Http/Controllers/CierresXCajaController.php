@@ -22,7 +22,8 @@ class CierresXCajaController extends Controller
         if($request->fec_hasta){$fec_hasta = $request->fec_hasta.' 23:59:59';}else{$fec_hasta=$request->fec_hasta;}
         
         $cierres_caja = CierresXCaja::leftJoin('cajas','cajas_cierres.id_caja','=','cajas.id')
-        ->select('cajas_cierres.id','cajas_cierres.id_caja','cajas_cierres.vr_inicial','cajas_cierres.obs_inicial','cajas_cierres.vr_gastos','cajas_cierres.obs_gastos','cajas_cierres.vr_software','cajas_cierres.vr_final','cajas_cierres.estado','cajas.nombre','cajas_cierres.created_at','cajas_cierres.usu_crea')
+        ->leftJoin('users','cajas_cierres.usu_crea','users.id')
+        ->select('cajas_cierres.id','cajas_cierres.id_caja','cajas_cierres.vr_inicial','cajas_cierres.obs_inicial','cajas_cierres.vr_gastos','cajas_cierres.obs_gastos','cajas_cierres.vr_software','cajas_cierres.vr_final','cajas_cierres.estado','cajas.nombre','cajas_cierres.created_at','cajas_cierres.usu_crea','users.usuario as nom_cajero')
         ->where('.cajas_cierres.id_empresa','=',$id_empresa);
         if($fec_desde!="" && $fec_hasta!="")
         {
@@ -184,5 +185,34 @@ class CierresXCajaController extends Controller
         $cierres_caja = CierresXCaja::where('id_caja','=',$request->id)->where('estado','=','2')->orderBy('id','desc')->limit(1)->get();
 
         return ['cierres_caja' => $cierres_caja];
+    }
+
+    public function validarCierreCaja(Request $request)
+    {
+        // if (!$request->ajax()) return redirect('/');
+        $id_empresa = $request->session()->get('id_empresa');
+        $id_usuario = Auth::user()->id;
+
+        $carbon = Carbon::now('America/Bogota')->subDay()->toDateTimeString();
+
+        $cierres_caja = CierresXCaja::leftJoin('cajas','cajas_cierres.id_caja','=','cajas.id')
+        ->select('cajas_cierres.id','cajas_cierres.id_caja','cajas_cierres.vr_inicial','cajas_cierres.obs_inicial','cajas_cierres.vr_gastos','cajas_cierres.obs_gastos','cajas_cierres.vr_software','cajas_cierres.vr_final','cajas_cierres.estado','cajas.nombre','cajas_cierres.created_at','cajas_cierres.usu_crea','cajas_cierres.created_at')
+        ->where('.cajas_cierres.id_empresa','=',$id_empresa)
+        ->where('cajas_cierres.usu_crea','=',$id_usuario)
+        ->orderBy('cajas_cierres.id','desc')->get();
+
+        $ban = 0;
+
+        if(!empty($cierres_caja) && count($cierres_caja)>0)
+        {
+            $ban = 1;
+
+            foreach($cierres_caja as $cc)
+            {
+                if($cc->estado==1 && $cc->created_at->lessThan($carbon)) { $ban = 2; }
+            }
+        }
+
+        return ['carbon'=>$carbon, 'cierres_cajas'=>$cierres_caja, 'ban'=>$ban, 'usu_crea'=>$id_usuario];
     }
 }

@@ -45,10 +45,10 @@
                                 <tr v-for="zona in arrayZona" :key="zona.id">
                                     <td v-text="zona.zona"></td>
                                     <td>
-                                        <button v-if="permisosUser.actualizar && zona.estado" type="button" @click="abrirModal('zona','actualizar',zona)" class="btn btn-warning btn-sm" title="Editar">
+                                        <button v-if="permisosUser.actualizar && zona.estado" type="button" @click="abrirModal('zona','actualizar',zona)" class="btn btn-warning btn-sm" title="Actualizar">
                                           <i class="icon-pencil"></i>
                                         </button>
-                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Editar (Deshabilitado)">
+                                        <button v-else type="button" class="btn btn-secondary btn-sm" title="Actualizar (Deshabilitado)">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
 
@@ -61,10 +61,10 @@
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button v-if="zona.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar">
+                                            <button v-if="zona.estado" type="button" class="btn btn-secondary btn-sm" title="Desactivar (Deshabilitado)">
                                                 <i class="icon-trash"></i>
                                             </button>
-                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar">
+                                            <button v-else type="button" class="btn btn-secondary btn-sm" title="Activar (Deshabilitado)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
