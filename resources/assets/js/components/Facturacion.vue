@@ -11,14 +11,14 @@
                     <div class="card-header">
                         <div class="col-md-6 float-left">
                             <i class="fa fa-align-justify"></i> Facturacion
-                            <button v-if="permisosUser.crear && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
+                            <button v-if="permisosUser.crear && id_caja_facturacion!=0" type="button" @click="mostrarDetalle('facturacion','registrar')" v-show="listado==1" class="btn btn-primary">
                                 <i class="icon-plus"></i>&nbsp;Nuevo
                             </button>
                             <button v-else type="button" v-show="listado==1" class="btn btn-secondary">
                                 <i class="icon-plus"></i>&nbsp;Nuevo
                             </button>
 
-                            <button v-if="permisosUser.actualizar && id_cierre_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
+                            <button v-if="permisosUser.actualizar && id_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
                                 <i class="icon-plus"></i>&nbsp;Cerrar caja
                             </button>
                             <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="listarCajas()">
@@ -26,7 +26,7 @@
                             </button>
                         </div>
                         <div class="col-md-6 float-right">
-                            <span v-if="nom_caja_cierre_facturacion!=''" v-text="'Usted esta en la caja: '+nom_caja_cierre_facturacion"></span>
+                            <span v-if="nom_caja_cierre_facturacion && nom_caja_cierre_facturacion!=''" v-text="'Usted esta en la caja: '+nom_caja_cierre_facturacion"></span>
                             <span v-else >No hay caja abierta</span>
                         </div>
                     </div>
@@ -1381,31 +1381,14 @@
                     var respuesta= response.data;
                     var ban = respuesta.ban;
                     me.arrayCierresXCajas = respuesta.cierres_cajas;
-                    
-                    /*if(ban == 1 && me.arrayCierresXCajas.length)
-                    {
-                        me.id_cierre_caja_facturacion = me.arrayCierresXCajas[0]['id'];
-                        me.nom_caja_cierre_facturacion = me.arrayCierresXCajas[0]['nombre'];
-                        me.cierre_caja_id = me.arrayCierresXCajas[0]['id'];
-                        me.id_caja_cierre = me.arrayCierresXCajas[0]['id_caja'];
-                        me.nom_caja_cierre = me.arrayCierresXCajas[0]['nombre'];
-                        me.vr_inicial_cierre = me.arrayCierresXCajas[0]['vr_inicial'];
-                        me.obs_inicial_cierre = me.arrayCierresXCajas[0]['obs_inicial'];
-                        
-                        me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
-                    }
-                    else if(ban == 0 && me.arrayCierresXCajas.length)
-                    {
-                        me.mostrarDetalle('cierres_caja','listar_cierres',me.arrayCierresXCajas[0]);
-                    }*/
 
-                    if(ban==0)
+                    if(ban==0 || ban==1)
                     {
                         me.mostrarDetalle('cierres_caja','registrar');
                     }
                     else
                     {
-                        if(ban==1)
+                        if(ban==3)
                         {
                             me.id_cierre_caja_facturacion = me.arrayCierresXCajas[0]['id'];
                             me.nom_caja_cierre_facturacion = me.arrayCierresXCajas[0]['nombre'];
@@ -1417,7 +1400,8 @@
                             
                             me.listarFacturacion(1,me.numFacturaFiltro,me.estadoFiltro,me.idTerceroFiltro,me.ordenFiltro,me.desdeFiltro,me.hastaFiltro,me.idVendedorFiltro);
                         }
-                        else
+
+                        if(ban==2)
                         {
                             me.mostrarDetalle('cierres_caja','listar_cierres',me.arrayCierresXCajas[0]);
                         }
@@ -1626,12 +1610,11 @@
                                 me.id_caja_facturacion = 0;
                                 me.nom_caja_cierre_facturacion = '';
                                 me.cerrarModalCierreCaja();
-                                me.listarCajas();
                                 Swal.fire(
                                 'Desactivado!',
-                            'El registro ha sido cerrado con éxito.',
-                            'success'
-                            )
+                                'El registro ha sido cerrado con éxito.',
+                                'success')
+                                me.listarCajas();
                             }).catch(function (error) {
                                 console.log(error);
                             });
@@ -2264,6 +2247,7 @@
                             }
                             case 'listar_cierres':
                             {
+                                console.log(data);
                                 Swal.fire({
                                 title: 'ERROR!',
                                 text: "Este usuario tiene una caja abierta desde hace mas de 24 horas",
@@ -2273,7 +2257,7 @@
                                 cancelButtonColor: '#d33',
                                 confirmButtonText: 'Ok!'
                                 }).then((result) => {
-                                    if (result.value) {
+                                    if(result.value){
                                         this.arrayCierresUsuario.push({
                                             created_at : data['created_at'],
                                             estado : data['estado'],
@@ -2291,17 +2275,11 @@
                                         this.modalCierreCaja=1;
                                         this.tituloModalCierre='Listado de cierres de caja';
                                         this.tipoAccionCierre=3;
-
-                                        
-                                        // this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
-                                    } else {
-                                        // this.listarFacturacion(1,this.numFacturaFiltro,this.estadoFiltro,this.idTerceroFiltro,this.ordenFiltro,this.desdeFiltro,this.hastaFiltro,this.idVendedorFiltro);
+                                    }
+                                    else{
+                                        result.dismiss === Swal.DismissReason.cancel
                                     }
                                 })
-                                
-                                // this.modalCierreCaja=1;
-                                // this.tituloModalCierre='Listado de cierres de caja';
-                                // this.tipoAccionCierre=3;
                                 break;
                             }
                             case 'ver':

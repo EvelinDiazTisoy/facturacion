@@ -199,20 +199,26 @@ class CierresXCajaController extends Controller
         ->select('cajas_cierres.id','cajas_cierres.id_caja','cajas_cierres.vr_inicial','cajas_cierres.obs_inicial','cajas_cierres.vr_gastos','cajas_cierres.obs_gastos','cajas_cierres.vr_software','cajas_cierres.vr_final','cajas_cierres.estado','cajas.nombre','cajas_cierres.created_at','cajas_cierres.usu_crea','cajas_cierres.created_at')
         ->where('.cajas_cierres.id_empresa','=',$id_empresa)
         ->where('cajas_cierres.usu_crea','=',$id_usuario)
-        ->orderBy('cajas_cierres.id','desc')->get();
+        ->orderBy('cajas_cierres.id','desc')->limit(1)->get();
 
         $ban = 0;
 
         if(!empty($cierres_caja) && count($cierres_caja)>0)
         {
-            $ban = 1;
-
-            foreach($cierres_caja as $cc)
-            {
-                if($cc->estado==1 && $cc->created_at->lessThan($carbon)) { $ban = 2; }
+            if($cierres_caja[0]->estado!=1){$ban = 1;} /*caja cerrada*/
+            else if($cierres_caja[0]->estado==1){
+                if($cierres_caja[0]->created_at->lessThan($carbon))
+                { $ban = 2; } /*Caja abierta pero vencida */
+                else
+                { $ban = 3; } /*Caja abierta y vigente*/
             }
         }
 
-        return ['carbon'=>$carbon, 'cierres_cajas'=>$cierres_caja, 'ban'=>$ban, 'usu_crea'=>$id_usuario];
+        return [
+            'carbon'=>$carbon,
+            'cierres_cajas'=>$cierres_caja,
+            'ban'=>$ban,
+            'usu_crea'=>$id_usuario,
+        ];
     }
 }
