@@ -18,12 +18,22 @@
                                 <i class="icon-plus"></i>&nbsp;Nuevo
                             </button>
 
-                            <button v-if="permisosUser.actualizar && id_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
-                                <i class="icon-plus"></i>&nbsp;Cerrar caja
-                            </button>
-                            <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="listarCajas()">
-                                <i class="icon-plus"></i>&nbsp;Abrir caja
-                            </button>
+                            <template v-if="permisosUser.actualizar">
+                                <button v-if="id_caja_facturacion!=0" type="button" @click="mostrarDetalle('cierres_caja','cerrar_caja')" v-show="listado==1" class="btn btn-primary">
+                                    <i class="icon-plus"></i>&nbsp;Cerrar caja
+                                </button>
+                                <button v-else type="button" v-show="listado==1" class="btn btn-primary" @click="listarCajas()">
+                                    <i class="icon-plus"></i>&nbsp;Abrir caja
+                                </button>
+                            </template>
+                            <template v-else>
+                                <button v-if="id_caja_facturacion!=0" type="button"  v-show="listado==1" class="btn btn-secondary">
+                                    <i class="icon-plus"></i>&nbsp;Cerrar caja
+                                </button>
+                                <button v-else type="button" v-show="listado==1" class="btn btn-secondary">
+                                    <i class="icon-plus"></i>&nbsp;Abrir caja
+                                </button>
+                            </template>
                         </div>
                         <div class="col-md-6 float-right">
                             <span v-if="nom_caja_cierre_facturacion && nom_caja_cierre_facturacion!=''" v-text="'Usted esta en la caja: '+nom_caja_cierre_facturacion"></span>
@@ -638,9 +648,9 @@
                                             <td v-if="articulo.padre==''" v-text="articulo.codigo"></td>
                                             <td v-else></td>
                                             <td>
-                                                <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" height="30" width="30">
+                                                <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/Empresas/${articulo.id_empresa}_empresa/ImgProductos/${articulo.img}`" height="30" width="30">
 
-                                                <img v-else :src="`${ruta}/img_productos/${articulo.img}`" height="30" width="30">
+                                                <img v-else :src="`${ruta}/Empresas/${articulo.img}`" height="30" width="30">
                                             </td>
                                             <td>
                                                 <span v-text="articulo.nombre"></span>
@@ -679,9 +689,9 @@
                                 <div v-for="(articulo, index) in arrayArticulo" @click="abrirModalCantidadArticulo(articulo)" class="col-sm-6 col-md-3 p-sm-2 p-md-1 mosaico" style="height: 43%;">
                                     <div class="border col-md-12" style="height: 100%;">
                                         <div class="text-center py-md-2">
-                                            <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/img_productos/${articulo.id_empresa}_empresa/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
+                                            <img v-if="`${articulo.img}`!='default.png'" :src="`${ruta}/Empresas/${articulo.id_empresa}_empresa/ImgProductos/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
 
-                                            <img v-else :src="`${ruta}/img_productos/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
+                                            <img v-else :src="`${ruta}/Empresas/${articulo.img}`" class="img-responsive img-thumbnail" style="width: 8.5em;height: 8.5em;">
                                         </div>
                                         <div class="text-center col-md-12">
                                             <h6 v-text="articulo.nombre"></h6>
@@ -1390,6 +1400,7 @@
                     {
                         if(ban==3)
                         {
+                            me.id_caja_facturacion = me.arrayCierresXCajas[0]['id'];
                             me.id_cierre_caja_facturacion = me.arrayCierresXCajas[0]['id'];
                             me.nom_caja_cierre_facturacion = me.arrayCierresXCajas[0]['nombre'];
                             me.cierre_caja_id = me.arrayCierresXCajas[0]['id'];

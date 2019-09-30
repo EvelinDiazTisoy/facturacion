@@ -345,9 +345,10 @@ class FacturacionController extends Controller
         {
             if($facturacion->saldo>0)
             {
-                $cons= "INSERT INTO cuentas_x_cobrar (id_tercero,id_factura,valor_deuda,abono,saldo,fecha_cobro,estado_cobro,id_empresa,usu_crea) VALUES (".$facturacion->id_tercero.",".$facturacion->id.",".$facturacion->total.",".$facturacion->abono.",".$facturacion->saldo.",".$facturacion->fecha.",1,".$id_empresa.",".$id_usuario.")";
+                $cons= "INSERT INTO cuentas_x_cobrar (id_tercero,id_factura,valor_deuda,abono,saldo,fecha_cobro,estado_cobro,id_empresa,usu_crea) VALUES (".$facturacion->id_tercero.",".$facturacion->id.",".$facturacion->total.",".$facturacion->abono.",".$facturacion->saldo.",'".$facturacion->fecha."',1,".$id_empresa.",".$id_usuario.")";
 
                 $cuentaXCobrar = DB::insert($cons);
+                return $cons;
             }
         }
     }
